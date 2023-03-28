@@ -1,5 +1,5 @@
 # Save results
-function save_results(mdict::Dict,EOM::Dict,ETS::Dict,ADMM::Dict,results::Dict,data::Dict,agents::Dict,sens) 
+function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,results::Dict,data::Dict,agents::Dict,sens) 
     # note that type of "sens" is not defined as a string stored in a dictionary is of type String31, whereas a "regular" string is of type String. Specifying one or the other may trow errors.
     Years = range(2021,stop=2021+data["nyears"]-1)
     Iterations = range(1,stop=data["CircularBufferSize"])
@@ -68,13 +68,14 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,ADMM::Dict,results::Dict,d
     # Power sector
     fuel_shares = zeros(length(agents[:ps]),data["nyears"])
     available_cap = zeros(length(agents[:ps]),data["nyears"])
+    add_cap = zeros(length(agents[:ps]),data["nyears"])
     mm = 1
     for m in agents[:ps]
         gw = value.(mdict[m].ext[:expressions][:gw])
         fuel_shares[mm,:] = sum(gw[jh,jd,:] for jh in mdict[m].ext[:sets][:JH], jd in mdict[m].ext[:sets][:JD])
         CAP_LT = mdict[m].ext[:parameters][:CAP_LT]
         LEG_CAP = mdict[m].ext[:parameters][:LEG_CAP]
-        cap = value.(mdict[m].ext[:variables][:cap])
+        add_cap[mm,:] = cap = value.(mdict[m].ext[:variables][:cap])
         available_cap[mm,:] = [sum(CAP_LT[y2,jy]*cap[y2] for y2=1:jy) + LEG_CAP[jy] for jy in mdict[m].ext[:sets][:JY]]
         mm = mm+1
     end
@@ -87,19 +88,20 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,ADMM::Dict,results::Dict,d
     # For the production weighted averages below I assume that REC support for RES from electrolyzers (or electricity costs) are internal transfers - not taken into account:
     λ_EOM_avg = [sum(gw_tot[:,:,jy].*results[ "λ"]["EOM"][end][:,:,jy])./sum(gw_tot[:,:,jy]) for jy in mdict[agents[:ps][1]].ext[:sets][:JY]] # production weighted average electricity price
     λ_REC_avg = [gw_res_tot[jy].*results[ "λ"]["REC_y"][end][jy]./gw_res_tot[jy] for jy in mdict[agents[:ps][1]].ext[:sets][:JY]] # production weighted support for RES  
-    mat_output = [Years λ_EOM_avg λ_REC_avg transpose(available_cap) transpose(fuel_shares)]
-    CSV.write(joinpath(home_dir,string("Results_",data["nReprDays"],"_repr_days"),string("Scenario_",data["scen_number"],"_PS_",sens,".csv")), DataFrame(mat_output,:auto), delim=";",header=["Year";"EOM_avg";"REC_y";string.("CAP_",agents[:ps]);string.("FS_",agents[:ps])]);
+    mat_output = [Years λ_EOM_avg λ_REC_avg transpose(add_cap) transpose(available_cap) transpose(fuel_shares)]
+    CSV.write(joinpath(home_dir,string("Results_",data["nReprDays"],"_repr_days"),string("Scenario_",data["scen_number"],"_PS_",sens,".csv")), DataFrame(mat_output,:auto), delim=";",header=["Year";"EOM_avg";"REC_y";string.("ADD_CAP_",agents[:ps]);string.("CAP_",agents[:ps]);string.("FS_",agents[:ps])]);
     
     # Hydrogen sector 
     h2_cap = zeros(length(agents[:h2s]),data["nyears"])
     h2_prod = zeros(length(agents[:h2s]),data["nyears"])
+    h2_add_cap = zeros(length(agents[:h2s]),data["nyears"])
     h2_import = zeros(length(agents[:h2import]),data["nyears"])
 
     mm = 1
     for m in agents[:h2s]
         CAP_LT = mdict[m].ext[:parameters][:CAP_LT]
         LEG_CAP = mdict[m].ext[:parameters][:LEG_CAP]
-        cap = value.(mdict[m].ext[:variables][:capH])
+        h2_add_cap[mm,:] = cap = value.(mdict[m].ext[:variables][:capH])
         h2_cap[mm,:] = [sum(CAP_LT[y2,jy]*cap[y2] for y2=1:jy) + LEG_CAP[jy] for jy in mdict[m].ext[:sets][:JY]]    
         h2_prod[mm,:] = value.(mdict[m].ext[:expressions][:gH_y])./data["conv_factor"] # Convert to Mt
         mm = mm+1
@@ -160,7 +162,8 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,ADMM::Dict,results::Dict,d
                 string.("IMPORT_",agents[:h2import]) ; 
                 string.("CN_CAP_",agents[:h2cn_prod]);string.("CN_PROD_",agents[:h2cn_prod]);
                 "PriceH2";"PremiumH2CN_prod";"PremiumH2CN_cap"]);
-    
+
+                   
     # Operational data
     # Extract hydrogen and electricity production and import data
     Hours = collect(1:data["nTimesteps"]*data["nReprDays"])
@@ -195,4 +198,5 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,ADMM::Dict,results::Dict,d
             string.("PROD_", agents[:ps])
             ]
     )
+
 end

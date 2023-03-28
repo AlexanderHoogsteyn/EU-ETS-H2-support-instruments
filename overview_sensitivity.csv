@@ -1,14 +1,22 @@
 Parameter;Scaling;remarks
-HydrogenImport Import a_1; 0.0; no fixed cost
-HydrogenImport Import a_2; 0.1; cheap_import
-HydrogenImport Import a_2; 0.01; cheaper_import
-HydrogenSector Alkaline_base OC; 0.8; cheap_PtH_base
+NG SF;0.5;low_natural_gas_price
+NG SF;2;high_natural_gas_price
+HydrogenSector  Alkaline_base-Alkaline_peak max_YoY_new_cap;0.8;high_electrolysis_buildout
+HydrogenSector Alkaline_base-Alkaline_peak max_YoY_new_cap;1.2;extreme_electrolysis_buildout
+HydrogenImport Import a_2; 0.5; cheap_import
+HydrogenImport Import a_2; 2; expensive_import
+scenario RES_target_2030;1.5;2030 res target 60
+scenario RES_target_2030;2;2030 res target 80
+PowerSector Solar-WindOnshore-WindOffshore YoY_OC;0.5;Expensive RES
+PowerSector Solar-WindOnshore-WindOffshore YoY_OC;2;Cheap RES
+EOM SF;0.5;low demand growth
+EOM SF;2;high demand growth
+General discount_rate;0.8;Low discount rate
+General discount_rate;1.2;High discount rate
+PowerSector Nuclear-Biomass max_YoY_new_cap;0;No new nuclear-biomass
+PowerSector Solar-WindOnshore-WindOffshore max_YoY_new_cap;0.5;Low RES buildout
+PowerSector Solar-WindOnshore-WindOffshore max_YoY_new_cap;2;High RES buildout
+HydrogenSector SMRCCS YoY_OC;0.5;cheap SMR+CCS
+HydrogenSector SMRCCS YoY_OC;2;expensive SMR+CCS
 HydrogenSector Alkaline_base OC; 1.2; Expensive_PtH_base
 HydrogenSector Alkaline_peak OC; 0.8; cheap_PtH_peak
-HydrogenSector Alkaline_peak OC; 1.2; expensive_PtH_peak
-NG SF;0.8;low_natural_gas_price
-NG SF;1.2;high_natural_gas_price
-scenario RES_target_2030;1.25;2030_res_target_50
-scenario RES_target_2030;1.5;2030_res_target_60
-PowerSector Solar-WindOnshore-WindOffshore YoY_OC;0.5;Expensive_RES
-PowerSector Solar-WindOnshore-WindOffshore YoY_OC;2;Cheap_RES

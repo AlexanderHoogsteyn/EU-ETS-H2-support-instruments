@@ -28,10 +28,6 @@ REC:
   RES_share_other_2021: 0.174119315 # RES share from hydro and other renewables in 2021 ("other renewables","geothermal","hydro run-of-river","hydro reservoir"), own calculation 
 
 ETS: 
-  LRF_stat_2021: 43.003515 # MtCO2, only stationary installations, @ 2.2% of cap 2010
-  CAP_stat_2021: 1571.583007 # Stationary installations, after brexit - https://ec.europa.eu/clima/policies/ets/cap_en
-  CAP_aviation_2021: 24.5 # aviation - https://ec.europa.eu/clima/policies/ets/cap_en
-  CAP_maritime_2021: 40 # Maritime sector, green deal - https://www.nature.com/articles/s41467-022-28398-2 
   TNAC_THRESHOLD: 1096 # MtCO2 
   TNAC_MAX: 833 # MtCO2 
   TNAC_MIN: 400 # MtCO2 
@@ -60,7 +56,7 @@ NG:
   P_2019: 25 # €/MWh - rough estimate based on https://tradingeconomics.com/commodity/eu-natural-gas
   P_2020: 25 # €/MWh - rough estimate based on https://tradingeconomics.com/commodity/eu-natural-gas
   P_2021: 80 # €/MWh - rough estimate based on https://tradingeconomics.com/commodity/eu-natural-gas
-  P_2022: 200 # €/MWh - rough estimate based on https://tradingeconomics.com/commodity/eu-natural-gas
+  P_2022: 150 # €/MWh - rough estimate based on https://tradingeconomics.com/commodity/eu-natural-gas
   P_2023: 47.5 ## Dec 2024 ttf future (20 March 2023)
   P_2024: 48.7 # Dec 2024 ttf future (20 March 2023)
   P_2025: 42.0 # Dec 2024 ttf future (20 March 2023)
@@ -82,9 +78,9 @@ H2:
 
 
 Industry: 
-  E_ref: 1900 #  MtCO2 - baseline emissions MACC
+  E_ref: 800 #  MtCO2 - baseline emissions MACC
+  E_ref_maritime: 80 #  MtCO2 - baseline emissions MACC
   tolerance_calibration: 1 # €/tCO2  - tolerance in calibration MACC
-  SF_ind: 0.38410844005092487 # relative share of emissions from industry in 2021, excluding emissions from hydrogen
   E_ind_2019: 598 # Emissions in 2019 - excluding emissions from production of hydrogen, estimated at 100MtCO2 today - https://sandbag.be/index.php/eu-ets-dashboard/ 
   E_ind_2020: 548.6 # Emissions in 2020 - excluding emissions from production of hydrogen, estimated at 100MtCO2 today - https://sandbag.be/index.php/eu-ets-dashboard/ 
   E_ind_2021: 512.9 # Emissions in 2021 - excluding emissions from production of hydrogen, estimated at 100MtCO2 today - https://sandbag.be/index.php/eu-ets-dashboard/ 
