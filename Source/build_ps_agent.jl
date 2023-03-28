@@ -20,11 +20,11 @@ function build_ps_agent!(mod::Model)
     end
     IC = mod.ext[:parameters][:IC] # overnight investment costs
     CI = mod.ext[:parameters][:CI] # carbon intensity
+    A = mod.ext[:parameters][:A] # discount factors
     LEG_CAP = mod.ext[:parameters][:LEG_CAP] # legacy capacity
     CAP_LT = mod.ext[:parameters][:CAP_LT] # lead time on new capacity
     CAP_SV = mod.ext[:parameters][:CAP_SV] # salvage value of new capacity
     DELTA_CAP_MAX = mod.ext[:parameters][:DELTA_CAP_MAX] # max YoY change in new capacity
-    A = mod.ext[:parameters][:A] # discount factors
     ρ_y_REC = mod.ext[:parameters][:ρ_y_REC] # rho-value in ADMM related to REC auctions
     ρ_m_REC_pre2030 = mod.ext[:parameters][:ρ_m_REC_pre2030] # rho-value in ADMM related to REC auctions
     ρ_m_REC_post2030 = mod.ext[:parameters][:ρ_m_REC_post2030] # rho-value in ADMM related to REC auctions
@@ -32,6 +32,9 @@ function build_ps_agent!(mod::Model)
     ρ_d_REC_post2030 = mod.ext[:parameters][:ρ_d_REC_post2030] # rho-value in ADMM related to REC auctions
     ρ_h_REC_pre2030 = mod.ext[:parameters][:ρ_h_REC_pre2030] # rho-value in ADMM related to REC auctions
     ρ_h_REC_post2030 = mod.ext[:parameters][:ρ_h_REC_post2030] # rho-value in ADMM related to REC auctions
+    λ_EOM = mod.ext[:parameters][:λ_EOM] # EOM prices
+    λ_EUA = mod.ext[:parameters][:λ_EUA] # ETS prices
+
 
     # Create variables
     cap = mod.ext[:variables][:cap] = @variable(mod, [jy=JY], lower_bound=0, base_name="capacity")
@@ -42,6 +45,7 @@ function build_ps_agent!(mod::Model)
     r_d = mod.ext[:variables][:r_d] = @variable(mod, [jd=JD,jy=JY], lower_bound=0, base_name="REC_d") 
     r_h = mod.ext[:variables][:r_h] = @variable(mod, [jh=JH,jd=JD,jy=JY], lower_bound=0, base_name="REC_h") 
 
+    
     # Create affine expressions - used in postprocessing, haven't tested impact on computational cost of having these here computed in every iteration
     mod.ext[:expressions][:curt] = @expression(mod, [jh=JH,jd=JD,jy=JY],
         AF[jh,jd]*(sum(CAP_LT[y2,jy]*cap[jy] for y2=1:jy) + LEG_CAP[jy]) - g[jh,jd,jy]
@@ -56,6 +60,67 @@ function build_ps_agent!(mod::Model)
         + sum(A[jy]*(1-CAP_SV[jy])*IC[jy]*cap[jy] for jy in JY)
         + sum(A[jy]*W[jd]*VC[jy]*g[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
     )
+    if  mod.ext[:parameters][:REC] == 1
+        λ_y_REC = mod.ext[:parameters][:λ_y_REC] # REC prices
+        if ρ_h_REC_pre2030 > 0 
+            λ_h_REC = mod.ext[:parameters][:λ_h_REC] # REC prices
+            REC_obj_pre2030 = mod.ext[:expressions][:REC_obj_pre2030] = @expression(mod,
+                - sum(A[jy]*λ_y_REC[jy]*r_y[jy] for jy in JY_pre2030)
+                - sum(A[jy]*W[jd]*λ_h_REC[jh,jd,jy]*r_h[jh,jd,jy] for jh in JH, jd in JD, jy in JY_pre2030)
+            )
+        elseif ρ_d_REC_pre2030 > 0 
+            λ_d_REC = mod.ext[:parameters][:λ_d_REC] # REC prices
+            REC_obj_pre2030 = mod.ext[:expressions][:REC_obj_pre2030] = @expression(mod,
+                - sum(A[jy]*λ_y_REC[jy]*r_y[jy] for jy in JY_pre2030)
+                - sum(A[jy]*W[jd]*λ_d_REC[jd,jy]*r_d[jd,jy] for jd in JD, jy in JY_pre2030)
+            )
+        elseif ρ_m_REC_pre2030 > 0 
+            λ_m_REC = mod.ext[:parameters][:λ_m_REC] # REC prices
+
+            REC_obj_pre2030 = mod.ext[:expressions][:REC_obj_pre2030] = @expression(mod,
+                - sum(A[jy]*λ_y_REC[jy]*r_y[jy] for jy in JY_pre2030)
+                - sum(A[jy]*λ_m_REC[jm,jy]*r_m[jm,jy] for jm in JM, jy in JY_pre2030)
+            )
+        else
+            REC_obj_pre2030 = mod.ext[:expressions][:REC_obj_pre2030] = @expression(mod,
+                - sum(A[jy]*λ_y_REC[jy]*r_y[jy] for jy in JY_pre2030)
+            )
+        end     
+
+        if ρ_h_REC_post2030 > 0 
+            λ_h_REC = mod.ext[:parameters][:λ_h_REC] # REC prices
+            REC_obj_post2030 = mod.ext[:expressions][:REC_obj_post2030] = @expression(mod,
+                - sum(A[jy]*λ_y_REC[jy]*r_y[jy] for jy in JY_post2030)
+                - sum(A[jy]*W[jd]*λ_h_REC[jh,jd,jy]*r_h[jh,jd,jy] for jh in JH, jd in JD, jy in JY_post2030)
+            )
+        elseif ρ_d_REC_post2030 > 0 
+            λ_d_REC = mod.ext[:parameters][:λ_d_REC] # REC prices
+            REC_obj_post2030 = mod.ext[:expressions][:REC_obj_post2030] = @expression(mod,
+                - sum(A[jy]*λ_y_REC[jy]*r_y[jy] for jy in JY_post2030)
+                - sum(A[jy]*W[jd]*λ_d_REC[jd,jy]*r_d[jd,jy] for jd in JD, jy in JY_post2030)
+            )
+        elseif ρ_m_REC_post2030 > 0 
+            λ_m_REC = mod.ext[:parameters][:λ_m_REC] # REC prices
+            r_m = mod.ext[:variables][:r_m] 
+
+            REC_obj_post2030 = mod.ext[:expressions][:REC_obj_post2030] = @expression(mod,
+                - sum(A[jy]*λ_y_REC[jy]*r_y[jy] for jy in JY_post2030)
+                - sum(A[jy]*λ_m_REC[jm,jy]*r_m[jm,jy] for jm in JM, jy in JY_post2030)
+            )
+        else
+            REC_obj_post2030 = mod.ext[:expressions][:REC_obj_post2030] = @expression(mod,
+                - sum(A[jy]*λ_y_REC[jy]*r_y[jy] for jy in JY_post2030)
+            )
+        end  
+    else
+        REC_obj_pre2030 = mod.ext[:expressions][:REC_obj_pre2030] = @expression(mod,
+            0
+        )
+        REC_obj_post2030 = mod.ext[:expressions][:REC_obj_post2030] = @expression(mod,
+            0
+        )
+    end
+
     mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod,
         - sum(A[jy]*(1-CAP_SV[jy])*IC[jy]*cap[jy] for jy in JY)
         - sum(A[jy]*W[jd]*VC[jy]*g[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
@@ -64,11 +129,9 @@ function build_ps_agent!(mod::Model)
     )
     mod.ext[:expressions][:agent_revenue_after_support] = @expression(mod,
         mod.ext[:expressions][:agent_revenue_before_support]
-        + sum(A[jy]*λ_y_REC[jy]*r_y[jy] for jy in JY)
-        + sum(A[jy]*λ_m_REC[jm,jy]*r_m[jm,jy] for jm in JM, jy in JY)
-        + sum(A[jy]*W[jd]*λ_d_REC[jd,jy]*r_d[jd,jy] for jd in JD, jy in JY)
-        + sum(A[jy]*W[jd]*λ_h_REC[jh,jd,jy]*r_h[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
-    )
+        - REC_obj_post2030
+        - REC_obj_post2030
+        )
 
     # Objective  - will be updated in solve-step
     mod.ext[:objective] = @objective(mod, Min, 0)

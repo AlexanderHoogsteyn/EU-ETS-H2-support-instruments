@@ -71,10 +71,8 @@ NG:
 H2:
   demand: 10 # baseline demand for hydrogen, mtH2
   conv_factor: 33 # 1 mt H2 = 33 TWh
-  P_calibration: 121 # €/MWh
-  tolerance_calibration: 2 # €/MWh
-  a_1: 0 # Fixed component in MC hydrogen import: MC = a_1 + a_2*q 
-  a_2: 140000 # Variable component in MC hydrogen import: MC = a_1 + a_2*q
+  tolerance_calibration: 0.1 # €/MWh
+  Import_Q_calibration: 10 # Mt
 
 
 Industry: 

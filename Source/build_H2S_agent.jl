@@ -20,6 +20,23 @@ function build_h2s_agent!(mod::Model)
     η_E_H2 = mod.ext[:parameters][:η_E_H2] # efficiency E->H2
     η_NG_H2 = mod.ext[:parameters][:η_NG_H2] # efficiency NG->H2
     λ_NG = mod.ext[:parameters][:λ_NG] # natural gas price
+    λ_EOM = mod.ext[:parameters][:λ_EOM] # EOM prices
+    λ_EUA = mod.ext[:parameters][:λ_EUA] # ETS prices
+
+    λ_h_H2 = mod.ext[:parameters][:λ_h_H2] # H2 prices
+    λ_d_H2 = mod.ext[:parameters][:λ_d_H2] # H2 prices
+    λ_m_H2 = mod.ext[:parameters][:λ_m_H2] # H2 prices
+    λ_y_H2 = mod.ext[:parameters][:λ_y_H2] # H2 prices
+
+    λ_h_REC = mod.ext[:parameters][:λ_h_REC] # REC prices
+    λ_d_REC = mod.ext[:parameters][:λ_d_REC] # REC prices
+    λ_m_REC = mod.ext[:parameters][:λ_m_REC] # REC prices
+    λ_y_REC = mod.ext[:parameters][:λ_y_REC] # REC prices
+
+    λ_H2CN_prod = mod.ext[:parameters][:λ_H2CN_prod] # Carbon neutral H2 generation subsidy
+    λ_H2CN_cap = mod.ext[:parameters][:λ_H2CN_cap] # Carbon neutral H2 capacity subsidy
+
+
 
     # Extract H2 policy parameters
     max_support_duration = mod.ext[:parameters][:max_support_duration]

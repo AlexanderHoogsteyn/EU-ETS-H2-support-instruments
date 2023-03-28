@@ -1,4 +1,4 @@
-function solve_ps_agent_v2!(mod::Model)
+function solve_ps_agent!(mod::Model)
     # Extract sets
     JH = mod.ext[:sets][:JH]
     JD = mod.ext[:sets][:JD]
@@ -172,7 +172,7 @@ function solve_ps_agent_v2!(mod::Model)
     return mod
 end
 
-function solve_ps_agent!(mod::Model)
+function solve_ps_agent_v2!(mod::Model)
     # Extract sets
     JH = mod.ext[:sets][:JH]
     JD = mod.ext[:sets][:JD]
