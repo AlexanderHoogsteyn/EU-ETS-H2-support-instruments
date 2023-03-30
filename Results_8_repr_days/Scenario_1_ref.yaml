@@ -4,25 +4,29 @@ REC:
 EOM:
   SF: 1
 scenario:
+  Additionality_pre_2030: "NA"
   H2_demand_2030: 20
-  Additionality: "NA"
+  Comments: "Used to calibrate MACC"
   CNH2_cap_target_2030: 0
-  LRF_2031: 0.042
-  LRF_2021: 0.042
+  Additionality_post_2030: "NA"
   CNH2_cap_target_2024: 0
   Sens_analysis: "NO"
   scen_number: 1
-  MSR: "NA"
+  MSR: "NO"
   ref_scen_number: 1
-  RES_target_2030: 0.4
+  max_support_duration: 8760
   CNH2_demand_2040: 0
+  RES_target_2030: 0.45
+  HPA_price: 0
   import: "YES"
   H2_demand_2050: 50
+  H2_cap_grant: 0
   CNH2_demand_2024: 0
-  sensitivity: "NO"
+  H2S_premium: 0
+  H2F_premium: 0
   gamma: 1
-  CNH2_demand_2030: 5.6
-  H2_balance: "Yearly"
+  CNH2_demand_2030: 0
+  H2_balance: "Daily"
   CNH2_cap_target_2040: 0
   sens_number: 1
   max_em_change: 100
@@ -34,16 +38,17 @@ General:
   nTimesteps: 24
   nyears: 40
   nReprDays: 8
+  contract_duration: 10
 HydrogenImport:
   Import:
     EOM: "NO"
     H2CN_cap: "NO"
     REC: "NO"
     a_1: 150
-    H2CN_prod: "YES"
+    H2CN_prod: "NO"
     ETS: "NO"
     NG: "NO"
-    a_2: 1400000
+    a_2: 100000
     H2: "YES"
 PowerSector:
   CCGT_new:
@@ -207,24 +212,22 @@ ADMM:
   rho_REC_y_pre2030: 0
   CircularBufferSize: 2
   rho_REC_m_post2030: 0
-  rho_REC_y: 1
+  rho_REC_y: 0.1
   rho_REC_d_pre2030: 0
   rho_H2_h: 0
-  rho_H2_y: 1
+  rho_H2_y: 0
   rho_H2: 1
-  rho_H2_d: 0
+  rho_H2_d: 1
   rho_EUA: 1
-  max_iter: 10000
+  max_iter: 5000
   rho_REC_h_post2030: 0
   rho_REC_y_post2030: 0
   rho_REC_m_pre2030: 0
-  rho_REC: 1
+  rho_REC: 0.1
   rho_REC_h_pre2030: 0
   rho_H2CN_cap: 1
-  max_iter: 5000
   rho_EOM: 500
   epsilon: 0.1
-  rho_REC: 0.1
   rho_H2CN_prod: 1
   rho_REC_d_post2030: 0
   rho_H2_m: 0
@@ -267,16 +270,16 @@ ETS:
   S_2020: 2173.195623
   X_MSR_MAX_NEG_2023: 100
 NG:
-  P_2023: 80
+  P_2023: 47.5
   P_2030: 43.9
-  P_2025: 46.6
+  P_2025: 42.0
   SF: 1
   P_2019: 25
   P_2028: 45
   P_2026: 46.1
   P_2020: 25
   P_2021: 80
-  P_2024: 51.4
+  P_2024: 48.7
   YoY: 0
   P_2029: 44.5
   P_2022: 150
@@ -363,9 +366,7 @@ HydrogenSector:
     max_YoY_new_cap: 1000
     H2: "YES"
 H2:
-  a_1: 150
-  P_calibration: 121
+  Import_Q_calibration: 10
   demand: 10
   conv_factor: 33
-  tolerance_calibration: 2
-  a_2: 1400000
+  tolerance_calibration: 0.1
