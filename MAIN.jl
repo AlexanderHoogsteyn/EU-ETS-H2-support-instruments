@@ -164,14 +164,14 @@ if HPC == "DelftBlue" || HPC == "ThinKing"
    stop_sens = dict_sim_number["stop_sens"]
 else
     # Range of scenarios to be simulated
-    start_scen = 1
-    stop_scen = 4
+    start_scen = 52
+    stop_scen = 62
     start_sens = 1 
     stop_sens = 1  
 end
 
 #scen_number = 5
- for scen_number in range(start_scen,stop=stop_scen,step=1)
+for scen_number in range(start_scen,stop=stop_scen,step=1)
 
 println("    ")
 println(string("######################                  Scenario ",scen_number,"                 #########################"))
@@ -382,7 +382,6 @@ else
     # @save joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_ref"))
     YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_TO_ref.yaml")),TO)
 end
-
 println("Postprocessing & save results: done")
 println("   ")
 

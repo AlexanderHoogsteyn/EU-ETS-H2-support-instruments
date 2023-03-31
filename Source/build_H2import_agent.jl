@@ -56,7 +56,14 @@ function build_h2import_agent!(mod)
     mod.ext[:expressions][:tot_cost] = @expression(mod, 
     sum(A[jy]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
     )
-    
+    mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod,
+    - sum(A[jy]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+    + sum(A[jy]*gH_y[jy]*λ_y_H2[jy] for jy in JY)
+    )
+    mod.ext[:expressions][:agent_revenue_after_support] = @expression(mod,
+        mod.ext[:expressions][:agent_revenue_before_support]
+        + sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY)
+    )
     # Objective
     @objective(mod, Min,
     + sum(A[jy]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
