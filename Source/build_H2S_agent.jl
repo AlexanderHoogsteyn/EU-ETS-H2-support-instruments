@@ -109,14 +109,14 @@ function build_h2s_agent!(mod::Model)
 
     # Hydrogen policy costs 
     mod.ext[:expressions][:hpa_cost] = @expression(mod, 
-        sum(A[jy]*is_HPA_covered[jy]*(λ_HPA[jy]
+        sum(A[jy]*W[jd]*is_HPA_covered[jy]*(λ_HPA[jy]
             -λ_y_H2[jy]
             -sum(λ_m_H2[jm,jy] for jm in JM)
             -sum(W[jd]*λ_d_H2[jd,jy] for jd in JD)
             -sum(W[jd]*λ_h_H2[jh,jd,jy]*gH[jh,jd,jy] for jh in JH, jd in JD))  for jy in JY)
     )
     mod.ext[:expressions][:h2f_cost] = @expression(mod, 
-        sum(A[jy]*H2FP_PREM[jy]*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY) 
+        sum(A[jy]*W[jd]*H2FP_PREM[jy]*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY) 
     )
     mod.ext[:expressions][:h2_cap_grant_cost] = @expression(mod, 
         sum(A[jy]*H2_CAPG[jy]*capH[jy] for jy in JY)
