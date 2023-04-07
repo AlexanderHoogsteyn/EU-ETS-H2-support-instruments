@@ -4,7 +4,7 @@
 
 ## 0. Set-up code
 # HPC or not?
-HPC = "ThinkKing" # NA, DelftBlue or ThinKing
+HPC = "ThinKing" # NA, DelftBlue or ThinKing
 
 # Home directory
 const home_dir = @__DIR__
@@ -15,10 +15,10 @@ if HPC == "DelftBlue"  # only for running this on DelftBlue
     println(string("Number of threads: ", Threads.nthreads()))
 end
 
-if HPC == "ThinKing"  # only for running this on VSC
-    ENV["GRB_LICENSE_FILE"] = "./gurobi.lic"
-    ENV["GUROBI_HOME"] = "$VSC_DATA/gurobi900/linux64"
-end
+#if HPC == "ThinKing"  # only for running this on VSC
+#    ENV["GRB_LICENSE_FILE"] = "./gurobi.lic"
+#    ENV["GUROBI_HOME"] = "$VSC_DATA/gurobi900/linux64"
+#end
 
 # Include packages 
 using JuMP, Gurobi # Optimization packages
