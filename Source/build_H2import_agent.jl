@@ -53,29 +53,71 @@ function build_h2import_agent!(mod)
     gH_m = mod.ext[:variables][:gH_m] = @expression(mod, [jm=JM,jy=JY],
     sum(Wm[jd]*sum(gH[jh,jd,jy] for jh in JH) for jd in JD)
     )
+
     mod.ext[:expressions][:tot_cost] = @expression(mod, 
     sum(A[jy]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
     )
-    mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod,
-    - sum(A[jy]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
-    + sum(A[jy]*gH_y[jy]*λ_y_H2[jy] for jy in JY)
-    )
-    mod.ext[:expressions][:agent_revenue_after_support] = @expression(mod,
-        mod.ext[:expressions][:agent_revenue_before_support]
-        + sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY)
-    )
-    # Objective
-    @objective(mod, Min,
-    + sum(A[jy]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
-    - sum(A[jy]*gH_y[jy]*λ_y_H2[jy] for jy in JY)
-    - sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
-    + sum(ρ_y_H2/2*(gH_y[jy] - gH_y_bar[jy])^2 for jy in JY)
-    + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY)
-    )
 
-    #mod.ext[:constraints][:H2_balance] = @constraint(mod, [jh=JH,jd=JD,jy=JY], 
-    #gH[jh,jd,jy] == gH[1,1,jy] 
-    #)
+
+    if ρ_h_H2 > 0 
+        mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod,
+        - sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        + sum(A[jy]*W[jd]*gH[jh,jd,jy]*λ_h_H2[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
+        )
+
+        # Objective
+        @objective(mod, Min,
+        + sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        - sum(A[jy]*W[jd]*gH[jh,jd,jy]*λ_h_H2[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
+        - sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
+        + sum(ρ_h_H2/2*W[jd]*(gH[jh,jd,jy] - gH_h_bar[jh,jd,jy])^2 for jh in JH, jd in JD, jy in JY) 
+        + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY)
+        )
+    elseif ρ_d_H2 > 0
+        mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod,
+        - sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        + sum(A[jy]*W[jd]*λ_d_H2[jd,jy]*gH_d[jd,jy] for jd in JD, jy in JY)
+        )
+
+        # Objective
+        @objective(mod, Min,
+        + sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        - sum(A[jy]*W[jd]*λ_d_H2[jd,jy]*gH_d[jd,jy] for jd in JD, jy in JY)
+        - sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
+        + sum(ρ_d_H2/2*W[jd]*(gH_d[jd,jy] - gH_d_bar[jd,jy])^2 for jd in JD, jy in JY) 
+        + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY)
+        )
+    elseif ρ_m_H2 > 0
+        mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod,
+        - sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        + sum(A[jy]*λ_m_H2[jm,jy]*gH_m[jm,jy] for jm in JM, jy in JY)
+        )
+
+        # Objective
+        @objective(mod, Min,
+        + sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        - sum(A[jy]*λ_m_H2[jm,jy]*gH_m[jm,jy] for jm in JM, jy in JY)
+        - sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
+        + sum(ρ_m_H2/2*(gH_m[jm,jy] - gH_m_bar[jm,jy])^2 for jm in JM, jy in JY) 
+        + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY)
+        )
+    elseif ρ_y_H2 > 0
+        mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod,
+        - sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        + sum(A[jy]*λ_y_H2[jy]*gH_y[jy] for jy in JY)
+        )
+
+        # Objective
+        @objective(mod, Min,
+        + sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        - sum(A[jy]*λ_y_H2[jy]*gH_y[jy] for jy in JY)
+        - sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
+        + sum(ρ_y_H2/2*(gH_y[jy] - gH_y_bar[jy])^2 for jy in JY) 
+        + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY)
+        )
+    end
+
+    # Carbon  neutral compensation - If import were to be considered eligable for support
     if mod.ext[:parameters][:H2CN_prod] == 1
         mod.ext[:constraints][:gen_limit_carbon_neutral] = @constraint(mod, [jy=JY],
             gHCN[jy] <=  sum(W[jd]*gH[jh,jd,jy] for jh in JH, jd in JD) # [TWh]
@@ -85,6 +127,11 @@ function build_h2import_agent!(mod)
             gHCN[jy] == 0 # [TWh]
         )
     end
+
+    mod.ext[:expressions][:agent_revenue_after_support] = @expression(mod,
+    mod.ext[:expressions][:agent_revenue_before_support]
+    + sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY)
+    )
     
     optimize!(mod);
     

@@ -4,7 +4,7 @@
 
 ## 0. Set-up code
 # HPC or not?
-HPC = "ThinKing" # NA, DelftBlue or ThinKing
+HPC =  "ThinKing" # NA, DelftBlue or ThinKing
 
 # Home directory
 const home_dir = @__DIR__
@@ -164,8 +164,8 @@ if HPC == "DelftBlue" || HPC == "ThinKing"
    stop_sens = dict_sim_number["stop_sens"]
 else
     # Range of scenarios to be simulated
-    start_scen = 203
-    stop_scen = 207
+    start_scen = 2
+    stop_scen = 2
     start_sens = 1 
     stop_sens = 1  
 end
