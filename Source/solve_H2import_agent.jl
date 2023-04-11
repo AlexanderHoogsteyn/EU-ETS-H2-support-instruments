@@ -78,7 +78,7 @@ function solve_h2import_agent!(mod::Model)
     end
     # Update objective 
     mod.ext[:objective] = @objective(mod, Min,
-         + sum(A[jy]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+         + sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
          + H2_obj
          + H2CN_obj
     )

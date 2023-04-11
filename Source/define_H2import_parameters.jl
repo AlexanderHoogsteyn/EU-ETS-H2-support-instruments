@@ -1,7 +1,5 @@
 function define_H2import_parameters!(mod::Model, data::Dict,ts::DataFrame,repr_days::DataFrame,REC::Dict)
    
-
-
     # α-value
     if data["scen_number"] - data["ref_scen_number"] == 0 && data["sens_number"] == 1 # this is a calibration run - provide an initial estimate
         mod.ext[:parameters][:α_2] = data["a_2"]
