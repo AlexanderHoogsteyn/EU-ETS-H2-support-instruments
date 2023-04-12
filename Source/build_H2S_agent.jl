@@ -56,6 +56,11 @@ function build_h2s_agent!(mod::Model)
     ρ_h_REC_pre2030 = mod.ext[:parameters][:ρ_h_REC_pre2030] # rho-value in ADMM related to REC auctions
     ρ_h_REC_post2030 = mod.ext[:parameters][:ρ_h_REC_post2030] # rho-value in ADMM related to REC auctions
     ADD_SF = mod.ext[:parameters][:ADD_SF] 
+    
+    ρ_h_H2 = mod.ext[:parameters][:ρ_h_H2] # rho-value in ADMM related to H2 market
+    ρ_d_H2 = mod.ext[:parameters][:ρ_d_H2] # rho-value in ADMM related to H2 market
+    ρ_m_H2 = mod.ext[:parameters][:ρ_m_H2] # rho-value in ADMM related to H2 market
+    ρ_y_H2 = mod.ext[:parameters][:ρ_y_H2] # rho-value in ADMM related to H2 market
 
     # Decision variables
     capH = mod.ext[:variables][:capH] = @variable(mod, [jy=JY], lower_bound=0, base_name="capacity")
@@ -108,13 +113,24 @@ function build_h2s_agent!(mod::Model)
     )
 
     # Hydrogen policy costs 
+    if ρ_y_H2 > 0
     mod.ext[:expressions][:hpa_cost] = @expression(mod, 
-        sum(A[jy]*is_HPA_covered[jy]*(λ_HPA[jy]
-            -λ_y_H2[jy]
-            -sum(λ_m_H2[jm,jy] for jm in JM)
-            -sum(W[jd]*λ_d_H2[jd,jy] for jd in JD)
-            -sum(W[jd]*λ_h_H2[jh,jd,jy]*gH[jh,jd,jy] for jh in JH, jd in JD))  for jy in JY)
+        sum(A[jy]*is_HPA_covered[jy]*(λ_HPA[jy]-λ_y_H2[jy])*gH_y[jy] for jy in JY)
     )
+    elseif ρ_m_H2 > 0
+    mod.ext[:expressions][:hpa_cost] = @expression(mod, 
+        sum(A[jy]*is_HPA_covered[jy]*(λ_HPA[jy]-λ_m_H2[jm,jy])*gH_m[jm,jy] for jm in JM, jy in JY)
+    )
+    elseif ρ_d_H2 > 0
+    mod.ext[:expressions][:hpa_cost] = @expression(mod, 
+        sum(A[jy]*is_HPA_covered[jy]*(λ_HPA[jy]-λ_d_H2[jy])*W[jd]*gH_d[jd,jy] for jd in JD, jy in JY)
+    )
+    elseif ρ_h_H2 > 0
+    mod.ext[:expressions][:hpa_cost] = @expression(mod, 
+        sum(A[jy]*is_HPA_covered[jy]*(λ_HPA[jy]-λ_h_H2[jy])*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
+    )
+    end
+
     mod.ext[:expressions][:h2f_cost] = @expression(mod, 
         sum(A[jy]*W[jd]*H2FP_PREM[jy]*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY) 
     )

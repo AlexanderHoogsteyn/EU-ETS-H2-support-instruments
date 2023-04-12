@@ -15,7 +15,7 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
         )
     end
     if isfile(joinpath(home_dir, string("agent_profits_before_support",temp_data["General"]["nReprDays"],"_repr_days.csv"))) != 1
-        CSV.write(joinpath(string("agent_profits_before_support",temp_data["General"]["nReprDays"],"_repr_days.csv")), DataFrame(), delim=";", 
+        CSV.write(joinpath(string("agent_profits_before_support_",temp_data["General"]["nReprDays"],"_repr_days.csv")), DataFrame(), delim=";", 
                     header=["scen_number";"sensitivity";"n_iter";string.(agents[:all])]
         )
     end
