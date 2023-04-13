@@ -1,7 +1,7 @@
 General: 
   nyears: 40
   nTimesteps: 24 # number of timesteps per representative day
-  nReprDays: 2 # days
+  nReprDays: 8 # days
   nMonths: 12 # number of months
   inflation: 0.02
   discount_rate: 0.1
@@ -161,7 +161,7 @@ HydrogenSector:
    Leadtime: 2 # years 
    AF: 1 # - own calculation
    Legcap_2021: 0.1 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683
-   efficiency_E_H2: 0.70 # efficiency conversion electricity to hydrogen 
+   efficiency_E_H2: 0.75 # efficiency conversion electricity to hydrogen 
    Legcap_2021: 0.135 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683, https://www.swp-berlin.org/en/publication/electrolysers-for-the-hydrogen-revolution#:~:text=However%2C%20the%20EU%2Dwide%20electrolysis,still%20pending%20in%20most%20cases. 
    efficiency_NG_H2: 0 # efficiency conversion natural gas to hydrogen 
    emissions: 0.0 # [ton CO2/MWh] = [Mton CO2/TWh]
@@ -185,8 +185,9 @@ HydrogenImport:
     H2CN_prod: "NO" # participate in the carbon neutral H2 market (production)
     H2CN_cap: "NO" # participate in the carbon neutral H2 market (capacity)
     NG: "NO" # participate in the natural gas market  
-    a_1: 40 # Fixed component in MC hydrogen import: MC = a_1 + a_2*q 
-    a_2: 45672 # Variable component in MC hydrogen import: MC = a_1 + a_2*q 
+    YoY_OC: -2.1
+    a_1: 100 # Fixed component in MC hydrogen import: MC = a_1 + a_2*q 
+    a_2: 456 # Variable component in MC hydrogen import: MC = a_1 + a_2*q 
 
 # Legacy capacities (2021), load and renewable availability factors based on ENTSO-E https://transparency.entsoe.eu
 # Unless stated otherwise, cost/tech data from EUR-PyPSA https://technology-data.readthedocs.io/en/latest/# 

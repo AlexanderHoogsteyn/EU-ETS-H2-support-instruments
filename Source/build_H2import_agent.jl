@@ -28,7 +28,7 @@ function build_h2import_agent!(mod)
     capHCN_bar = mod.ext[:parameters][:capHCN_bar] # element in ADMM penalty term related to carbon neutral hydrogen capacity subsidy
     ρ_H2CN_cap = mod.ext[:parameters][:ρ_H2CN_cap] # rho-value in ADMM related to carbon neutral H2 capacity subsidy 
     ADD_SF = mod.ext[:parameters][:ADD_SF] 
-
+    SF = mod.ext[:parameters][:SF]
     α_1 = mod.ext[:parameters][:α_1]
     α_2 = mod.ext[:parameters][:α_2]
 
@@ -55,19 +55,19 @@ function build_h2import_agent!(mod)
     )
 
     mod.ext[:expressions][:tot_cost] = @expression(mod, 
-    sum(A[jy]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
+    sum(A[jy]*SF[jy]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
     )
 
 
     if ρ_h_H2 > 0 
         mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod,
-        - sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        - sum(A[jy]*SF[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
         + sum(A[jy]*W[jd]*gH[jh,jd,jy]*λ_h_H2[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
         )
 
         # Objective
         @objective(mod, Min,
-        + sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        + sum(A[jy]*SF[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
         - sum(A[jy]*W[jd]*gH[jh,jd,jy]*λ_h_H2[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
         - sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
         + sum(ρ_h_H2/2*W[jd]*(gH[jh,jd,jy] - gH_h_bar[jh,jd,jy])^2 for jh in JH, jd in JD, jy in JY) 
@@ -75,13 +75,13 @@ function build_h2import_agent!(mod)
         )
     elseif ρ_d_H2 > 0
         mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod,
-        - sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        - sum(A[jy]*SF[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
         + sum(A[jy]*W[jd]*λ_d_H2[jd,jy]*gH_d[jd,jy] for jd in JD, jy in JY)
         )
 
         # Objective
         @objective(mod, Min,
-        + sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        + sum(A[jy]*SF[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
         - sum(A[jy]*W[jd]*λ_d_H2[jd,jy]*gH_d[jd,jy] for jd in JD, jy in JY)
         - sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
         + sum(ρ_d_H2/2*W[jd]*(gH_d[jd,jy] - gH_d_bar[jd,jy])^2 for jd in JD, jy in JY) 
@@ -89,13 +89,13 @@ function build_h2import_agent!(mod)
         )
     elseif ρ_m_H2 > 0
         mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod,
-        - sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        - sum(A[jy]*SF[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
         + sum(A[jy]*λ_m_H2[jm,jy]*gH_m[jm,jy] for jm in JM, jy in JY)
         )
 
         # Objective
         @objective(mod, Min,
-        + sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        + sum(A[jy]*SF[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
         - sum(A[jy]*λ_m_H2[jm,jy]*gH_m[jm,jy] for jm in JM, jy in JY)
         - sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
         + sum(ρ_m_H2/2*(gH_m[jm,jy] - gH_m_bar[jm,jy])^2 for jm in JM, jy in JY) 
@@ -103,13 +103,13 @@ function build_h2import_agent!(mod)
         )
     elseif ρ_y_H2 > 0
         mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod,
-        - sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        - sum(A[jy]*SF[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
         + sum(A[jy]*λ_y_H2[jy]*gH_y[jy] for jy in JY)
         )
 
         # Objective
         @objective(mod, Min,
-        + sum(A[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
+        + sum(A[jy]*SF[jy]*W[jd]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy]  for jh in JH, jd in JD, jy in JY)
         - sum(A[jy]*λ_y_H2[jy]*gH_y[jy] for jy in JY)
         - sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
         + sum(ρ_y_H2/2*(gH_y[jy] - gH_y_bar[jy])^2 for jy in JY) 
