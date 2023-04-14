@@ -179,7 +179,8 @@ println(string("######################                  Scenario ",scen_number,"
 ## 1. Read associated input for this simulation
 scenario_overview_row = Dict(pairs(scenario_overview[scen_number,:])) # create dict from dataframe
 scenario_definition = Dict("scenario" => Dict([String(collect(keys(scenario_overview_row))[x]) => collect(values(scenario_overview_row))[x] for x = 1:length(collect(values(scenario_overview_row)))]))  # Keys from Symbol to String
-data = YAML.load_file(joinpath(home_dir,"Input","overview_data.yaml")) # reload data to avoid previous sensitivity analysis affected data
+#data = YAML.load_file(joinpath(home_dir,"Input","overview_data.yaml")) # reload data to avoid previous sensitivity analysis affected data
+data = YAML.load_file(joinpath(home_dir,"Input","overview_data_HPA.yaml"))
 data = merge(data,scenario_definition)
 
 # Define rho-values based on additionality rules and hydrogen demand resolution in this scenario
