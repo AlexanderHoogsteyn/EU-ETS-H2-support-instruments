@@ -201,19 +201,19 @@ function solve_h2s_agent!(mod::Model)
             - sum(A[jy]*(1-CAP_SV[jy])*λ_H2CN_cap[jy]*capHCN[jy] for jy in JY) 
             + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY)
             + sum(ρ_H2CN_cap/2*(capHCN[jy] - capHCN_bar[jy])^2 for jy in JY)  
-            - sum(A[jy]*W[jd]*H2FP_PREM[jy]*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY) 
-            - sum(A[jy]*H2_CAPG[jy]*capH[jy] for jy in JY)
+            - sum(A[jy]*W[jd]*I[jy]*H2FP_PREM[jy]*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY) 
+            - sum(A[jy]*H2_CAPG[jy]*I[jy]*capH[jy] for jy in JY)
         )
         # HPA is added to objective function
         if sum(is_HPA_covered) != 0
             if ρ_h_H2 > 0
-                H2CN_obj = H2CN_obj - sum(A[jy]*W[jd]*is_HPA_covered[jy]*(λ_HPA[jy]-W[jd]*λ_h_H2[jh,jd,jy])*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
+                H2CN_obj = H2CN_obj - sum(A[jy]*I[jy]*is_HPA_covered[jy]*(λ_HPA[jy]-λ_h_H2[jh,jd,jy])*W[jd]*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
             elseif ρ_d_H2 > 0
-                H2CN_obj = H2CN_obj - sum(A[jy]*W[jd]*is_HPA_covered[jy]*(λ_HPA[jy]-W[jd]*λ_d_H2[jd,jy])*gH_d[jd,jy] for jd in JD, jy in JY)
+                H2CN_obj = H2CN_obj - sum(A[jy]*I[jy]*is_HPA_covered[jy]*(λ_HPA[jy]-λ_d_H2[jd,jy])*W[jd]*gH_d[jd,jy] for jd in JD, jy in JY)
             elseif ρ_m_H2 > 0
-                H2CN_obj = H2CN_obj - sum(A[jy]*is_HPA_covered[jy]*(λ_HPA[jy]-λ_m_H2[jm,jy])*gH_m[jm,jy] for jm in JM, jy in JY)
+                H2CN_obj = H2CN_obj - sum(A[jy]*I[jy]*is_HPA_covered[jy]*(λ_HPA[jy]-λ_m_H2[jm,jy])*gH_m[jm,jy] for jm in JM, jy in JY)
             elseif ρ_y_H2 > 0 
-                H2CN_obj = H2CN_obj - sum(A[jy]*is_HPA_covered[jy]*(λ_HPA[jy]-λ_y_H2[jy])*gH_y[jy] for jy in JY)
+                H2CN_obj = H2CN_obj - sum(A[jy]*I[jy]*is_HPA_covered[jy]*(λ_HPA[jy]-λ_y_H2[jy])*gH_y[jy] for jy in JY)
             end
         end
     else
