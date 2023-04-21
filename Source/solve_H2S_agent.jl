@@ -12,6 +12,8 @@ function solve_h2s_agent!(mod::Model)
    IC = mod.ext[:parameters][:IC] # overnight investment costs
    CAP_SV = mod.ext[:parameters][:CAP_SV] # salvage value of new capacity
    A = mod.ext[:parameters][:A] # discount factors
+   I = mod.ext[:parameters][:I] # discount factors
+
    
    # Extract variables and expressions
    capH = mod.ext[:variables][:capH] 
