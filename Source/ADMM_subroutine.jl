@@ -53,6 +53,17 @@ TO_local = TimerOutput()
         mod.ext[:parameters][:gHCN_bar] = results["h2cn_prod"][m][end] - 1/(H2CN_prod["nAgents"]+1)*ADMM["Imbalances"]["H2CN_prod"][end]
         mod.ext[:parameters][:λ_H2CN_prod] = results["λ"]["H2CN_prod"][end] 
         mod.ext[:parameters][:ρ_H2CN_prod] = ADMM["ρ"]["H2CN_prod"][end]
+
+        # Fixed premium contract price
+        mod.ext[:parameters][:gHFP_bar] = results["h2fp_bid"][m][end] - 1/(H2CN_prod["nAgents"]+1)*ADMM["Imbalances"]["H2FP"][end]
+        mod.ext[:parameters][:λ_H2FP] = results["λ"]["H2FP"][end] 
+        mod.ext[:parameters][:ρ_H2FP] = ADMM["ρ"]["H2FP"][end]
+
+        # CfD contract price
+        mod.ext[:parameters][:gHCfD_bar] = results["h2cfd_bid"][m][end] - 1/(H2CN_prod["nAgents"]+1)*ADMM["Imbalances"]["H2CfD"][end]
+        mod.ext[:parameters][:λ_H2CfD] = results["λ"]["H2CfD"][end] 
+        mod.ext[:parameters][:ρ_H2CfD] = ADMM["ρ"]["H2CfD"][end]
+
     end
     if mod.ext[:parameters][:H2CN_cap] == 1
         mod.ext[:parameters][:capHCN_bar] = results["h2cn_cap"][m][end] - 1/(H2CN_cap["nAgents"]+1)*ADMM["Imbalances"]["H2CN_cap"][end]
@@ -102,6 +113,9 @@ if mod.ext[:parameters][:H2] == 1
 end                     
 if mod.ext[:parameters][:H2CN_prod] == 1
     push!(results["h2cn_prod"][m], collect(value.(mod.ext[:variables][:gHCN])))
+    push!(results["h2cfd_bid"][m], collect(value.(mod.ext[:variables][:gHCfD])))
+    push!(results["h2fp_bid"][m], collect(value.(mod.ext[:variables][:gHFP])))
+
 end
 if mod.ext[:parameters][:H2CN_cap] == 1
     push!(results["h2cn_cap"][m], collect(value.(mod.ext[:variables][:capHCN])))

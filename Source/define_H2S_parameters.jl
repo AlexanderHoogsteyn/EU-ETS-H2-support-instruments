@@ -11,15 +11,30 @@ function define_H2S_parameters!(mod::Model, data::Dict,ts::DataFrame,repr_days::
     mod.ext[:parameters][:LEG_CAP][2:data["nyears"]] = [data["AF"]*data["Legcap_2021"]*maximum([0,(data["Legcap_out"]-jy+1)/data["Legcap_out"]]) for jy=1:data["nyears"]-1] 
     mod.ext[:parameters][:CAP_LT] = zeros(data["nyears"],data["nyears"]) 
     mod.ext[:parameters][:max_support_duration] = data["max_support_duration"]
-    mod.ext[:parameters][:H2FP_PREM] = [zeros(9); data["H2F_premium"]*ones(data["contract_duration"]); zeros(data["nyears"]-9-data["contract_duration"])]
-    mod.ext[:parameters][:λ_HPA] = [zeros(9); data["HPA_price"]*ones(data["contract_duration"]); zeros(data["nyears"]-9-data["contract_duration"])]
-    mod.ext[:parameters][:is_HPA_covered] = [zeros(9); (data["HPA_price"] != 0)*ones(data["contract_duration"]); zeros(data["nyears"]-9-data["contract_duration"])]
-    mod.ext[:parameters][:H2CAP_PREM] = [zeros(9); data["H2_cap_grant"]*ones(data["contract_duration"]); zeros(data["nyears"]-9-data["contract_duration"])]
+
+    # Contract tenders are enforced to happen here once in 2030
+    mod.ext[:parameters][:CONT_LT] = zeros(data["nyears"],data["nyears"])
+    mod.ext[:parameters][:H2CAP_PREM] = [zeros(9); data["H2_cap_grant"]; zeros(data["nyears"]-10)]
+ 
+
+    # TO DO 
+    #mod.ext[:parameters][:H2FP_PREM] = [zeros(9); data["H2F_premium"]*ones(data["contract_duration"]); zeros(data["nyears"]-9-data["contract_duration"])]
+    #mod.ext[:parameters][:λ_HPA] = [zeros(9); data["HPA_price"]*ones(data["contract_duration"]); zeros(data["nyears"]-9-data["contract_duration"])]
+    #mod.ext[:parameters][:is_HPA_covered] = [zeros(9); (data["HPA_price"] != 0)*ones(data["contract_duration"]); zeros(data["nyears"]-9-data["contract_duration"])]
 
     for y=1:data["nyears"]
         if y+data["Leadtime"] < data["nyears"]
             for yy = y+data["Leadtime"]:minimum([y+data["Leadtime"]+data["Lifetime"]- 1, data["nyears"]])
                 mod.ext[:parameters][:CAP_LT][y,yy] = 1
+            end
+        end
+    end
+
+    # Matrix that maps any  given year to the tender years that are covered in that year. No leadtime is assumed
+    for y=1:data["nyears"]
+        if y < data["nyears"]
+            for yy = y:minimum([y+data["contract_duration"] - 1, data["nyears"]])
+                mod.ext[:parameters][:CONT_LT][y,yy] = 1
             end
         end
     end

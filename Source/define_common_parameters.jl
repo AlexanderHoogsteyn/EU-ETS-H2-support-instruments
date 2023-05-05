@@ -91,6 +91,16 @@ function define_common_parameters!(m::String,mod::Model, data::Dict, ts::DataFra
     # Parameters related to the natural gas market
     mod.ext[:parameters][:λ_NG] = zeros(data["nyears"],1)               # Price structure
 
+    # Parameters related to hydrogen support mechanisms
+    mod.ext[:parameters][:λ_H2FP] = zeros(data["nyears"],1)
+    mod.ext[:parameters][:gHCfD_bar] = zeros(data["nyears"],1)
+    mod.ext[:parameters][:ρ_H2FP] = data["rho_H2FP"]
+
+    mod.ext[:parameters][:λ_H2CfD] = zeros(data["nyears"],1)
+    mod.ext[:parameters][:gHCfD_bar] = zeros(data["nyears"],1)
+    mod.ext[:parameters][:ρ_H2CfD] =  data["rho_H2CfD"] 
+
+    
     # Eligble for RECs?
     if data["REC"] == "YES" 
         mod.ext[:parameters][:REC] = 1

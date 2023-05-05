@@ -22,14 +22,14 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
 
     # Aggregate metrics 
     tot_cost = sum(value(mdict[m].ext[:expressions][:tot_cost]) for m in agents[:all])
-    hpa_cost = sum(value(mdict[m].ext[:expressions][:hpa_cost]) for m in agents[:h2s])
+    h2cfd_cost = sum(value(mdict[m].ext[:expressions][:h2CfD_cost]) for m in agents[:h2s])
     h2f_cost = sum(value(mdict[m].ext[:expressions][:h2f_cost]) for m in agents[:h2s])
     h2_cap_grant_cost = sum(value(mdict[m].ext[:expressions][:h2_cap_grant_cost]) for m in agents[:h2s])
 
     tot_em = sum(results["e"][m][end][jy] for m in agents[:ets],jy in mdict[agents[:ps][1]].ext[:sets][:JY]) 
     H2_policy_cost = ( sum(sum(results["h2cn_prod"][m][end].*results["λ"]["H2CN_prod"][end])  for m in agents[:h2cn_prod])
                     + sum(sum(results["h2cn_cap"][m][end].*results["λ"]["H2CN_cap"][end]) for m in agents[:h2cn_cap])
-                    + hpa_cost
+                    + h2cfd_cost
                     + h2f_cost
                     + h2_cap_grant_cost )
     if data["import"] == "YES" 

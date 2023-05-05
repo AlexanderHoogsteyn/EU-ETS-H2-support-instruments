@@ -82,5 +82,17 @@ function update_rho!(ADMM::Dict, iter::Int64)
         elseif ADMM["Residuals"]["Dual"]["H2CN_cap"][end] > 2*ADMM["Residuals"]["Primal"]["H2CN_cap"][end]
             push!(ADMM["ρ"]["H2CN_cap"], 1/1.1*ADMM["ρ"]["H2CN_cap"][end])
         end
+
+        if ADMM["Residuals"]["Primal"]["H2FP"][end] > 2*ADMM["Residuals"]["Dual"]["H2FP"][end]
+            push!(ADMM["ρ"]["H2FP"], minimum([1000,1.1*ADMM["ρ"]["H2FP"][end]]))
+        elseif ADMM["Residuals"]["Dual"]["H2FP"][end] > 2*ADMM["Residuals"]["Primal"]["H2FP"][end]
+            push!(ADMM["ρ"]["H2FP"], 1/1.1*ADMM["ρ"]["H2FP"][end])
+        end
+
+        if ADMM["Residuals"]["Primal"]["H2CfD"][end] > 2*ADMM["Residuals"]["Dual"]["H2CfD"][end]
+            push!(ADMM["ρ"]["H2CfD"], minimum([1000,1.1*ADMM["ρ"]["H2CfD"][end]]))
+        elseif ADMM["Residuals"]["Dual"]["H2CfD"][end] > 2*ADMM["Residuals"]["Primal"]["H2CfD"][end]
+            push!(ADMM["ρ"]["H2CfD"], 1/1.1*ADMM["ρ"]["H2CfD"][end])
+        end
     end
 end
