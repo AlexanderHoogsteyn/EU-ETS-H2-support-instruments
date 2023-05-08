@@ -20,7 +20,7 @@ end
 #    ENV["GUROBI_HOME"] = "$VSC_DATA/gurobi900/linux64"
 #end
 
-# Include packages 
+# Include packages
 using JuMP, Gurobi # Optimization packages
 using DataFrames, CSV, YAML, DataStructures # dataprocessing
 using ProgressBars, Printf # progress bar
@@ -164,8 +164,8 @@ if HPC == "DelftBlue" || HPC == "ThinKing"
    stop_sens = dict_sim_number["stop_sens"]
 else
     # Range of scenarios to be simulated
-    start_scen = 352
-    stop_scen = 367
+    start_scen = 401
+    stop_scen = 415
     start_sens = 1
     stop_sens = 1 
 end
