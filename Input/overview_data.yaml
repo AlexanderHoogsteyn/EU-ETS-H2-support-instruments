@@ -1,23 +1,24 @@
 General: 
   nyears: 40
   nTimesteps: 24 # number of timesteps per representative day
-  nReprDays: 8 # days
+  nReprDays: 2 # days
   nMonths: 12 # number of months
   inflation: 0.02
   discount_rate: 0.1
   operationalYear: 2040
   contract_duration: 10
+  conv_factor: 33 # 1 mt H2 = 33 TWh
 
 
 ADMM:
  rho_EUA: 1 # rho ADMM penalty term, EUA market
- rho_EOM: 500 # rho ADMM penalty term, EOM 
- rho_REC: 0.1 # rho ADMM penalty term, REC electricity
+ rho_EOM: 1000 # rho ADMM penalty term, EOM 
+ rho_REC: 1 # rho ADMM penalty term, REC electricity
  rho_H2: 1  # rho ADMM penalty term, H2
  rho_H2CN_prod: 1 # rho ADMM penalty term, carbon-neutral H2 production incentive (€/tH2)
  rho_H2CN_cap: 1 # rho ADMM penalty term, carbon-neutral H2 capacity incentive (€/GW)
- rho_H2FP: 5000
- rho_H2CfD: 5000
+ rho_H2FP: 100
+ rho_H2CfD: 100
  max_iter: 10000 # maximum number of iterations
  epsilon: 0.1 # stopping criterion - tolerance on "accuracy" with which the coupling constraints are satisfied, expressed as percentage of initial imbalance (e.g., demand). Applied to dual and primal residuals.
  CircularBufferSize: 2 # number of iterations for which data will be retained, should be at least 2 and less than max_iter
@@ -72,7 +73,6 @@ NG:
 
 H2:
   demand: 10 # baseline demand for hydrogen, mtH2
-  conv_factor: 33 # 1 mt H2 = 33 TWh
   tolerance_calibration: 0.1 # €/MWh
   Import_Q_calibration: 10 # Mt
 

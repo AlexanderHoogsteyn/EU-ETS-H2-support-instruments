@@ -8,9 +8,9 @@ function update_rho!(ADMM::Dict, iter::Int64)
         end
 
         if ADMM["Residuals"]["Primal"]["EOM"][end] > 2*ADMM["Residuals"]["Dual"]["EOM"][end]
-            push!(ADMM["ρ"]["EOM"], minimum([1000,1.1*ADMM["ρ"]["EOM"][end]]))
+            push!(ADMM["ρ"]["EOM"], minimum([1000,1.01*ADMM["ρ"]["EOM"][end]]))
         elseif ADMM["Residuals"]["Dual"]["EOM"][end] > 2*ADMM["Residuals"]["Primal"]["EOM"][end]
-            push!(ADMM["ρ"]["EOM"], 1/1.1*ADMM["ρ"]["EOM"][end])
+            push!(ADMM["ρ"]["EOM"], 1/1.01*ADMM["ρ"]["EOM"][end])
         end
 
         if ADMM["Residuals"]["Primal"]["REC_y"][end] > 2*ADMM["Residuals"]["Dual"]["REC_y"][end]
@@ -84,15 +84,15 @@ function update_rho!(ADMM::Dict, iter::Int64)
         end
 
         if ADMM["Residuals"]["Primal"]["H2FP"][end] > 2*ADMM["Residuals"]["Dual"]["H2FP"][end]
-            push!(ADMM["ρ"]["H2FP"], minimum([1000,1.1*ADMM["ρ"]["H2FP"][end]]))
+            push!(ADMM["ρ"]["H2FP"], minimum([1000,1.01*ADMM["ρ"]["H2FP"][end]]))
         elseif ADMM["Residuals"]["Dual"]["H2FP"][end] > 2*ADMM["Residuals"]["Primal"]["H2FP"][end]
-            push!(ADMM["ρ"]["H2FP"], 1/1.1*ADMM["ρ"]["H2FP"][end])
+            push!(ADMM["ρ"]["H2FP"], 1/1.01*ADMM["ρ"]["H2FP"][end])
         end
 
         if ADMM["Residuals"]["Primal"]["H2CfD"][end] > 2*ADMM["Residuals"]["Dual"]["H2CfD"][end]
-            push!(ADMM["ρ"]["H2CfD"], minimum([1000,1.1*ADMM["ρ"]["H2CfD"][end]]))
+            push!(ADMM["ρ"]["H2CfD"], minimum([1000,1.01*ADMM["ρ"]["H2CfD"][end]]))
         elseif ADMM["Residuals"]["Dual"]["H2CfD"][end] > 2*ADMM["Residuals"]["Primal"]["H2CfD"][end]
-            push!(ADMM["ρ"]["H2CfD"], 1/1.1*ADMM["ρ"]["H2CfD"][end])
+            push!(ADMM["ρ"]["H2CfD"], 1/1.01*ADMM["ρ"]["H2CfD"][end])
         end
     end
 end
