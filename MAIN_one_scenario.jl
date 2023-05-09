@@ -4,7 +4,7 @@
 
 ## 0. Set-up code
 # HPC or not?
-HPC = "NA" # NA, DelftBlue or ThinKing
+HPC =  "NA" #"ThinKing" # NA, DelftBlue or ThinKing
 
 # Home directory
 const home_dir = @__DIR__
@@ -15,12 +15,12 @@ if HPC == "DelftBlue"  # only for running this on DelftBlue
     println(string("Number of threads: ", Threads.nthreads()))
 end
 
-if HPC == "ThinKing"  # only for running this on VSC
-    # ENV["GRB_LICENSE_FILE"] = " "
-    # ENV["GUROBI_HOME"] = " "
-end
+#if HPC == "ThinKing"  # only for running this on VSC
+#    ENV["GRB_LICENSE_FILE"] = "./gurobi.lic"
+#    ENV["GUROBI_HOME"] = "$VSC_DATA/gurobi900/linux64"
+#end
 
-# Include packages 
+# Include packages
 using JuMP, Gurobi # Optimization packages
 using DataFrames, CSV, YAML, DataStructures # dataprocessing
 using ProgressBars, Printf # progress bar
@@ -36,11 +36,13 @@ println("        ")
 const GUROBI_ENV = Gurobi.Env()
 # set parameters:
 GRBsetparam(GUROBI_ENV, "OutputFlag", "0")   
-GRBsetparam(GUROBI_ENV, "Threads", "4")   
+GRBsetparam(GUROBI_ENV, "Threads", "4")
+GRBsetparam(GUROBI_ENV, "Method", "2")  
 GRBsetparam(GUROBI_ENV, "TimeLimit", "300")  # will only affect solutions if you're selecting representative days  
 println("        ")
 
 # Include functions
+include(joinpath(home_dir,"Source","define_rho_parameters.jl"))
 include(joinpath(home_dir,"Source","define_common_parameters.jl"))
 include(joinpath(home_dir,"Source","define_H2S_parameters.jl"))
 include(joinpath(home_dir,"Source","define_ps_parameters.jl"))
@@ -96,7 +98,7 @@ else
     # Create syntethic time series - https://ucm.pages.gitlab.kuleuven.be/representativeperiodsfinder.jl/examples/days_re_ordering/ 
     pf = PeriodsFinder(config_file; populate_entries=true)
     # specific settings to create syntethic time series
-    pf.config["method"]["optimization"]["binary_ordering"] = false
+    pf.config["method"]["optimization"]["binary_ordering"] = true
     pf.config["method"]["options"]["representative_periods"] = temp_data["General"]["nReprDays"]
     pf.config["results"]["result_dir"] = string("output_",temp_data["General"]["nReprDays"],"_repr_days")
     delete!(pf.config["method"]["optimization"], "duration_curve_error")
@@ -122,10 +124,8 @@ sensitivity_overview = CSV.read(joinpath(home_dir,"overview_sensitivity.csv"),Da
 # Create file with results 
 # add column for sensitivity analsysis
 if isfile(joinpath(home_dir,string("overview_results_",temp_data["General"]["nReprDays"],"_repr_days.csv"))) != 1
-    CSV.write(joinpath(home_dir,string("overview_results_",temp_data["General"]["nReprDays"],"_repr_days.csv")),DataFrame(),delim=";",header=["scen_number";"sensitivity";"n_iter";"walltime";"PrimalResidual_ETS";"PrimalResidual_MSR";"PrimalResidual_EOM";"PrimalResidual_REC";"PrimalResidual_H2";"PrimalResidual_H2CN_prod";"PrimalResidual_H2CN_cap"; "DualResidual_ETS"; "DualResidual_EOM";"DualResidual_REC";"DualResidual_H2";"DualResidual_H2CN_prod";"DualResidual_H2CN_cap";"Beta";"Alpha";"EUA_2022";"CumulativeEmissions";"TotalCost"])
+    CSV.write(joinpath(home_dir,string("overview_results_",temp_data["General"]["nReprDays"],"_repr_days.csv")),DataFrame(),delim=";",header=["scen_number";"sensitivity";"n_iter";"walltime";"PrimalResidual_ETS";"PrimalResidual_MSR";"PrimalResidual_EOM";"PrimalResidual_REC";"PrimalResidual_H2";"PrimalResidual_H2CN_prod";"PrimalResidual_H2CN_cap"; "DualResidual_ETS"; "DualResidual_EOM";"DualResidual_REC";"DualResidual_H2";"DualResidual_H2CN_prod";"DualResidual_H2CN_cap";"Beta";"Alpha";"EUA_2022";"CumulativeEmissions";"TotalCost";"PolicyCost"])
 end
-
-
 
 # Create folder for results
 if isdir(joinpath(home_dir,string("Results_",temp_data["General"]["nReprDays"],"_repr_days"))) != 1
@@ -164,14 +164,14 @@ if HPC == "DelftBlue" || HPC == "ThinKing"
    stop_sens = dict_sim_number["stop_sens"]
 else
     # Range of scenarios to be simulated
-    start_scen = 1
-    stop_scen = 100
-    start_sens = 1 
-    stop_sens = 100 # will be overwritten 
+    start_scen = 404
+    stop_scen = 415
+    start_sens = 1
+    stop_sens = 1 
 end
 
-scen_number = 8
-# for scen_number in range(start_scen,stop=stop_scen,step=1)
+scen_number = 404
+#for scen_number in range(start_scen,stop=stop_scen,step=1)
 
 println("    ")
 println(string("######################                  Scenario ",scen_number,"                 #########################"))
@@ -180,10 +180,14 @@ println(string("######################                  Scenario ",scen_number,"
 scenario_overview_row = Dict(pairs(scenario_overview[scen_number,:])) # create dict from dataframe
 scenario_definition = Dict("scenario" => Dict([String(collect(keys(scenario_overview_row))[x]) => collect(values(scenario_overview_row))[x] for x = 1:length(collect(values(scenario_overview_row)))]))  # Keys from Symbol to String
 data = YAML.load_file(joinpath(home_dir,"Input","overview_data.yaml")) # reload data to avoid previous sensitivity analysis affected data
+#data = YAML.load_file(joinpath(home_dir,"Input","overview_data_HPA.yaml"))
 data = merge(data,scenario_definition)
 
+# Define rho-values based on additionality rules and hydrogen demand resolution in this scenario
+define_rho_parameters!(data)
+
 sens_number = 1 
-# for sens_number in range(start_sens,stop=minimum([length(sensitivity_overview[!,:Parameter])+1,stop_sens]),step=1) 
+#for sens_number in range(start_sens,stop=minimum([length(sensitivity_overview[!,:Parameter])+1,stop_sens]),step=1) 
 data["scenario"]["sens_number"] = sens_number 
 
 if sens_number >= 2
@@ -236,7 +240,7 @@ agents[:all] = union(agents[:ps],agents[:h2s],agents[:ind],agents[:h2import])
 agents[:eom] = []                  
 agents[:ets] = []                  
 agents[:rec] = []      
-agents[:h2] = []             
+agents[:h2] = []            
 agents[:h2cn_prod] = []         
 agents[:h2cn_cap] = []   
 agents[:ng] = []                    
@@ -332,21 +336,35 @@ ADMM!(results,ADMM,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG,mdict,agents,data,TO)   
 ADMM["walltime"] =  TimerOutputs.tottime(TO)*10^-9/60                                                                                     # wall time 
 
 # Calibration of industry MACC (β) and import MC (α)
-while abs(results[ "λ"]["EUA"][end][1]-data["ETS"]["P_calibration"]) > data["Industry"]["tolerance_calibration"] && data["scenario"]["ref_scen_number"] == scen_number && sens_number == 1
-    # Calibration β - new estimate:
-    println(string("Calibration error 2021 EUA prices: " , results[ "λ"]["EUA"][end][1]-data["ETS"]["P_calibration"]," €/tCO2"))
+h2_import_2030 = 0
+if data["scenario"]["ref_scen_number"] == scen_number && sens_number == 1
+    while abs(results[ "λ"]["EUA"][end][1]-data["ETS"]["P_calibration"]) > data["Industry"]["tolerance_calibration"] || (data["scenario"]["import"] == "YES" && abs(h2_import_2030 -data["H2"]["Import_Q_calibration"]) > data["H2"]["tolerance_calibration"])
+        # Calibration β - new estimate:
+        println(string("Calibration error 2021 EUA prices: " , results[ "λ"]["EUA"][end][1]-data["ETS"]["P_calibration"]," €/tCO2"))
+        mdict["Ind"].ext[:parameters][:β] = copy(mdict["Ind"].ext[:parameters][:β]/(1+(results[ "λ"]["EUA"][end][1]-data["ETS"]["P_calibration"])/data["ETS"]["P_calibration"])^(1/data["scenario"]["gamma"]))
+        println(string("New estimate for β: ", mdict["Ind"].ext[:parameters][:β]))
 
-    mdict["Ind"].ext[:parameters][:β] = copy(mdict["Ind"].ext[:parameters][:β]/(1+(results[ "λ"]["EUA"][end][1]-data["ETS"]["P_calibration"])/data["ETS"]["P_calibration"])^(1/data["scenario"]["gamma"]))
+        # Calibration α - new estimate:
+        if data["scenario"]["import"] == "YES" 
+            h2_import_2030 = 0
+            for m in agents[:h2import]
+                h2_import_2030 = h2_import_2030 + value.(mdict[m].ext[:expressions][:gH_y][10])./data["H2"]["conv_factor"] # Convert to Mt
+            end
 
-    println(string("Required iterations: ",ADMM["n_iter"]))
-    println(string("Required walltime: ",ADMM["walltime"], " minutes"))
-    println(string("New estimate for β: ", mdict["Ind"].ext[:parameters][:β]))
-    println(string("        "))
+            println(string("Calibration error 2030 H2 Import: " , data["H2"]["Import_Q_calibration"]-h2_import_2030," Mt H2"))
+            mdict["Import"].ext[:parameters][:α_2] = copy(mdict["Import"].ext[:parameters][:α_2]/(1+(data["H2"]["Import_Q_calibration"] - h2_import_2030)/data["H2"]["Import_Q_calibration"])^(1/2))
+            println(string("New estimate for α: ", mdict["Import"].ext[:parameters][:α_2]))
+        end
 
-    # Calculate equilibrium with new estimate beta
-    define_results!(merge(data["General"],data["ADMM"],data["scenario"]),results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)      # initialize structure of results, only those that will be stored in each iteration
-    ADMM!(results,ADMM,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG,mdict,agents,data,TO)                                                       # calculate equilibrium 
-    ADMM["walltime"] =  TimerOutputs.tottime(TO)*10^-9/60                                                                               # wall time 
+        println(string("Required iterations: ",ADMM["n_iter"]))
+        println(string("Required walltime: ",ADMM["walltime"], " minutes"))
+        println(string("        "))
+
+        # Calculate equilibrium with new estimate beta
+        define_results!(merge(data["General"],data["ADMM"],data["scenario"]),results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)      # initialize structure of results, only those that will be stored in each iteration
+        ADMM!(results,ADMM,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG,mdict,agents,data,TO)                                                       # calculate equilibrium 
+        ADMM["walltime"] =  TimerOutputs.tottime(TO)*10^-9/60                                                                               # wall time 
+    end
 end
 
 println(string("Done!"))
@@ -357,19 +375,18 @@ println(string("        "))
 
 ## 6. Postprocessing and save results 
 if sens_number >= 2
-    save_results(mdict,EOM,ETS,ADMM,results,merge(data["General"],data["ADMM"],data["H2"],data["scenario"]),agents,sensitivity_overview[sens_number-1,:remarks]) 
+    save_results(mdict,EOM,ETS,H2,ADMM,results,merge(data["General"],data["ADMM"],data["H2"],data["scenario"]),agents,sensitivity_overview[sens_number-1,:remarks]) 
     # @save joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_",sensitivity_overview[sens_number-1,:remarks]))
     YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_TO_",sensitivity_overview[sens_number-1,:remarks],".yaml")),TO)
 else
-    save_results(mdict,EOM,ETS,ADMM,results,merge(data["General"],data["ADMM"],data["H2"],data["scenario"]),agents,"ref") 
+    save_results(mdict,EOM,ETS,H2,ADMM,results,merge(data["General"],data["ADMM"],data["H2"],data["scenario"]),agents,"ref") 
     # @save joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_ref"))
     YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_TO_ref.yaml")),TO)
 end
-
 println("Postprocessing & save results: done")
 println("   ")
 
-# end # end loop over sensititivity
-# end # end for loop over scenarios
+# end loop over sensititivity
+# end for loop over scenarios
 
 println(string("##############################################################################################"))

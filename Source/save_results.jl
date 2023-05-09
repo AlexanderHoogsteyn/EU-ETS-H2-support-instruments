@@ -142,6 +142,9 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
     end
     h2cn_prod = zeros(length(agents[:h2cn_prod]),data["nyears"])
     h2cn_cap = zeros(length(agents[:h2cn_prod]),data["nyears"])
+    h2cfd = zeros(length(agents[:h2cn_prod]),data["nyears"])
+    h2fp = zeros(length(agents[:h2cn_prod]),data["nyears"])
+
     mm = 1
     for m in agents[:h2cn_cap]
         h2cn_cap[mm,:] = value.(mdict[m].ext[:variables][:capHCN])
@@ -150,6 +153,9 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
     mm = 1
     for m in agents[:h2cn_prod]
         h2cn_prod[mm,:] = value.(mdict[m].ext[:variables][:gHCN])./data["conv_factor"] # Convert to Mt
+        h2cfd[mm,:] = value.(mdict[m].ext[:variables][:gHCfD])./data["conv_factor"] # Convert to Mt
+        h2fp[mm,:] = value.(mdict[m].ext[:variables][:gHFP])./data["conv_factor"] # Convert to Mt
+
         mm = mm+1
     end
     mm = 1
@@ -185,7 +191,7 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
         λ_H2_avg = results["λ"]["H2_y"][end]*data["conv_factor"]/1000
     end
 
-    mat_output = [Years transpose(h2_cap) transpose(h2_prod) transpose(h2_import) transpose(h2cn_cap) transpose(h2cn_prod) λ_H2_avg results["λ"]["H2CN_prod"][end]*data["conv_factor"]/1000 results["λ"]["H2CN_cap"][end]]
+    mat_output = [Years transpose(h2_cap) transpose(h2_prod) transpose(h2_import) transpose(h2cn_cap) transpose(h2cn_prod) transpose(h2cfd) transpose(h2fp) λ_H2_avg results["λ"]["H2CN_prod"][end]*data["conv_factor"]/1000 results["λ"]["H2CN_cap"][end]]
     CSV.write(
         joinpath(
             home_dir,
@@ -194,7 +200,7 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
         DataFrame(mat_output,:auto), delim=";",
         header=["Year";string.("CAP_",agents[:h2s]);string.("PROD_",agents[:h2s]);
                 string.("IMPORT_",agents[:h2import]) ; 
-                string.("CN_CAP_",agents[:h2cn_prod]);string.("CN_PROD_",agents[:h2cn_prod]);
+                string.("CN_CAP_",agents[:h2cn_prod]);string.("CN_PROD_",agents[:h2cn_prod]);string.("H2CfD_",agents[:h2cn_prod]);string.("H2FP_",agents[:h2cn_prod]);
                 "PriceH2";"PremiumH2CN_prod";"PremiumH2CN_cap"]);
 
                    

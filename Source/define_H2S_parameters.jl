@@ -11,6 +11,7 @@ function define_H2S_parameters!(mod::Model, data::Dict,ts::DataFrame,repr_days::
     mod.ext[:parameters][:LEG_CAP][2:data["nyears"]] = [data["AF"]*data["Legcap_2021"]*maximum([0,(data["Legcap_out"]-jy+1)/data["Legcap_out"]]) for jy=1:data["nyears"]-1] 
     mod.ext[:parameters][:CAP_LT] = zeros(data["nyears"],data["nyears"]) 
     mod.ext[:parameters][:max_support_duration] = data["max_support_duration"]
+    mod.ext[:parameters][:max_bid] = data["conv_factor"]*data["H2CfD_tender_2030"]
 
     # Contract tenders are enforced to happen here once in 2030
     mod.ext[:parameters][:CONT_LT] = zeros(data["nyears"],data["nyears"])

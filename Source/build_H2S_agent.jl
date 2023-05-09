@@ -32,6 +32,7 @@ function build_h2s_agent!(mod::Model)
     ρ_m_H2 = mod.ext[:parameters][:ρ_m_H2] # rho-value in ADMM related to H2 market
     ρ_y_H2 = mod.ext[:parameters][:ρ_y_H2] # rho-value in ADMM related to H2 market
 
+
     if ρ_h_H2 > 0
         λ_y_H2 = [ sum(λ_h_H2[jh,jd,jy]*W[jd] for jh in JH, jd in JD)/8760 for jy in JY ]
     elseif ρ_d_H2 > 0
@@ -58,6 +59,7 @@ function build_h2s_agent!(mod::Model)
 
     # Extract H2 policy parameters
     max_support_duration = mod.ext[:parameters][:max_support_duration]
+    max_bid = mod.ext[:parameters][:max_bid]
     CONT_LT = mod.ext[:parameters][:CONT_LT]
     H2_CAPG = mod.ext[:parameters][:H2CAP_PREM]
 
@@ -226,16 +228,19 @@ function build_h2s_agent!(mod::Model)
             gHCN[jy] <= max_support_duration * (sum(CAP_LT[y2,jy]*capH[y2] for y2=1:jy) + LEG_CAP[jy])/1000 # [TWh]
         )
         mod.ext[:constraints][:max_support_duration_FP] = @constraint(mod, [jy=JY], 
-        gHFP[jy] <= max_support_duration * (sum(CAP_LT[y2,jy]*capH[y2] for y2=1:jy) + LEG_CAP[jy])/1000 # [TWh]
+            gHFP[jy] <= max_support_duration * (sum(CAP_LT[y2,jy]*capH[y2] for y2=1:jy) + LEG_CAP[jy])/1000 # [TWh]
         )
         mod.ext[:constraints][:max_support_duration_CfD] = @constraint(mod, [jy=JY], 
-        gHCfD[jy] <= max_support_duration * (sum(CAP_LT[y2,jy]*capH[y2] for y2=1:jy) + LEG_CAP[jy])/1000 # [TWh]
+            gHCfD[jy] <= max_support_duration * (sum(CAP_LT[y2,jy]*capH[y2] for y2=1:jy) + LEG_CAP[jy])/1000 # [TWh]
         )
         mod.ext[:constraints][:tender_limit_FP] = @constraint(mod, [jy=JY], 
             sum(gHFP[jyy] for jyy in 1:jy ) <= gH_y[jy] # [TWh]
         )
         mod.ext[:constraints][:tender_limit_CfD] = @constraint(mod, [jy=JY], 
             sum(gHCfD[jyy] for jyy in 1:jy ) <= gH_y[jy] # [TWh]
+        )
+        mod.ext[:constraints][:overbid_limit_CfD] = @constraint(mod, [jy=JY], 
+            gHCfD[jy] <= max_bid # [TWh]
         )
     else
         mod.ext[:constraints][:gen_limit_carbon_neutral] = @constraint(mod, [jy=JY],
@@ -247,6 +252,7 @@ function build_h2s_agent!(mod::Model)
         mod.ext[:constraints][:tender_limit_CfD] = @constraint(mod, [jy=JY], 
             gHCfD[jy] == 0 # [TWh]
         )
+
     end
 
     if mod.ext[:parameters][:H2CN_cap] == 1

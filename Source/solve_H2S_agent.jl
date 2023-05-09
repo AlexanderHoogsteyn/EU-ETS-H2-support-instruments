@@ -201,7 +201,7 @@ function solve_h2s_agent!(mod::Model)
         capH = mod.ext[:variables][:capH]
 
         CONT_LT = mod.ext[:parameters][:CONT_LT]
-        gHFP = mod.ext[:variables][:gHCfD] 
+        gHFP = mod.ext[:variables][:gHFP] 
         gHCfD = mod.ext[:variables][:gHCfD] 
         gHCfD_bar = mod.ext[:parameters][:gHCfD_bar]
         ρ_H2CfD = mod.ext[:parameters][:ρ_H2CfD]
@@ -213,7 +213,7 @@ function solve_h2s_agent!(mod::Model)
 
 
 
-        #Extract premiums 
+        #Extract premiums /
         #H2FP_PREM = mod.ext[:parameters][:H2FP_PREM]
         #λ_HPA = mod.ext[:parameters][:λ_HPA]
         #is_HPA_covered = mod.ext[:parameters][:is_HPA_covered]
@@ -221,20 +221,24 @@ function solve_h2s_agent!(mod::Model)
         H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod,
             - sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
             - sum(A[jy]*(1-CAP_SV[jy])*λ_H2CN_cap[jy]*capHCN[jy] for jy in JY) 
-            - sum(A[jy]*(λ_H2CfD[jy]-λ_y_H2[jy])*sum(CONT_LT[jyy,jy]*gHCfD[jyy] for jyy=1:jy) for jy in JY)
-            - sum(A[jy]*λ_H2FP[jy]*sum(CONT_LT[jyy,jy]*gHFP[jy] for jyy=1:jy) for jy in JY)
+            - sum(A[jy]*(λ_H2CfD[jy]-λ_y_H2[jy])*10*gHCfD[jy] for jy in JY)
+            - sum(A[jy]*λ_H2FP[jy]*10*gHFP[jy] for jy in JY)
             + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY)
             + sum(ρ_H2CN_cap/2*(capHCN[jy] - capHCN_bar[jy])^2 for jy in JY)
             + sum(ρ_H2CfD/2*(gHCfD[jy] - gHCfD_bar[jy])^2 for jy in JY)
             + sum(ρ_H2FP/2*(gHFP[jy] - gHFP_bar[jy])^2 for jy in JY)
-         #   - sum(A[jy]*W[jd]*I[jy]*H2FP_PREM[jy]*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY) 
-           - sum(A[jy]*H2_CAPG[jy]*I[jy]*capH[jy] for jy in JY)
+            - sum(A[jy]*H2_CAPG[jy]*I[jy]*capH[jy] for jy in JY)
         )
     else
         H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod,
            0
         )
     end
+            #- sum(A[jy]*(λ_H2CfD[jy]-λ_y_H2[jy])*sum(CONT_LT[jyy,jy]*gHCfD[jyy] for jyy=1:jy) for jy in JY)
+                        #- sum(A[jy]*λ_H2FP[jy]*sum(CONT_LT[jyy,jy]*gHFP[jyy] for jyy=1:jy) for jy in JY)
+                                 #   - sum(A[jy]*W[jd]*I[jy]*H2FP_PREM[jy]*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY) 
+
+
 
     if mod.ext[:parameters][:ETS] == 1
         λ_EUA = mod.ext[:parameters][:λ_EUA] # EUA prices
