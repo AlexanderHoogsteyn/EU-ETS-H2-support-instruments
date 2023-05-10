@@ -156,16 +156,6 @@ function build_h2s_agent!(mod::Model)
     # )
     # end
 
-    mod.ext[:expressions][:h2f_cost] = @expression(mod, 
-        sum(A[jy]*W[jd]*λ_H2FP[jy]*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY) 
-    )
-    mod.ext[:expressions][:h2CfD_cost] = @expression(mod, 
-    sum(A[jy]*W[jd]*(λ_H2CfD[jy]-λ_y_H2[jy])*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY) 
-    )
-    mod.ext[:expressions][:h2_cap_grant_cost] = @expression(mod, 
-        sum(A[jy]*H2_CAPG[jy]*capH[jy] for jy in JY)
-    )
-
     # Agent revenue do consider all cost of an agent, including exogenous costs of the modelled comodities
     mod.ext[:expressions][:agent_revenue_after_support] = @expression(mod, 
         mod.ext[:expressions][:agent_revenue_before_support]
@@ -179,7 +169,11 @@ function build_h2s_agent!(mod::Model)
         + sum(A[jy]*W[jd]*λ_h_REC[jh,jd,jy]*r_h[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
         + sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
         + sum(A[jy]*(1-CAP_SV[jy])*λ_H2CN_cap[jy]*capHCN[jy] for jy in JY)
-)
+    )
+
+    mod.ext[:expressions][:h2_cap_grant_cost] = @expression(mod, 
+    sum(A[jy]*H2_CAPG[jy]*capH[jy] for jy in JY)
+    )
 
     # Definition of the objective function - will be updated 
     mod.ext[:objective] = @objective(mod, Min,0)
