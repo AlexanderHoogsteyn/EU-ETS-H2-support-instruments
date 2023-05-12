@@ -41,7 +41,7 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
 
                 
 
-            # Primal residuals 
+            # Primal residuals '
                 push!(ADMM["Residuals"]["Primal"]["ETS"], sqrt(sum(ADMM["Imbalances"]["ETS"][end].^2)))
                 push!(ADMM["Residuals"]["Primal"]["MSR"], sqrt(sum(ADMM["Imbalances"]["MSR"][end].^2)))
                 push!(ADMM["Residuals"]["Primal"]["EOM"], sqrt(sum(ADMM["Imbalances"]["EOM"][end].^2)))
@@ -89,7 +89,7 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
             # Price updates 
             # In general, price caps or floors can be imposed, but may slow down convergence (a negative price gives a stronger incentive than a zero price).
             if data["scenario"]["ref_scen_number"] == data["scenario"]["scen_number"] && data["scenario"]["sens_number"] == 1 # calibration run, 2021 to be calibrated
-                push!(results["λ"]["EUA"], results["λ"]["EUA"][end] - ADMM["ρ"]["EUA"][end]/100*ADMM["Imbalances"]["ETS"][end])    
+                push!(results["λ"]["EUA"], results["λ"]["EUA"][end] - ADMM["ρ"]["EUA"][end]/100*ADMM["Imbalances"]["ETS"][end])
             else # 2019-2021 ETS prices fixed to historical values
                 push!(results["λ"]["EUA"], [ETS["P_2021"]; results[ "λ"]["EUA"][end][2:end] - ADMM["ρ"]["EUA"][end]/100*ADMM["Imbalances"]["ETS"][end][2:end]])    
             end
@@ -104,12 +104,17 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
             end
             if data["scenario"]["H2_balance"] == "Hourly"
                 push!(results["λ"]["H2_h"], results["λ"]["H2_h"][end] - ADMM["ρ"]["H2_h"][end]*ADMM["Imbalances"]["H2_h"][end])
+                push!(results["λ"]["H2CfD_ref"], [sum(H2["D_h"][:,:,jy].*results["λ"]["H2_h"][end][:,:,jy])./sum(H2["D_h"][:,:,jy]) for jy in mdict[agents[:h2s][1]].ext[:sets][:JY]])
             elseif data["scenario"]["H2_balance"] == "Daily"
                 push!(results["λ"]["H2_d"], results["λ"]["H2_d"][end] - ADMM["ρ"]["H2_d"][end]/10*ADMM["Imbalances"]["H2_d"][end])
+                push!(results["λ"]["H2CfD_ref"], [sum(H2["D_d"][:,jy].*results["λ"]["H2_d"][end][:,jy])./sum(H2["D_d"][:,jy]) for jy in mdict[agents[:h2s][1]].ext[:sets][:JY]])
             elseif data["scenario"]["H2_balance"] == "Monthly"
                 push!(results["λ"]["H2_m"], results["λ"]["H2_m"][end] - ADMM["ρ"]["H2_m"][end]/10*ADMM["Imbalances"]["H2_m"][end])
+                push!(results["λ"]["H2CfD_ref"], [sum(H2["D_m"][:,jy].*results["λ"]["H2_m"][end][:,jy])./sum(H2["D_m"][:,jy]) for jy in mdict[agents[:h2s][1]].ext[:sets][:JY]])
             elseif data["scenario"]["H2_balance"] == "Yearly"
                 push!(results["λ"]["H2_y"], results["λ"]["H2_y"][end] - ADMM["ρ"]["H2_y"][end]/1000*ADMM["Imbalances"]["H2_y"][end])
+                push!(results["λ"]["H2CfD_ref"], results["λ"]["H2_y"][end])
+
             end
             push!(results["λ"]["H2CN_prod"], results["λ"]["H2CN_prod"][end] - ADMM["ρ"]["H2CN_prod"][end]/100*ADMM["Imbalances"]["H2CN_prod"][end])
             push!(results["λ"]["H2CN_cap"], results["λ"]["H2CN_cap"][end] - ADMM["ρ"]["H2CN_cap"][end]/1000*ADMM["Imbalances"]["H2CN_cap"][end])
@@ -167,7 +172,7 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
             end
 
             # Check convergence: primal and dual satisfy tolerance 
-            if ADMM["Residuals"]["Primal"]["MSR"][end] <= ADMM["Tolerance"]["ETS"] && ADMM["Residuals"]["Primal"]["ETS"][end] <= ADMM["Tolerance"]["ETS"] && ADMM["Residuals"]["Dual"]["ETS"][end] <= ADMM["Tolerance"]["ETS"] && ADMM["Residuals"]["Primal"]["EOM"][end] <= ADMM["Tolerance"]["EOM"] && ADMM["Residuals"]["Primal"]["REC_y"][end] <= ADMM["Tolerance"]["REC_y"] && ADMM["Residuals"]["Primal"]["REC_m"][end] <= ADMM["Tolerance"]["REC_m"] && ADMM["Residuals"]["Primal"]["REC_d"][end] <= ADMM["Tolerance"]["REC_d"] && ADMM["Residuals"]["Primal"]["REC_h"][end] <= ADMM["Tolerance"]["REC_h"] && ADMM["Residuals"]["Dual"]["REC_y"][end] <= ADMM["Tolerance"]["REC_y"] && ADMM["Residuals"]["Dual"]["REC_m"][end] <= ADMM["Tolerance"]["REC_m"] && ADMM["Residuals"]["Dual"]["REC_d"][end] <= ADMM["Tolerance"]["REC_d"] && ADMM["Residuals"]["Dual"]["REC_h"][end] <= ADMM["Tolerance"]["REC_h"] && ADMM["Residuals"]["Primal"]["H2_h"][end] <= ADMM["Tolerance"]["H2_h"] && ADMM["Residuals"]["Dual"]["H2_h"][end] <= ADMM["Tolerance"]["H2_h"] && ADMM["Residuals"]["Primal"]["H2_d"][end] <= ADMM["Tolerance"]["H2_d"] && ADMM["Residuals"]["Dual"]["H2_d"][end] <= ADMM["Tolerance"]["H2_d"] && ADMM["Residuals"]["Primal"]["H2_m"][end] <= ADMM["Tolerance"]["H2_m"] && ADMM["Residuals"]["Dual"]["H2_m"][end] <= ADMM["Tolerance"]["H2_m"] && ADMM["Residuals"]["Primal"]["H2_y"][end] <= ADMM["Tolerance"]["H2_y"] && ADMM["Residuals"]["Dual"]["H2_y"][end] <= ADMM["Tolerance"]["H2_y"] && ADMM["Residuals"]["Primal"]["H2CN_prod"][end] <= ADMM["Tolerance"]["H2CN_prod"] && ADMM["Residuals"]["Dual"]["H2CN_prod"][end] <= ADMM["Tolerance"]["H2CN_prod"] && ADMM["Residuals"]["Primal"]["H2CN_cap"][end] <= ADMM["Tolerance"]["H2CN_cap"] && ADMM["Residuals"]["Dual"]["H2CN_cap"][end] <= ADMM["Tolerance"]["H2CN_cap"] && ADMM["Residuals"]["Primal"]["H2FP"][end] <= ADMM["Tolerance"]["H2FP"] && ADMM["Residuals"]["Primal"]["H2CfD"][end] <= ADMM["Tolerance"]["H2CfD"]
+            if ADMM["Residuals"]["Primal"]["MSR"][end] <= ADMM["Tolerance"]["ETS"] && ADMM["Residuals"]["Primal"]["ETS"][end] <= ADMM["Tolerance"]["ETS"] && ADMM["Residuals"]["Dual"]["ETS"][end] <= ADMM["Tolerance"]["ETS"] && ADMM["Residuals"]["Primal"]["EOM"][end] <= ADMM["Tolerance"]["EOM"] && ADMM["Residuals"]["Dual"]["EOM"][end] <= ADMM["Tolerance"]["EOM"] && ADMM["Residuals"]["Primal"]["REC_y"][end] <= ADMM["Tolerance"]["REC_y"] && ADMM["Residuals"]["Primal"]["REC_m"][end] <= ADMM["Tolerance"]["REC_m"] && ADMM["Residuals"]["Primal"]["REC_d"][end] <= ADMM["Tolerance"]["REC_d"] && ADMM["Residuals"]["Primal"]["REC_h"][end] <= ADMM["Tolerance"]["REC_h"] && ADMM["Residuals"]["Dual"]["REC_y"][end] <= ADMM["Tolerance"]["REC_y"] && ADMM["Residuals"]["Dual"]["REC_m"][end] <= ADMM["Tolerance"]["REC_m"] && ADMM["Residuals"]["Dual"]["REC_d"][end] <= ADMM["Tolerance"]["REC_d"] && ADMM["Residuals"]["Dual"]["REC_h"][end] <= ADMM["Tolerance"]["REC_h"] && ADMM["Residuals"]["Primal"]["H2_h"][end] <= ADMM["Tolerance"]["H2_h"] && ADMM["Residuals"]["Dual"]["H2_h"][end] <= ADMM["Tolerance"]["H2_h"] && ADMM["Residuals"]["Primal"]["H2_d"][end] <= ADMM["Tolerance"]["H2_d"] && ADMM["Residuals"]["Dual"]["H2_d"][end] <= ADMM["Tolerance"]["H2_d"] && ADMM["Residuals"]["Primal"]["H2_m"][end] <= ADMM["Tolerance"]["H2_m"] && ADMM["Residuals"]["Dual"]["H2_m"][end] <= ADMM["Tolerance"]["H2_m"] && ADMM["Residuals"]["Primal"]["H2_y"][end] <= ADMM["Tolerance"]["H2_y"] && ADMM["Residuals"]["Dual"]["H2_y"][end] <= ADMM["Tolerance"]["H2_y"] && ADMM["Residuals"]["Primal"]["H2CN_prod"][end] <= ADMM["Tolerance"]["H2CN_prod"] && ADMM["Residuals"]["Dual"]["H2CN_prod"][end] <= ADMM["Tolerance"]["H2CN_prod"] && ADMM["Residuals"]["Primal"]["H2CN_cap"][end] <= ADMM["Tolerance"]["H2CN_cap"] && ADMM["Residuals"]["Dual"]["H2CN_cap"][end] <= ADMM["Tolerance"]["H2CN_cap"] && ADMM["Residuals"]["Primal"]["H2FP"][end] <= ADMM["Tolerance"]["H2FP"] && ADMM["Residuals"]["Dual"]["H2FP"][end] <= ADMM["Tolerance"]["H2FP"] && ADMM["Residuals"]["Primal"]["H2CfD"][end] <= ADMM["Tolerance"]["H2CfD"]
                 convergence = 1
             end
             # store number of iterations

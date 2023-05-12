@@ -59,7 +59,9 @@ function build_h2s_agent!(mod::Model)
 
     # Extract H2 policy parameters
     max_support_duration = mod.ext[:parameters][:max_support_duration]
-    max_bid = mod.ext[:parameters][:max_bid]
+    max_bid_CfD = mod.ext[:parameters][:max_bid_CfD]
+    max_bid_FP = mod.ext[:parameters][:max_bid_FP]
+
     CONT_LT = mod.ext[:parameters][:CONT_LT]
     H2_CAPG = mod.ext[:parameters][:H2CAP_PREM]
 
@@ -126,16 +128,16 @@ function build_h2s_agent!(mod::Model)
         + sum(A[jy]*λ_NG[jy]*dNG[jy] for jy in JY) 
     )
     # Agent revenue before  do consider all cost of an agent, including exogenous costs of the modelled comodities 
-    mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod, 
-        - sum(A[jy]*(1-CAP_SV[jy])*IC[jy]*capH[jy] for jy in JY)
-        - sum(A[jy]*λ_NG[jy]*dNG[jy] for jy in JY)
-        + sum(A[jy]*W[jd]*(λ_EOM[jh,jd,jy])*g[jh,jd,jy] for jh in JH, jd in JD, jy in JY) # [MEUR]
-        + sum(A[jy]*λ_EUA[jy]*b[jy] for jy in JY)  
-        + sum(A[jy]*W[jd]*λ_h_H2[jh,jd,jy]*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
-        + sum(A[jy]*W[jd]*λ_d_H2[jd,jy]*gH_d[jd,jy] for jd in JD, jy in JY)
-        + sum(A[jy]*λ_m_H2[jm,jy]*gH_m[jm,jy] for jm in JM, jy in JY)
-        + sum(A[jy]*λ_y_H2[jy]*gH_y[jy] for jy in JY)
-    )
+    # mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod, 
+    #     - sum(A[jy]*(1-CAP_SV[jy])*IC[jy]*capH[jy] for jy in JY)
+    #     - sum(A[jy]*λ_NG[jy]*dNG[jy] for jy in JY)
+    #     + sum(A[jy]*W[jd]*(λ_EOM[jh,jd,jy])*g[jh,jd,jy] for jh in JH, jd in JD, jy in JY) # [MEUR]
+    #     + sum(A[jy]*λ_EUA[jy]*b[jy] for jy in JY)  
+    #     + sum(A[jy]*W[jd]*λ_h_H2[jh,jd,jy]*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
+    #     + sum(A[jy]*W[jd]*λ_d_H2[jd,jy]*gH_d[jd,jy] for jd in JD, jy in JY)
+    #     + sum(A[jy]*λ_m_H2[jm,jy]*gH_m[jm,jy] for jm in JM, jy in JY)
+    #     + sum(A[jy]*λ_y_H2[jy]*gH_y[jy] for jy in JY)
+    # )
 
     # Hydrogen policy costs 
     # if ρ_y_H2 > 0
@@ -157,19 +159,19 @@ function build_h2s_agent!(mod::Model)
     # end
 
     # Agent revenue do consider all cost of an agent, including exogenous costs of the modelled comodities
-    mod.ext[:expressions][:agent_revenue_after_support] = @expression(mod, 
-        mod.ext[:expressions][:agent_revenue_before_support]
-        #+ mod.ext[:expressions][:hpa_cost]
-        + mod.ext[:expressions][:h2f_cost]
-        + mod.ext[:expressions][:h2CfD_cost]
-        + mod.ext[:expressions][:h2_cap_grant_cost]
-        + sum(A[jy]*ADD_SF[jy]*λ_y_REC[jy]*r_y[jy] for jy in JY)
-        + sum(A[jy]*λ_m_REC[jm,jy]*r_m[jm,jy] for jm in JM, jy in JY)
-        + sum(A[jy]*W[jd]*λ_d_REC[jd,jy]*r_d[jd,jy] for jd in JD, jy in JY)
-        + sum(A[jy]*W[jd]*λ_h_REC[jh,jd,jy]*r_h[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
-        + sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
-        + sum(A[jy]*(1-CAP_SV[jy])*λ_H2CN_cap[jy]*capHCN[jy] for jy in JY)
-    )
+    # mod.ext[:expressions][:agent_revenue_after_support] = @expression(mod, 
+    #     mod.ext[:expressions][:agent_revenue_before_support]
+    #     #+ mod.ext[:expressions][:hpa_cost]
+    #     + mod.ext[:expressions][:h2f_cost]
+    #     + mod.ext[:expressions][:h2CfD_cost]
+    #     + mod.ext[:expressions][:h2_cap_grant_cost]
+    #     + sum(A[jy]*ADD_SF[jy]*λ_y_REC[jy]*r_y[jy] for jy in JY)
+    #     + sum(A[jy]*λ_m_REC[jm,jy]*r_m[jm,jy] for jm in JM, jy in JY)
+    #     + sum(A[jy]*W[jd]*λ_d_REC[jd,jy]*r_d[jd,jy] for jd in JD, jy in JY)
+    #     + sum(A[jy]*W[jd]*λ_h_REC[jh,jd,jy]*r_h[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
+    #     + sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
+    #     + sum(A[jy]*(1-CAP_SV[jy])*λ_H2CN_cap[jy]*capHCN[jy] for jy in JY)
+    # )
 
     mod.ext[:expressions][:h2_cap_grant_cost] = @expression(mod, 
     sum(A[jy]*H2_CAPG[jy]*capH[jy] for jy in JY)
@@ -234,7 +236,10 @@ function build_h2s_agent!(mod::Model)
             sum(gHCfD[jyy] for jyy in 1:jy ) <= gH_y[jy] # [TWh]
         )
         mod.ext[:constraints][:overbid_limit_CfD] = @constraint(mod, [jy=JY], 
-            gHCfD[jy] <= max_bid # [TWh]
+            gHCfD[jy] <= max_bid_CfD # [TWh]
+        )
+        mod.ext[:constraints][:overbid_limit_CfD] = @constraint(mod, [jy=JY], 
+            gHFP[jy] <= max_bid_FP # [TWh]
         )
     else
         mod.ext[:constraints][:gen_limit_carbon_neutral] = @constraint(mod, [jy=JY],

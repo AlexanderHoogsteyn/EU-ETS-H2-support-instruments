@@ -94,6 +94,8 @@ function define_results!(data::Dict,results::Dict,ADMM::Dict,agents::Dict,ETS::D
     push!(results["λ"]["H2FP"],zeros(data["nyears"]))
     results["λ"]["H2CfD"] = CircularBuffer{Array{Float64,1}}(data["CircularBufferSize"])  
     push!(results["λ"]["H2CfD"],zeros(data["nyears"]))
+    results["λ"]["H2CfD_ref"] = CircularBuffer{Array{Float64,1}}(data["CircularBufferSize"])  
+    push!(results["λ"]["H2CfD_ref"],zeros(data["nyears"]))
     results["λ"]["NG"] = CircularBuffer{Array{Float64,1}}(data["CircularBufferSize"])  
     push!(results["λ"]["NG"],zeros(data["nyears"]))
 
@@ -203,10 +205,10 @@ function define_results!(data::Dict,results::Dict,ADMM::Dict,agents::Dict,ETS::D
     ADMM["Tolerance"]["H2_d"] = data["epsilon"]/100*maximum(H2["D_d"])*sqrt(data["nyears"]*data["nReprDays"])
     ADMM["Tolerance"]["H2_m"] = data["epsilon"]/100*maximum(H2["D_m"])*sqrt(data["nyears"]*data["nMonths"])
     ADMM["Tolerance"]["H2_y"] = data["epsilon"]/100*maximum(H2["D_y"])*sqrt(data["nyears"])
-    ADMM["Tolerance"]["H2CN_prod"] = data["epsilon"]/100*maximum(H2CN_prod["H2CN_PRODT"])*sqrt(data["nyears"])
-    ADMM["Tolerance"]["H2CN_cap"] = data["epsilon"]/100*maximum(H2CN_cap["H2CN_CAPT"])*sqrt(data["nyears"])
-    ADMM["Tolerance"]["H2FP"] = data["epsilon"]/100*maximum(H2CN_prod["H2FP_BIDT"])*sqrt(data["nyears"])
-    ADMM["Tolerance"]["H2CfD"] = data["epsilon"]/100*maximum(H2CN_prod["H2CfD_BIDT"])*sqrt(data["nyears"])
+    ADMM["Tolerance"]["H2CN_prod"] = data["epsilon"]/100*max(maximum(H2CN_prod["H2CN_PRODT"])*sqrt(data["nyears"]),1e-3)
+    ADMM["Tolerance"]["H2CN_cap"] = data["epsilon"]/100*max(maximum(H2CN_cap["H2CN_CAPT"])*sqrt(data["nyears"]),1e-3)
+    ADMM["Tolerance"]["H2FP"] = data["epsilon"]/100*max(maximum(H2CN_prod["H2FP_BIDT"])*sqrt(data["nyears"]),1e-3)
+    ADMM["Tolerance"]["H2CfD"] = data["epsilon"]/100*max(maximum(H2CN_prod["H2CfD_BIDT"])*sqrt(data["nyears"]),1e-3)
 
 
     ADMM["ρ"] = Dict()

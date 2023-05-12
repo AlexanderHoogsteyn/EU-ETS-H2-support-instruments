@@ -115,7 +115,6 @@ if mod.ext[:parameters][:H2CN_prod] == 1
     push!(results["h2cn_prod"][m], collect(value.(mod.ext[:variables][:gHCN])))
     push!(results["h2cfd_bid"][m], collect(value.(mod.ext[:variables][:gHCfD])))
     push!(results["h2fp_bid"][m], collect(value.(mod.ext[:variables][:gHFP])))
-
 end
 if mod.ext[:parameters][:H2CN_cap] == 1
     push!(results["h2cn_cap"][m], collect(value.(mod.ext[:variables][:capHCN])))

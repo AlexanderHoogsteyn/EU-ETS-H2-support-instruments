@@ -14,9 +14,6 @@ function solve_h2s_agent!(mod::Model)
    CAP_SV = mod.ext[:parameters][:CAP_SV] # salvage value of new capacity
    A = mod.ext[:parameters][:A] # discount factors
    I = mod.ext[:parameters][:I] # discount factors
-
-
-   
    
    # Extract variables and expressions
    capH = mod.ext[:variables][:capH] 
@@ -185,7 +182,7 @@ function solve_h2s_agent!(mod::Model)
             - sum(A[jy]*λ_y_H2[jy]*gH_y[jy] for jy in JY)
             + sum(ρ_y_H2/2*(gH_y[jy] - gH_y_bar[jy])^2 for jy in JY) 
         )
-    end  
+    end
 
     if mod.ext[:parameters][:H2CN_prod] == 1
         λ_H2CN_prod = mod.ext[:parameters][:λ_H2CN_prod] # Carbon neutral H2 generation subsidy
@@ -211,8 +208,6 @@ function solve_h2s_agent!(mod::Model)
         λ_H2FP = mod.ext[:parameters][:λ_H2FP]
         λ_H2CfD = mod.ext[:parameters][:λ_H2CfD]
 
-
-
         #Extract premiums /
         #H2FP_PREM = mod.ext[:parameters][:H2FP_PREM]
         #λ_HPA = mod.ext[:parameters][:λ_HPA]
@@ -221,8 +216,9 @@ function solve_h2s_agent!(mod::Model)
         H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod,
             - sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
             - sum(A[jy]*(1-CAP_SV[jy])*λ_H2CN_cap[jy]*capHCN[jy] for jy in JY) 
-            - sum(A[jy]*(λ_H2CfD[jy]-λ_y_H2[jy])*10*gHCfD[jy] for jy in JY)
-            - sum(A[jy]*λ_H2FP[jy]*10*gHFP[jy] for jy in JY)
+            - sum(A[jy]*CONT_LT[jt,jy]*gHCfD[jt]*(λ_H2CfD[jt]-λ_y_H2[jy]) for jy=JY, jt in JY)
+            #- sum(A[jy]*λ_H2FP[jt]*CONT_LT[jt,jy]*gHFP[jt] for jy=JY, jt in JY)
+            - sum(A[jy]*λ_H2FP[jy]*10*gHFP[jy] for jy=JY)
             + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY)
             + sum(ρ_H2CN_cap/2*(capHCN[jy] - capHCN_bar[jy])^2 for jy in JY)
             + sum(ρ_H2CfD/2*(gHCfD[jy] - gHCfD_bar[jy])^2 for jy in JY)
