@@ -202,7 +202,7 @@ function solve_h2s_agent!(mod::Model)
         gHCfD = mod.ext[:variables][:gHCfD] 
         gHCfD_bar = mod.ext[:parameters][:gHCfD_bar]
         ρ_H2CfD = mod.ext[:parameters][:ρ_H2CfD]
-        gHFP_bar = mod.ext[:parameters][:gHCfD_bar]
+        gHFP_bar = mod.ext[:parameters][:gHFP_bar]
         ρ_H2FP = mod.ext[:parameters][:ρ_H2FP]
         H2_CAPG = mod.ext[:parameters][:H2CAP_PREM]
         λ_H2FP = mod.ext[:parameters][:λ_H2FP]
@@ -217,8 +217,8 @@ function solve_h2s_agent!(mod::Model)
             - sum(A[jy]*λ_H2CN_prod[jy]*gHCN[jy] for jy in JY) 
             - sum(A[jy]*(1-CAP_SV[jy])*λ_H2CN_cap[jy]*capHCN[jy] for jy in JY) 
             - sum(A[jy]*CONT_LT[jt,jy]*gHCfD[jt]*(λ_H2CfD[jt]-λ_y_H2[jy]) for jy=JY, jt in JY)
-            #- sum(A[jy]*λ_H2FP[jt]*CONT_LT[jt,jy]*gHFP[jt] for jy=JY, jt in JY)
-            - sum(A[jy]*λ_H2FP[jy]*10*gHFP[jy] for jy=JY)
+            - sum(A[jy]*λ_H2FP[jt]*CONT_LT[jt,jy]*gHFP[jt] for jy=JY, jt in JY)
+            #- sum(A[jy]*λ_H2FP[jy]*10*gHFP[jy] for jy=JY)
             + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY)
             + sum(ρ_H2CN_cap/2*(capHCN[jy] - capHCN_bar[jy])^2 for jy in JY)
             + sum(ρ_H2CfD/2*(gHCfD[jy] - gHCfD_bar[jy])^2 for jy in JY)
