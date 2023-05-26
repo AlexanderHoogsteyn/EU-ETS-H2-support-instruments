@@ -36,8 +36,8 @@ println("        ")
 const GUROBI_ENV = Gurobi.Env()
 # set parameters:
 GRBsetparam(GUROBI_ENV, "OutputFlag", "0")   
-GRBsetparam(GUROBI_ENV, "Threads", "4")
-GRBsetparam(GUROBI_ENV, "Method", "2")  
+#GRBsetparam(GUROBI_ENV, "Threads", "4")
+GRBsetparam(GUROBI_ENV, "Method", "1")  
 GRBsetparam(GUROBI_ENV, "TimeLimit", "300")  # will only affect solutions if you're selecting representative days  
 println("        ")
 
@@ -164,13 +164,13 @@ if HPC == "DelftBlue" || HPC == "ThinKing"
    stop_sens = dict_sim_number["stop_sens"]
 else
     # Range of scenarios to be simulated
-    start_scen = 401
+    start_scen = 404
     stop_scen = 415
     start_sens = 1
     stop_sens = 1 
 end
 
-#scen_number = 5
+#scen_number = 404
 for scen_number in range(start_scen,stop=stop_scen,step=1)
 
 println("    ")
@@ -186,7 +186,7 @@ data = merge(data,scenario_definition)
 # Define rho-values based on additionality rules and hydrogen demand resolution in this scenario
 define_rho_parameters!(data)
 
-#sens_number = 1 
+sens_number = 1 
 for sens_number in range(start_sens,stop=minimum([length(sensitivity_overview[!,:Parameter])+1,stop_sens]),step=1) 
 data["scenario"]["sens_number"] = sens_number 
 
