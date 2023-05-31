@@ -1,13 +1,17 @@
-This code was developed to study the interaction between the power sector, the energy intensive industry and the hydrogen sector on the auctions of the European Emission Trading System, the energy-only electricity market, the hydrogen market. It calculates an equilibrium between a set of representative price-taking agents on these markets and allows enforcing renewable targets and different defnitions of the "additionality" principle (putting requirements on the electricity used in the electrolysis proces). The market stability reserve in EU ETS is fully considered, endogenously adapting the supply of emission allowances.  It employs an iterative price-search algorithm based on ADMM to calculate this equilibrium iteratively. The emissions of the energy-intensive industry are represented via marginal abatement cost curves, which can be automatically calibrated to reproduce allowance prices post MSR reform (2019). 
+This code was developed to study the interaction between the power sector, the energy intensive industry and the hydrogen sector on the auctions of the European Emission Trading System, the energy-only electricity market, the hydrogen market. It calculates an equilibrium between a set of representative price-taking agents on these markets and allows enforcing renewable targets and different defnitions of the "additionality" principle (putting requirements on the electricity used in the electrolysis proces). It allows to enforce hydrogen and renewable energy targets. An auctioned fixed premium and hydrogen contract for difference can be applied. It employs an iterative price-search algorithm based on ADMM to calculate this equilibrium iteratively.  The emissions of the energy-intensive industry are represented via marginal abatement cost curves, which can be automatically calibrated to reproduce allowance prices post MSR reform (2019). An overview of the considered sectors and technologies is provided in Figure 1.
 
-(Variations on) this research code documented below have been used in the following papers:
+<picture>
+  <img alt="Figure 1: Overview of considered sectors and technologies" src="https://i.ibb.co/McXNZyX/Picture2.jpg">
+</picture>
+
+
+The research code is forked from the framework used in the following paper, and uses an identical representation of the power sector and ETS-sector than considered there:
 
 [1] K. Bruninx & Marten Ovaere, "COVID-19, Green Deal & the recovery plan permanently change emissions and prices in EU ETS Phase IV", Nature Communications, Volume 13, art. no. 1165, 2022.
 
-[2] Kenneth Bruninx, Marten Ovaere, Erik Delarue, "The long-term impact of the market stability reserve on the EU emission trading system," Energy Economics, Volume 89, art. no. 104746, 2020.
+The research code documented below has been used in the following paper, where the adaptations form the original paper are pointed out:
 
-[3] K. Bruninx & Marten Ovaere, “Estimating the impact of COVID-19 on emissions and emission allowance prices under EU ETS”, IAEE Energy Forum / Covid-19 Issue 2020, 2020. 
-
+[1] A. Hoogsteyn
 
 ## Installation, hardware & software requirements
 ### Installation
@@ -19,8 +23,8 @@ The program can be executed in the Julia terminal. Any text editor can be used t
 
 If the user does not have any of these programs installed, the installation should take approximately one hour.
 
-### Software requirements: (to be updated) 
-This code has been developed using Julia v1.5. The solver used is Gurobi v.9.0.
+### Software requirements: 
+This code has been developed using Julia v1.5 and is verified to be compatible up to v1.7.2 . The solver used is Gurobi v.9.0.
 
 The following Julia packages are required:
 - JuMP v.0.21.5
@@ -28,8 +32,13 @@ The following Julia packages are required:
 - DataFrames v.0.21.7
 - CSV v.0.7.7
 - YAML v0.4.2
+- DataStructures
 - ProgressBars v0.7.1
 - Printf
+- TimerOutputs
+- JLD2
+- ArgParse
+- RepresentativePeriodsFinder (https://ucm.pages.gitlab.kuleuven.be/representativeperiodsfinder.jl/)
 
 If the user does not have any of these programs installed, the installation should take less than one hour.
 
@@ -37,7 +46,7 @@ If the user does not have any of these programs installed, the installation shou
 No specific hardware is required. Depending on the configuration (number of agents and markets considered), computational effort may significantly increase.
 
 ## Running the program
-### Input (to be updated)
+### Input
 There are three places where the user can change the input.
 
 1. On line 9 of the "Main.jl"-file, the user can specify the set of scenarios one would like to study, ranging from "start_scen" to "stop_scen". This determines which scenarios in the "overview_scenarios.csv"-file will be executed.
@@ -78,7 +87,7 @@ Resources:
 - For interactive jobs, see https://doc.dhpc.tudelft.nl/delftblue/Slurm-scheduler/#interactive-use 
 
 
-## Running the code on ThinKing (VSC) 
+## Running the code on VSC (KU Leuven) 
 
 ### Output & Postprocessing (to be updated)
 Running the code will generate X output files:
