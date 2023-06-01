@@ -21,6 +21,7 @@ function build_ps_agent!(mod::Model)
     IC = mod.ext[:parameters][:IC] # overnight investment costs
     CI = mod.ext[:parameters][:CI] # carbon intensity
     A = mod.ext[:parameters][:A] # discount factors
+    As = mod.ext[:parameters][:As] # discount factors
     LEG_CAP = mod.ext[:parameters][:LEG_CAP] # legacy capacity
     CAP_LT = mod.ext[:parameters][:CAP_LT] # lead time on new capacity
     CAP_SV = mod.ext[:parameters][:CAP_SV] # salvage value of new capacity
@@ -57,8 +58,8 @@ function build_ps_agent!(mod::Model)
         W[jd]*g[jh,jd,jy]
     )
     mod.ext[:expressions][:tot_cost] = @expression(mod, 
-        + sum(A[jy]*(1-CAP_SV[jy])*IC[jy]*cap[jy] for jy in JY)
-        + sum(A[jy]*W[jd]*VC[jy]*g[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
+        + sum(As[jy]*(1-CAP_SV[jy])*IC[jy]*cap[jy] for jy in JY)
+        + sum(As[jy]*W[jd]*VC[jy]*g[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
     )
     if  mod.ext[:parameters][:REC] == 1
         λ_y_REC = mod.ext[:parameters][:λ_y_REC] # REC prices

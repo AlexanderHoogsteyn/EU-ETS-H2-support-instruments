@@ -17,6 +17,7 @@ function build_h2s_agent!(mod::Model)
     CAP_SV = mod.ext[:parameters][:CAP_SV] # salvage value of new capacity
     DELTA_CAP_MAX = mod.ext[:parameters][:DELTA_CAP_MAX] # max YoY change in new capacity
     A = mod.ext[:parameters][:A] # discount factors
+    As = mod.ext[:parameters][:As] # discount factors
     η_E_H2 = mod.ext[:parameters][:η_E_H2] # efficiency E->H2
     η_NG_H2 = mod.ext[:parameters][:η_NG_H2] # efficiency NG->H2
     λ_NG = mod.ext[:parameters][:λ_NG] # natural gas price
@@ -124,8 +125,8 @@ function build_h2s_agent!(mod::Model)
     )
     # Used to calculate total system cost, hence does not consider exogenous costs of the modelled comodities
     mod.ext[:expressions][:tot_cost] = @expression(mod, 
-        + sum(A[jy]*(1-CAP_SV[jy])*IC[jy]*capH[jy] for jy in JY)
-        + sum(A[jy]*λ_NG[jy]*dNG[jy] for jy in JY) 
+        + sum(As[jy]*(1-CAP_SV[jy])*IC[jy]*capH[jy] for jy in JY)
+        + sum(As[jy]*λ_NG[jy]*dNG[jy] for jy in JY) 
     )
     # Agent revenue before  do consider all cost of an agent, including exogenous costs of the modelled comodities 
     # mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod, 

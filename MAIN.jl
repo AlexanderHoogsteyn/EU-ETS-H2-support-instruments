@@ -36,8 +36,8 @@ println("        ")
 const GUROBI_ENV = Gurobi.Env()
 # set parameters:
 GRBsetparam(GUROBI_ENV, "OutputFlag", "0")   
-#GRBsetparam(GUROBI_ENV, "Threads", "4")
-GRBsetparam(GUROBI_ENV, "Method", "1")  
+GRBsetparam(GUROBI_ENV, "Threads", "2")
+GRBsetparam(GUROBI_ENV, "Method", "2")  
 GRBsetparam(GUROBI_ENV, "TimeLimit", "300")  # will only affect solutions if you're selecting representative days  
 println("        ")
 
@@ -164,8 +164,8 @@ if HPC == "DelftBlue" || HPC == "ThinKing"
    stop_sens = dict_sim_number["stop_sens"]
 else
     # Range of scenarios to be simulated
-    start_scen = 404
-    stop_scen = 415
+    start_scen = 2
+    stop_scen = 2
     start_sens = 1
     stop_sens = 1 
 end
@@ -348,7 +348,7 @@ if data["scenario"]["ref_scen_number"] == scen_number && sens_number == 1
         if data["scenario"]["import"] == "YES" 
             h2_import_2030 = 0
             for m in agents[:h2import]
-                h2_import_2030 = h2_import_2030 + value.(mdict[m].ext[:expressions][:gH_y][10])./data["H2"]["conv_factor"] # Convert to Mt
+                h2_import_2030 = h2_import_2030 + value.(mdict[m].ext[:expressions][:gH_y][10])./data["General"]["conv_factor"] # Convert to Mt
             end
 
             println(string("Calibration error 2030 H2 Import: " , data["H2"]["Import_Q_calibration"]-h2_import_2030," Mt H2"))

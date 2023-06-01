@@ -4,6 +4,7 @@ JY = mod.ext[:sets][:JY]
 
 # Extract parameters
 A = mod.ext[:parameters][:A]
+As = mod.ext[:parameters][:As]
 e = mod.ext[:parameters][:e]
 AC = mod.ext[:parameters][:AC]
 λ_EUA = mod.ext[:parameters][:λ_EUA]
@@ -15,7 +16,7 @@ b = mod.ext[:variables][:b]
 
 # Update expressions
 mod.ext[:expressions][:tot_cost] = @expression(mod, 
-    sum(A[jy]*AC[jy] for jy in JY)
+    sum(As[jy]*AC[jy] for jy in JY)
 )
 
 # Update objective

@@ -4,6 +4,7 @@ JY = mod.ext[:sets][:JY]
 
 # Extract parameters
 A = mod.ext[:parameters][:A]
+As = mod.ext[:parameters][:As]
 e = mod.ext[:parameters][:e]
 AC = mod.ext[:parameters][:AC]
 λ_EUA = mod.ext[:parameters][:λ_EUA]
@@ -15,10 +16,10 @@ b = mod.ext[:variables][:b] = @variable(mod, [jy=JY], lower_bound = 0, base_name
 
 # Expressions
 mod.ext[:expressions][:tot_cost] = @expression(mod, 
-    sum(A[jy]*AC[jy] for jy in JY)
+    sum(As[jy]*AC[jy] for jy in JY)
 )
 mod.ext[:expressions][:agent_revenue_before_support] = @expression(mod,
-    -sum(A[jy]*λ_EUA[jy]*b[jy] for jy in JY)
+    -sum(As[jy]*λ_EUA[jy]*b[jy] for jy in JY)
 )
 mod.ext[:expressions][:agent_revenue_after_support] = @expression(mod,
     mod.ext[:expressions][:agent_revenue_before_support]

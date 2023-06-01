@@ -21,6 +21,7 @@ function define_common_parameters!(m::String,mod::Model, data::Dict, ts::DataFra
     mod.ext[:parameters][:W] = [repr_days[!,:weights][jd] for jd in mod.ext[:sets][:JD]]                              # weights of each representative day
     mod.ext[:parameters][:Wm] = [repr_days[!,months[jm]][jd] for jd in mod.ext[:sets][:JD],jm in mod.ext[:sets][:JM]] # weights of each representative day => month
     mod.ext[:parameters][:A] = ones(data["nyears"],1)                                                                 # Discount rate, 2021 as base year due to calibration to 2019 data
+    mod.ext[:parameters][:As] = ones(data["nyears"],1)                                                                 # Discount rate, 2021 as base year due to calibration to 2019 data
     for y in 4:data["nyears"]
         mod.ext[:parameters][:A][y] = 1/(1+data["discount_rate"])^(y-3)
     end
@@ -28,7 +29,9 @@ function define_common_parameters!(m::String,mod::Model, data::Dict, ts::DataFra
     for y in 4:data["nyears"]
         mod.ext[:parameters][:I][y] = (1+data["inflation"])^(y-3)
     end
-
+    for y in 4:data["nyears"]
+        mod.ext[:parameters][:As][y] = (1+data["social_discount_rate"])^(y-3)
+    end
     # Parameters related to the EUA auctions
     mod.ext[:parameters][:λ_EUA] = zeros(data["nyears"],1)       # Price structure
     mod.ext[:parameters][:b_bar] = zeros(data["nyears"],1)       # ADMM penalty term

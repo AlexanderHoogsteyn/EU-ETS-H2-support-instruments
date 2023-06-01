@@ -12,14 +12,16 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
 
     # Aggregate metrics 
     CONT_LT = mdict["Alkaline_peak"].ext[:parameters][:CONT_LT]
+    JY = mdict[agents[:h2cn_prod][1]].ext[:sets][:JY]
     h2_cap_grant_cost = 0 #sum(value(mdict[m].ext[:expressions][:h2_cap_grant_cost]) for m in agents[:h2s])
+    As = mdict["Alkaline_peak"].ext[:parameters][:As]
 
     tot_cost = sum(value(mdict[m].ext[:expressions][:tot_cost]) for m in agents[:all])
     tot_em = sum(results["e"][m][end][jy] for m in agents[:ets],jy in mdict[agents[:ps][1]].ext[:sets][:JY]) 
-    H2_policy_cost = ( sum(sum(results["h2cn_prod"][m][end].*results["λ"]["H2CN_prod"][end])  for m in agents[:h2cn_prod])
-                    + sum(sum(results["h2cn_cap"][m][end].*results["λ"]["H2CN_cap"][end]) for m in agents[:h2cn_cap])
-                    + sum(10*sum(results["h2fp_bid"][m][end].*results["λ"]["H2FP"][end]) for m in agents[:h2cn_prod])
-                    + sum(CONT_LT[jt,jy]*results["h2cfd_bid"][m][end][jt]*(results["λ"]["H2CfD"][end][jt] - results["λ"]["H2CfD_ref"][end][jy]) for jy in mdict[agents[:h2cn_prod][1]].ext[:sets][:JY], jt in mdict[agents[:h2cn_prod][1]].ext[:sets][:JY], m in agents[:h2cn_prod])
+    H2_policy_cost = ( sum(results["h2cn_prod"][m][end][jy]*results["λ"]["H2CN_prod"][end][jy]*As[jy] for jy in JY, m in agents[:h2cn_prod])
+                    + sum(results["h2cn_cap"][m][end][jy]*results["λ"]["H2CN_cap"][end][jy]*As[jy] for jy in JY, m in agents[:h2cn_cap])
+                    + sum(CONT_LT[jt,jy]*results["h2fp_bid"][m][end][jt]*results["λ"]["H2FP"][end][jt]*As[jy] for jy in JY, jt in JY, m in agents[:h2cn_prod])
+                    + sum(CONT_LT[jt,jy]*results["h2cfd_bid"][m][end][jt]*As[jy]*(results["λ"]["H2CfD"][end][jt] - results["λ"]["H2CfD_ref"][end][jy]) for jy in JY, jt in JY, m in agents[:h2cn_prod])
                     + h2_cap_grant_cost)
     if data["import"] == "YES" 
         α_1 = mdict["Import"].ext[:parameters][:α_1]

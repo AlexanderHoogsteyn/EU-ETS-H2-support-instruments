@@ -9,6 +9,7 @@ function build_h2import_agent!(mod)
     W = mod.ext[:parameters][:W] # weight of the representative days
     Wm = mod.ext[:parameters][:Wm] # weight of the representative days
     A = mod.ext[:parameters][:A]
+    As = mod.ext[:parameters][:As]
     λ_h_H2 = mod.ext[:parameters][:λ_h_H2] # H2 prices
     gH_h_bar = mod.ext[:parameters][:gH_h_bar] # element in ADMM penalty term related to hydrogen market
     ρ_h_H2 = mod.ext[:parameters][:ρ_h_H2] # rho-value in ADMM related to H2 market
@@ -55,7 +56,7 @@ function build_h2import_agent!(mod)
     )
 
     mod.ext[:expressions][:tot_cost] = @expression(mod, 
-    sum(A[jy]*SF[jy]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
+    sum(As[jy]*SF[jy]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
     )
 
 
