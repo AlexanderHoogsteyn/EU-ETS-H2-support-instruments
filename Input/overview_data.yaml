@@ -189,7 +189,7 @@ HydrogenImport:
     NG: "NO" # participate in the natural gas market  
     YoY_OC: -2.1
     a_1: 40 # Fixed component in MC hydrogen import: MC = a_1 + a_2*q 
-    a_2: 456 # Variable component in MC hydrogen import: MC = a_1 + a_2*q 
+    a_2: 861.2 # Variable component in MC hydrogen import: MC = a_1 + a_2*q 
 
 # Legacy capacities (2021), load and renewable availability factors based on ENTSO-E https://transparency.entsoe.eu
 # Unless stated otherwise, cost/tech data from EUR-PyPSA https://technology-data.readthedocs.io/en/latest/# 

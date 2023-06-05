@@ -364,6 +364,11 @@ if data["scenario"]["ref_scen_number"] == scen_number && sens_number == 1
         define_results!(merge(data["General"],data["ADMM"],data["scenario"]),results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)      # initialize structure of results, only those that will be stored in each iteration
         ADMM!(results,ADMM,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG,mdict,agents,data,TO)                                                       # calculate equilibrium 
         ADMM["walltime"] =  TimerOutputs.tottime(TO)*10^-9/60                                                                               # wall time 
+
+        # Save intermediate result
+        save_results(mdict,EOM,ETS,H2,ADMM,results,merge(data["General"],data["ADMM"],data["H2"],data["scenario"]),agents,"ref") 
+        YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_TO_ref.yaml")),TO)
+    
     end
 end
 
@@ -376,11 +381,9 @@ println(string("        "))
 ## 6. Postprocessing and save results 
 if sens_number >= 2
     save_results(mdict,EOM,ETS,H2,ADMM,results,merge(data["General"],data["ADMM"],data["H2"],data["scenario"]),agents,sensitivity_overview[sens_number-1,:remarks]) 
-    # @save joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_",sensitivity_overview[sens_number-1,:remarks]))
     YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_TO_",sensitivity_overview[sens_number-1,:remarks],".yaml")),TO)
 else
     save_results(mdict,EOM,ETS,H2,ADMM,results,merge(data["General"],data["ADMM"],data["H2"],data["scenario"]),agents,"ref") 
-    # @save joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_ref"))
     YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_TO_ref.yaml")),TO)
 end
 println("Postprocessing & save results: done")
