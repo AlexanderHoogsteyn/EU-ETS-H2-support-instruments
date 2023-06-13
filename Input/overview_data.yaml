@@ -1,7 +1,7 @@
 General: 
   nyears: 40
   nTimesteps: 24 # number of timesteps per representative day
-  nReprDays: 16 # days
+  nReprDays: 2 # days
   nMonths: 12 # number of months
   inflation: 0.02
   discount_rate: 0.1
@@ -169,7 +169,7 @@ HydrogenSector:
    emissions: 0.0 # [ton CO2/MWh] = [Mton CO2/TWh]
    max_YoY_new_cap: 1000 # % of current capacity
    YoY_OC: -2.1 # % change in overnight investment cost YoY
-   Legcap_out: 20 # years 
+   Legcap_out: 20 # years
    REC: "YES" # eligible for RECs
    ETS: "NO" # covered by ETS
    EOM: "YES" # participates in EOM
@@ -186,8 +186,10 @@ HydrogenImport:
     H2: "YES" # participate in the carbon neutral H2 market
     H2CN_prod: "NO" # participate in the carbon neutral H2 market (production)
     H2CN_cap: "NO" # participate in the carbon neutral H2 market (capacity)
-    NG: "NO" # participate in the natural gas market  
-    YoY_OC: -2.1
+    NG: "NO" # participate in the natural gas market
+    Leadtime: 3 # Import impossible in 2021-2023
+    YoY_OC_pre_2030: -8.4
+    YoY_OC_post_2030: -2.1
     a_1: 40 # Fixed component in MC hydrogen import: MC = a_1 + a_2*q 
     a_2: 861.2 # Variable component in MC hydrogen import: MC = a_1 + a_2*q 
 

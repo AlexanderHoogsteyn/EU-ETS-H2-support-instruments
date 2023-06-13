@@ -32,6 +32,7 @@ function build_h2import_agent!(mod)
     SF = mod.ext[:parameters][:SF]
     α_1 = mod.ext[:parameters][:α_1]
     α_2 = mod.ext[:parameters][:α_2]
+    LT = mod.ext[:parameters][:LT]
 
     # Decision variables
     gH = mod.ext[:variables][:gH] = @variable(mod, [jh=JH,jd=JD,jy=JY], lower_bound=0, base_name="generation_hydrogen") 
@@ -128,6 +129,14 @@ function build_h2import_agent!(mod)
             gHCN[jy] == 0 # [TWh]
         )
     end
+
+    mod.ext[:constraints][:leadtime] = @constraint(mod, [jh=JH,jd=JD,jy=1:LT],
+        gH[jh,jd,jy] == 0
+    )
+
+    mod.ext[:constraints][:daily_dispatch] = @constraint(mod, [jh=JH,jd=JD,jy=JY],
+    gH[1,jd,jy] == gH[jh,jd,jy]
+    )
 
     mod.ext[:expressions][:agent_revenue_after_support] = @expression(mod,
     mod.ext[:expressions][:agent_revenue_before_support]
