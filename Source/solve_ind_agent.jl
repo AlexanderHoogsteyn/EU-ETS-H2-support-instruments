@@ -16,7 +16,7 @@ b = mod.ext[:variables][:b]
 
 # Update expressions
 mod.ext[:expressions][:tot_cost] = @expression(mod, 
-    sum(As[jy]*AC[jy] for jy in JY)
+    sum(A[jy]*AC[jy] for jy in JY)
 )
 
 # Update objective

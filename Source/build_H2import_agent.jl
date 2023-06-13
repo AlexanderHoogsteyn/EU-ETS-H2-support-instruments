@@ -57,7 +57,7 @@ function build_h2import_agent!(mod)
     )
 
     mod.ext[:expressions][:tot_cost] = @expression(mod, 
-    sum(As[jy]*SF[jy]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
+    sum(A[jy]*SF[jy]*(α_2*gH[jh,jd,jy]+ α_1)*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
     )
 
 
