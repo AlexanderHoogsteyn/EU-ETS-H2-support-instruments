@@ -114,7 +114,6 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
             elseif data["scenario"]["H2_balance"] == "Yearly"
                 push!(results["λ"]["H2_y"], results["λ"]["H2_y"][end] - ADMM["ρ"]["H2_y"][end]/1000*ADMM["Imbalances"]["H2_y"][end])
                 push!(results["λ"]["H2CfD_ref"], results["λ"]["H2_y"][end])
-
             end
             push!(results["λ"]["H2CN_prod"], results["λ"]["H2CN_prod"][end] - ADMM["ρ"]["H2CN_prod"][end]/100*ADMM["Imbalances"]["H2CN_prod"][end])
             push!(results["λ"]["H2CN_cap"], results["λ"]["H2CN_cap"][end] - ADMM["ρ"]["H2CN_cap"][end]/1000*ADMM["Imbalances"]["H2CN_cap"][end])

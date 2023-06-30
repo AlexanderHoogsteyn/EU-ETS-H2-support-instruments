@@ -10,44 +10,6 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
         )
     end
 
-    # Aggregate metrics 
-    CONT_LT = mdict["Alkaline_peak"].ext[:parameters][:CONT_LT]
-    JY = mdict[agents[:h2cn_prod][1]].ext[:sets][:JY]
-    h2_cap_grant_cost = 0 #sum(value(mdict[m].ext[:expressions][:h2_cap_grant_cost]) for m in agents[:h2s])
-    As = mdict["Alkaline_peak"].ext[:parameters][:As]
-
-    tot_cost = sum(value(mdict[m].ext[:expressions][:tot_cost]) for m in agents[:all])
-    tot_em = sum(results["e"][m][end][jy] for m in agents[:ets],jy in mdict[agents[:ps][1]].ext[:sets][:JY]) 
-    H2_policy_cost = ( sum(results["h2cn_prod"][m][end][jy]*results["λ"]["H2CN_prod"][end][jy]*As[jy] for jy in JY, m in agents[:h2cn_prod])
-                    + sum(results["h2cn_cap"][m][end][jy]*results["λ"]["H2CN_cap"][end][jy]*As[jy] for jy in JY, m in agents[:h2cn_cap])
-                    + sum(CONT_LT[jt,jy]*results["h2fp_bid"][m][end][jt]*results["λ"]["H2FP"][end][jt]*As[jy] for jy in JY, jt in JY, m in agents[:h2cn_prod])
-                    + sum(CONT_LT[jt,jy]*results["h2cfd_bid"][m][end][jt]*As[jy]*(results["λ"]["H2CfD"][end][jt] - results["λ"]["H2CfD_ref"][end][jy]) for jy in JY, jt in JY, m in agents[:h2cn_prod])
-                    + h2_cap_grant_cost)
-    if data["import"] == "YES" 
-        α_1 = mdict["Import"].ext[:parameters][:α_1]
-        α_2 = mdict["Import"].ext[:parameters][:α_2]
-    else
-        α_1 = 0
-        α_2 = 0
-    end
-
-    vector_output = [data["scen_number"]; sens; ADMM["n_iter"];
-                     ADMM["walltime"];ADMM["Residuals"]["Primal"]["ETS"][end];ADMM["Residuals"]["Primal"]["MSR"][end]; 
-                     ADMM["Residuals"]["Primal"]["EOM"][end];
-                     ADMM["Residuals"]["Primal"]["REC_y"][end]+ADMM["Residuals"]["Primal"]["REC_m"][end]+ADMM["Residuals"]["Primal"]["REC_d"][end]+ADMM["Residuals"]["Primal"]["REC_h"][end]; 
-                     ADMM["Residuals"]["Primal"]["H2_y"][end]; ADMM["Residuals"]["Primal"]["H2CN_prod"][end]; ADMM["Residuals"]["Primal"]["H2CN_cap"][end]; 
-                     ADMM["Residuals"]["Dual"]["ETS"][end]; ADMM["Residuals"]["Dual"]["EOM"][end]; 
-                     ADMM["Residuals"]["Dual"]["REC_y"][end]+ADMM["Residuals"]["Dual"]["REC_m"][end]+ADMM["Residuals"]["Dual"]["REC_d"][end]+ADMM["Residuals"]["Dual"]["REC_h"][end]; 
-                     ADMM["Residuals"]["Dual"]["H2_y"][end];ADMM["Residuals"]["Dual"]["H2CN_prod"][end]; 
-                     ADMM["Residuals"]["Dual"]["H2CN_cap"][end]; mdict["Ind"].ext[:parameters][:β]; α_2;
-                     results[ "λ"]["EUA"][end][2]; tot_em; tot_cost;H2_policy_cost
-                     ]
-    CSV.write(joinpath(home_dir,string("overview_results_",data["nReprDays"],"_repr_days.csv")),
-             DataFrame(reshape(vector_output,1,:),:auto), 
-             delim=";",
-             append=true
-             );
-
     # Agent specific metrics
     agent_costs = [data["scen_number"]; sens; ADMM["n_iter"]]
     for m in agents[:all]
@@ -171,6 +133,43 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
                 string.("CN_CAP_",agents[:h2cn_prod]);string.("CN_PROD_",agents[:h2cn_prod]);string.("H2CfD_",agents[:h2cn_prod]);string.("H2FP_",agents[:h2cn_prod]);
                 "PriceH2";"PremiumH2CN_prod";"PremiumH2CN_cap";"PremiumFP";"StrikeH2CfD";"RefH2CfD"]);
 
+    # Aggregate metrics 
+    CONT_LT = mdict["Alkaline_peak"].ext[:parameters][:CONT_LT]
+    JY = mdict[agents[:h2cn_prod][1]].ext[:sets][:JY]
+    h2_cap_grant_cost = 0 #sum(value(mdict[m].ext[:expressions][:h2_cap_grant_cost]) for m in agents[:h2s])
+    As = mdict["Alkaline_peak"].ext[:parameters][:As]
+
+    tot_cost = sum(value(mdict[m].ext[:expressions][:tot_cost]) for m in agents[:all])
+    tot_em = sum(results["e"][m][end][jy] for m in agents[:ets],jy in mdict[agents[:ps][1]].ext[:sets][:JY]) 
+    H2_policy_cost = ( sum(results["h2cn_prod"][m][end][jy]*results["λ"]["H2CN_prod"][end][jy]*As[jy] for jy in JY, m in agents[:h2cn_prod])
+                    + sum(results["h2cn_cap"][m][end][jy]*results["λ"]["H2CN_cap"][end][jy]*As[jy] for jy in JY, m in agents[:h2cn_cap])
+                    + sum(CONT_LT[jt,jy]*results["h2fp_bid"][m][end][jt]*results["λ"]["H2FP"][end][jt]*As[jy] for jy in JY, jt in JY, m in agents[:h2cn_prod])
+                    + sum(CONT_LT[jt,jy]*results["h2cfd_bid"][m][end][jt]*As[jy]*(results["λ"]["H2CfD"][end][jt] - λ_H2_avg[jy]) for jy in JY, jt in JY, m in agents[:h2cn_prod])
+                    + h2_cap_grant_cost)
+    if data["import"] == "YES" 
+        α_1 = mdict["Import"].ext[:parameters][:α_1]
+        α_2 = mdict["Import"].ext[:parameters][:α_2]
+    else
+        α_1 = 0
+        α_2 = 0
+    end
+
+    vector_output = [data["scen_number"]; sens; ADMM["n_iter"];
+                     ADMM["walltime"];ADMM["Residuals"]["Primal"]["ETS"][end];ADMM["Residuals"]["Primal"]["MSR"][end]; 
+                     ADMM["Residuals"]["Primal"]["EOM"][end];
+                     ADMM["Residuals"]["Primal"]["REC_y"][end]+ADMM["Residuals"]["Primal"]["REC_m"][end]+ADMM["Residuals"]["Primal"]["REC_d"][end]+ADMM["Residuals"]["Primal"]["REC_h"][end]; 
+                     ADMM["Residuals"]["Primal"]["H2_y"][end]; ADMM["Residuals"]["Primal"]["H2CN_prod"][end]; ADMM["Residuals"]["Primal"]["H2CN_cap"][end]; 
+                     ADMM["Residuals"]["Dual"]["ETS"][end]; ADMM["Residuals"]["Dual"]["EOM"][end]; 
+                     ADMM["Residuals"]["Dual"]["REC_y"][end]+ADMM["Residuals"]["Dual"]["REC_m"][end]+ADMM["Residuals"]["Dual"]["REC_d"][end]+ADMM["Residuals"]["Dual"]["REC_h"][end]; 
+                     ADMM["Residuals"]["Dual"]["H2_y"][end];ADMM["Residuals"]["Dual"]["H2CN_prod"][end]; 
+                     ADMM["Residuals"]["Dual"]["H2CN_cap"][end]; mdict["Ind"].ext[:parameters][:β]; α_2;
+                     results[ "λ"]["EUA"][end][2]; tot_em; tot_cost;H2_policy_cost
+                     ]
+    CSV.write(joinpath(home_dir,string("overview_results_",data["nReprDays"],"_repr_days.csv")),
+             DataFrame(reshape(vector_output,1,:),:auto), 
+             delim=";",
+             append=true
+             );
                    
     # Operational data
     # Extract hydrogen and electricity production and import data
