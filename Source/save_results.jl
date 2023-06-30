@@ -190,7 +190,8 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
         mm += 1
     end
     eom_price = vec(values.(results["λ"]["EOM"][1][:,:,year]))
-    mat_output = [Hours eom_price transpose(h2) transpose(el_prod)]
+    h2_price = vec(values.(repeat(transpose(results["λ"]["H2_d"][end][:,year]),data["nTimesteps"])))
+    mat_output = [Hours eom_price h2_price transpose(h2) transpose(el_prod)]
     CSV.write(
         joinpath(
             home_dir,
@@ -202,6 +203,7 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
         header=[
             "Hour"; 
             "EOM_price";
+            "H2_price";
             string.("PROD_", agents[:h2]);
             string.("PROD_", agents[:ps])
             ]
