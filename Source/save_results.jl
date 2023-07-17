@@ -208,4 +208,42 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
             ]
     )
 
+    # Opertional profits overview_data
+    cap_cost = zeros(length(agents[:h2cn_prod]),data["nyears"])
+    elec_cost = zeros(length(agents[:h2cn_prod]),data["nyears"])
+    h2_revenue = zeros(length(agents[:h2cn_prod]),data["nyears"])
+    subsidy = zeros(length(agents[:h2cn_prod]),data["nyears"])
+
+    #operational_profit = zeros(length(agents[:h2cn_prod]),data["nyears"])
+    A = value.(mdict["Alkaline_peak"].ext[:parameters][:A])
+
+    mm = 1
+    for m in agents[:h2cn_prod]
+        cap_cost[mm,:] = value.(mdict[m].ext[:variables][:capH]).*value.(mdict[m].ext[:parameters][:IC]).*A
+        elec_cost[mm,:] = [ -sum(values.(results["λ"]["EOM"][end][:,:,jy]).*value.(mdict[m].ext[:expressions][:gw][:,:,jy]))*A[jy] for jy in JY]
+        h2_revenue[mm,:] = [ sum(values.(results["λ"]["H2_d"][end][:,jy]).*value.(mdict[m].ext[:expressions][:gH_d_w][:,jy]))*A[jy] for jy in JY]
+        subsidy[mm,:] = values.(results["λ"]["H2CN_prod"][end]).*value.(mdict[m].ext[:variables][:gHCN]) + values.(results["λ"]["H2CN_cap"][end]).*value.(mdict[m].ext[:variables][:capHCN])
+        subsidy[mm,:] = subsidy[mm,:].*A
+        #+ 10*values.(results["λ"]["H2CN_prod"][end]).*value.(mdict[m].ext[:variables][:gHFP]).*A
+                    #+ values.(results["λ"]["H2CN_prod"][1]).*values.(mdict[m].ext[:variables][:gHCfD])
+        mm = mm + 1
+    end
+    mat_output = [Years transpose(cap_cost) transpose(elec_cost) transpose(h2_revenue) transpose(subsidy)]
+    CSV.write(
+        joinpath(
+            home_dir,
+            string("Results_", data["nReprDays"], "_repr_days"),
+            string("Scenario_", data["scen_number"], "_operation_profits_", sens, ".csv")
+        ),
+        DataFrame(mat_output, :auto),
+        delim=";",
+        header=[
+            "Year"
+            string.("CAP_COST_", agents[:h2cn_prod]);
+            string.("ELEC_COST_", agents[:h2cn_prod]);
+            string.("H2_REV_", agents[:h2cn_prod]);
+            string.("CN_REV_", agents[:h2cn_prod]);
+            ]
+    )
+
 end
