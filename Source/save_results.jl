@@ -158,10 +158,12 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
                      ADMM["walltime"];ADMM["Residuals"]["Primal"]["ETS"][end];ADMM["Residuals"]["Primal"]["MSR"][end]; 
                      ADMM["Residuals"]["Primal"]["EOM"][end];
                      ADMM["Residuals"]["Primal"]["REC_y"][end]+ADMM["Residuals"]["Primal"]["REC_m"][end]+ADMM["Residuals"]["Primal"]["REC_d"][end]+ADMM["Residuals"]["Primal"]["REC_h"][end]; 
-                     ADMM["Residuals"]["Primal"]["H2_y"][end]; ADMM["Residuals"]["Primal"]["H2CN_prod"][end]; ADMM["Residuals"]["Primal"]["H2CN_cap"][end]; 
+                     ADMM["Residuals"]["Primal"]["H2_y"][end]+ADMM["Residuals"]["Primal"]["H2_m"][end] +ADMM["Residuals"]["Primal"]["H2_d"][end]+ADMM["Residuals"]["Primal"]["H2_h"][end]; 
+                     ADMM["Residuals"]["Primal"]["H2CN_prod"][end]; ADMM["Residuals"]["Primal"]["H2CN_cap"][end]; 
                      ADMM["Residuals"]["Dual"]["ETS"][end]; ADMM["Residuals"]["Dual"]["EOM"][end]; 
                      ADMM["Residuals"]["Dual"]["REC_y"][end]+ADMM["Residuals"]["Dual"]["REC_m"][end]+ADMM["Residuals"]["Dual"]["REC_d"][end]+ADMM["Residuals"]["Dual"]["REC_h"][end]; 
-                     ADMM["Residuals"]["Dual"]["H2_y"][end];ADMM["Residuals"]["Dual"]["H2CN_prod"][end]; 
+                     ADMM["Residuals"]["Dual"]["H2_y"][end]+ADMM["Residuals"]["Dual"]["H2_m"][end]+ADMM["Residuals"]["Dual"]["H2_d"][end]+ADMM["Residuals"]["Dual"]["H2_h"][end];
+                     ADMM["Residuals"]["Dual"]["H2CN_prod"][end]; 
                      ADMM["Residuals"]["Dual"]["H2CN_cap"][end]; mdict["Ind"].ext[:parameters][:β]; α_2;
                      results[ "λ"]["EUA"][end][2]; tot_em; tot_cost;H2_policy_cost
                      ]
