@@ -1,6 +1,6 @@
 # Save results
 function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,results::Dict,data::Dict,agents::Dict,sens) 
-    # note that type of "sens" is not defined as a string stored in a dictionary is of type String31, whereas a "regular" string is of type String. Specifying one or the other may trow errors.
+    # note that type of "sens" is not defined as a string stored in a dictionary is of type String31, whereas a "regular" string is of type String. Specifying one or the other may trow errors.  
     Years = range(2021,stop=2021+data["nyears"]-1)
     Iterations = range(1,stop=data["CircularBufferSize"])
 
@@ -158,7 +158,7 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
                      ADMM["walltime"];ADMM["Residuals"]["Primal"]["ETS"][end];ADMM["Residuals"]["Primal"]["MSR"][end]; 
                      ADMM["Residuals"]["Primal"]["EOM"][end];
                      ADMM["Residuals"]["Primal"]["REC_y"][end]+ADMM["Residuals"]["Primal"]["REC_m"][end]+ADMM["Residuals"]["Primal"]["REC_d"][end]+ADMM["Residuals"]["Primal"]["REC_h"][end]; 
-                     ADMM["Residuals"]["Primal"]["H2_y"][end]+ADMM["Residuals"]["Primal"]["H2_m"][end] +ADMM["Residuals"]["Primal"]["H2_d"][end]+ADMM["Residuals"]["Primal"]["H2_h"][end]; 
+                     ADMM["Residuals"]["Primal"]["H2_y"][end]+ADMM["Residuals"]["Primal"]["H2_m"][end] + ADMM["Residuals"]["Primal"]["H2_d"][end] + ADMM["Residuals"]["Primal"]["H2_h"][end];
                      ADMM["Residuals"]["Primal"]["H2CN_prod"][end]; ADMM["Residuals"]["Primal"]["H2CN_cap"][end]; 
                      ADMM["Residuals"]["Dual"]["ETS"][end]; ADMM["Residuals"]["Dual"]["EOM"][end]; 
                      ADMM["Residuals"]["Dual"]["REC_y"][end]+ADMM["Residuals"]["Dual"]["REC_m"][end]+ADMM["Residuals"]["Dual"]["REC_d"][end]+ADMM["Residuals"]["Dual"]["REC_h"][end]; 
@@ -247,5 +247,6 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
             string.("CN_REV_", agents[:h2cn_prod]);
             ]
     )
+
 
 end
