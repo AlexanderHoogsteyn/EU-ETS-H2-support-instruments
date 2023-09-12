@@ -14,6 +14,7 @@ function define_results!(data::Dict,results::Dict,ADMM::Dict,agents::Dict,ETS::D
     results["h2cn_cap"] = Dict()
     results["h2fp_bid"] = Dict()
     results["h2cfd_bid"] = Dict()
+    results["dual_max_support_duration"] = Dict()
 
 
     for m in agents[:ets]
@@ -53,6 +54,9 @@ function define_results!(data::Dict,results::Dict,ADMM::Dict,agents::Dict,ETS::D
         push!(results["h2fp_bid"][m],zeros(data["nyears"]))
         results["h2cfd_bid"][m] = CircularBuffer{Array{Float64,1}}(data["CircularBufferSize"]) 
         push!(results["h2cfd_bid"][m],zeros(data["nyears"]))
+        results["dual_max_support_duration"][m] = CircularBuffer{Array{Float64,1}}(data["CircularBufferSize"])
+        push!(results["dual_max_support_duration"][m],zeros(data["nyears"]))
+
     end
     for m in agents[:h2cn_cap]
         results["h2cn_cap"][m] = CircularBuffer{Array{Float64,1}}(data["CircularBufferSize"]) 

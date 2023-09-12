@@ -379,13 +379,39 @@ println(string("Required walltime: ",ADMM["walltime"], " minutes"))
 println(string("        "))
 
 ## 6. Postprocessing and save results 
+# Convert circular buffers to array
+for (r,data) in results 
+    if r!= "s"
+        for (m,cb) in data
+            results[r][m] = Array(cb)
+        end
+    elseif r == "s"
+        results[r] = Array(data)
+    end
+end
+# for (r,data) in ADMM["ρ"]
+#     for (m,cb) in data
+        
+# end
+# ADMM["ρ"] = 
+
+
 if sens_number >= 2
+    jldsave(
+        joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_",sensitivity_overview[sens_number-1,:remarks],".jld2"));
+        results
+    )
     save_results(mdict,EOM,ETS,H2,ADMM,results,merge(data["General"],data["ADMM"],data["H2"],data["scenario"]),agents,sensitivity_overview[sens_number-1,:remarks]) 
     YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_TO_",sensitivity_overview[sens_number-1,:remarks],".yaml")),TO)
 else
+    jldsave(
+        joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],".jld2"));
+        results
+    )
     save_results(mdict,EOM,ETS,H2,ADMM,results,merge(data["General"],data["ADMM"],data["H2"],data["scenario"]),agents,"ref") 
     YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_TO_ref.yaml")),TO)
 end
+
 println("Postprocessing & save results: done")
 println("   ")
 
