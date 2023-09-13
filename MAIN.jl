@@ -4,7 +4,7 @@
 
 ## 0. Set-up code
 # HPC or not?
-HPC =  "NA" #"ThinKing" # NA, DelftBlue or ThinKing
+HPC =  "NA" #ThinKing" # NA, DelftBlue or ThinKing
 
 # Home directory
 const home_dir = @__DIR__
@@ -389,24 +389,31 @@ for (r,data) in results
         results[r] = Array(data)
     end
 end
-# for (r,data) in ADMM["ρ"]
-#     for (m,cb) in data
-        
-# end
-# ADMM["ρ"] = 
+for (r,data) in ADMM["ρ"]
+    ADMM["ρ"][r] = Array(data)
+end
+for (r,data) in ADMM["Residuals"]["Primal"]
+    ADMM["Residuals"]["Primal"][r] = Array(data)
+end
+for (r,data) in ADMM["Residuals"]["Dual"]
+    ADMM["Residuals"]["Dual"][r] = Array(data)
+end
+for (r,data) in ADMM["Imbalances"]
+    ADMM["Imbalances"][r] = Array(data)
+end
 
 
 if sens_number >= 2
     jldsave(
         joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_",sensitivity_overview[sens_number-1,:remarks],".jld2"));
-        results
+        results, ADMM
     )
     save_results(mdict,EOM,ETS,H2,ADMM,results,merge(data["General"],data["ADMM"],data["H2"],data["scenario"]),agents,sensitivity_overview[sens_number-1,:remarks]) 
     YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_TO_",sensitivity_overview[sens_number-1,:remarks],".yaml")),TO)
 else
     jldsave(
         joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],".jld2"));
-        results
+        results, ADMM
     )
     save_results(mdict,EOM,ETS,H2,ADMM,results,merge(data["General"],data["ADMM"],data["H2"],data["scenario"]),agents,"ref") 
     YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_TO_ref.yaml")),TO)
