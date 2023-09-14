@@ -66,12 +66,6 @@ function build_h2s_agent!(mod::Model)
     CONT_LT = mod.ext[:parameters][:CONT_LT]
     H2_CAPG = mod.ext[:parameters][:H2CAP_PREM]
 
-
-    #H2FP_PREM = mod.ext[:parameters][:H2FP_PREM]
-    #\lambda_HPA = mod.ext[:parameters][:λ_HPA]
-    #is_HPA_covered = mod.ext[:parameters][:is_HPA_covered]
-
-
     # ADMM algorithm parameters
     ρ_y_REC_pre2030 = mod.ext[:parameters][:ρ_y_REC_pre2030] # rho-value in ADMM related to REC auctions
     ρ_y_REC_post2030 = mod.ext[:parameters][:ρ_y_REC_post2030] # rho-value in ADMM related to REC auctions

@@ -16,7 +16,6 @@ function define_results!(data::Dict,results::Dict,ADMM::Dict,agents::Dict,ETS::D
     results["h2cfd_bid"] = Dict()
     results["dual_max_support_duration"] = Dict()
 
-
     for m in agents[:ets]
         results["b"][m] = CircularBuffer{Array{Float64,1}}(data["CircularBufferSize"])  
         push!(results["b"][m],zeros(data["nyears"]))
@@ -258,5 +257,69 @@ function define_results!(data::Dict,results::Dict,ADMM::Dict,agents::Dict,ETS::D
     ADMM["n_iter"] = 1 
     ADMM["walltime"] = 0
     
+    return results, ADMM
+end
+
+function define_results_hot_start!(data::Dict,results::Dict,ADMM::Dict,agents::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H2CN_prod::Dict,H2CN_cap::Dict,NG::Dict)
+    # Convert Arrays to circular buffers
+    for (r,arr) in results
+        if r!= "s"
+            for (m,arr2) in arr
+                cb = CircularBuffer(data["CircularBufferSize"])
+                append!(cb,arr2)
+                results[r][m] = cb
+            end
+        elseif r == "s"
+            cb = CircularBuffer(data["CircularBufferSize"])
+            append!(cb,arr)
+            results[r] = cb
+        end
+    end
+    for (r,arr) in ADMM["ρ"]
+        cb = CircularBuffer(data["CircularBufferSize"])
+        append!(cb, arr)
+        ADMM["ρ"][r] = cb
+    end
+    for (r,arr) in ADMM["Residuals"]["Primal"]
+        cb = CircularBuffer(data["CircularBufferSize"])
+        append!(cb, arr)
+        ADMM["Residuals"]["Primal"][r] = cb
+    end
+    for (r,arr) in ADMM["Residuals"]["Dual"]
+        cb = CircularBuffer(data["CircularBufferSize"])
+        append!(cb, arr)
+        ADMM["Residuals"]["Dual"][r] = cb
+    end
+    for (r,arr) in ADMM["Imbalances"]
+        cb = CircularBuffer(data["CircularBufferSize"])
+        append!(cb, arr)
+        ADMM["Imbalances"][r] = cb
+    end
+
+    # Some ADMM adjestmets to ρ to help convergence
+    #ADMM["ρ"]["H2CN_prod"][1] = 1000
+    #ADMM["ρ"]["H2CN_cap"][1] = 1000
+
+    ADMM["Tolerance"] = Dict()
+    ADMM["Tolerance"]["ETS"] = data["epsilon"]/100*maximum(ETS["CAP"])*sqrt(data["nyears"])
+    ADMM["Tolerance"]["EOM"] = data["epsilon"]/100*maximum(EOM["D"])*sqrt(data["nyears"]*data["nTimesteps"]*data["nReprDays"])
+    ADMM["Tolerance"]["REC_y"] = data["epsilon"]/100*maximum(REC["RT"].*EOM["D_cum"])*sqrt(data["nyears"])  
+    ADMM["Tolerance"]["REC_m"] = data["epsilon"]/100*maximum(H2CN_prod["H2CN_PRODT"])/12*sqrt(data["nyears"]*12)  # unknown what maximum monthly REC requirement will be, assume equal distribtuion over year
+    ADMM["Tolerance"]["REC_d"] = data["epsilon"]/100*maximum(H2CN_prod["H2CN_PRODT"])/365*sqrt(data["nyears"]*data["nReprDays"])   # unknown what maximum daily REC requirement will be, assume equal distribtuion over year
+    ADMM["Tolerance"]["REC_h"] = data["epsilon"]/100*maximum(H2CN_prod["H2CN_PRODT"])/8760*sqrt(data["nyears"]*data["nTimesteps"]*data["nReprDays"])   # unknown what maximum hourly REC requirement will be, assume equal distribtuion over year
+    ADMM["Tolerance"]["H2_h"] = data["epsilon"]/100*maximum(H2["D_h"])*sqrt(data["nyears"]*data["nTimesteps"]*data["nReprDays"])
+    ADMM["Tolerance"]["H2_d"] = data["epsilon"]/100*maximum(H2["D_d"])*sqrt(data["nyears"]*data["nReprDays"])
+    ADMM["Tolerance"]["H2_m"] = data["epsilon"]/100*maximum(H2["D_m"])*sqrt(data["nyears"]*data["nMonths"])
+    ADMM["Tolerance"]["H2_y"] = data["epsilon"]/100*maximum(H2["D_y"])*sqrt(data["nyears"])
+    ADMM["Tolerance"]["H2CN_prod"] = data["epsilon"]/100*max(maximum(H2CN_prod["H2CN_PRODT"])*sqrt(data["nyears"]),1e-3)
+    ADMM["Tolerance"]["H2CN_cap"] = data["epsilon"]/100*max(maximum(H2CN_cap["H2CN_CAPT"])*sqrt(data["nyears"]),1e-3)
+    ADMM["Tolerance"]["H2FP"] = data["epsilon"]/100*max(maximum(H2CN_prod["H2FP_BIDT"])*sqrt(data["nyears"]),1e-3)
+    ADMM["Tolerance"]["H2CfD"] = data["epsilon"]/100*max(maximum(H2CN_prod["H2CfD_BIDT"])*sqrt(data["nyears"]),1e-3)
+
+    ADMM["n_iter"] = 1 
+    ADMM["walltime"] = 0
+
+
+
     return results, ADMM
 end

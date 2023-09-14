@@ -4,7 +4,7 @@
 
 ## 0. Set-up code
 # HPC or not?
-HPC =  "NA" #ThinKing" # NA, DelftBlue or ThinKing
+HPC =  "ThinKing" # NA, DelftBlue or ThinKing
 
 # Home directory
 const home_dir = @__DIR__
@@ -328,10 +328,20 @@ println("   ")
 println("(Progress indicators on primal residuals, relative to tolerance: <1 indicates convergence)")
 println("   ")
 
-results = Dict()
-ADMM = Dict()
+# Optional hot-start
 TO = TimerOutput()
-define_results!(merge(data["General"],data["ADMM"],data["scenario"]),results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)            # initialize structure of results, only those that will be stored in each iteration
+data_merged = merge(data["General"],data["ADMM"],data["scenario"])
+if data_merged["hot_start"] == "YES"      # initialize structure of results, only those that will be stored in each iteration
+    results = load("Scenario_2.jld2")["results"]
+    ADMM = load("Scenario_2.jld2")["ADMM"]
+    define_results_hot_start!(data_merged,results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)
+elseif data_merged["hot_start"] == "NO"
+    results = Dict()
+    ADMM = Dict()
+    define_results!(data_merged,results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)  
+else
+    print("Hot start ill-defined")    
+end
 ADMM!(results,ADMM,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG,mdict,agents,data,TO)                                                             # calculate equilibrium 
 ADMM["walltime"] =  TimerOutputs.tottime(TO)*10^-9/60                                                                                     # wall time 
 
