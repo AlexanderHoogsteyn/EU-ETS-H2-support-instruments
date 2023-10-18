@@ -164,10 +164,10 @@ if HPC == "DelftBlue" || HPC == "ThinKing"
    stop_sens = dict_sim_number["stop_sens"]
 else
     # Range of scenarios to be simulated
-    start_scen = 2
-    stop_scen = 2
-    start_sens = 1
-    stop_sens = 1 
+    start_scen = 10
+    stop_scen = 10
+    start_sens = 2
+    stop_sens = 5
 end
 
 #scen_number = 404
@@ -332,8 +332,20 @@ println("   ")
 TO = TimerOutput()
 data_merged = merge(data["General"],data["ADMM"],data["scenario"])
 if data_merged["hot_start"] == "YES"      # initialize structure of results, only those that will be stored in each iteration
-    results = load("Scenario_2.jld2")["results"]
-    ADMM = load("Scenario_2.jld2")["ADMM"]
+    if sens_number > 1
+        scen_string = joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_1_",sensitivity_overview[sens_number-1,:remarks], ".jld2"))
+    else 
+        scen_string = joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_1.jld2"))
+    end
+    if isfile(scen_string)
+        println("Hot start from '",scen_string,"'")
+        results = load(scen_string)["results"]
+        ADMM = load(scen_string)["ADMM"]
+    else
+        println("The file '",scen_string,"' does not exist.")
+        results = load("Scenario_2.jld2")["results"]
+        ADMM = load("Scenario_2.jld2")["ADMM"]
+    end
     define_results_hot_start!(data_merged,results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)
 elseif data_merged["hot_start"] == "NO"
     results = Dict()
@@ -411,7 +423,6 @@ end
 for (r,data) in ADMM["Imbalances"]
     ADMM["Imbalances"][r] = Array(data)
 end
-
 
 if sens_number >= 2
     jldsave(
