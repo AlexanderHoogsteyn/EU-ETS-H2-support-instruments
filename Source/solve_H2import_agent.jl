@@ -28,14 +28,14 @@ function solve_h2import_agent!(mod::Model)
     gH_y = mod.ext[:expressions][:gH_y]
 
     if ρ_h_H2 > 0
-            λ_h_H2 = mod.ext[:parameters][:λ_h_H2] # H2 prices
-            gH_h_bar = mod.ext[:parameters][:gH_h_bar] # element in ADMM penalty term related to hydrogen market
-            gH = mod.ext[:variables][:gH]
-    
-            H2_obj = mod.ext[:expressions][:H2_obj] = @expression(mod,
-                - sum(A[jy]*W[jd]*λ_h_H2[jh,jd,jy]*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
-                + sum(ρ_h_H2/2*W[jd]*(gH[jh,jd,jy] - gH_h_bar[jh,jd,jy])^2 for jh in JH, jd in JD, jy in JY) 
-            )
+        λ_h_H2 = mod.ext[:parameters][:λ_h_H2] # H2 prices
+        gH_h_bar = mod.ext[:parameters][:gH_h_bar] # element in ADMM penalty term related to hydrogen market
+        gH = mod.ext[:variables][:gH]
+
+        H2_obj = mod.ext[:expressions][:H2_obj] = @expression(mod,
+            - sum(A[jy]*W[jd]*λ_h_H2[jh,jd,jy]*gH[jh,jd,jy] for jh in JH, jd in JD, jy in JY)
+            + sum(ρ_h_H2/2*W[jd]*(gH[jh,jd,jy] - gH_h_bar[jh,jd,jy])^2 for jh in JH, jd in JD, jy in JY) 
+        )
     elseif ρ_d_H2 > 0 
         λ_d_H2 = mod.ext[:parameters][:λ_d_H2] # H2 prices
         gH_d_bar = mod.ext[:parameters][:gH_d_bar] # element in ADMM penalty term related to hydrogen market

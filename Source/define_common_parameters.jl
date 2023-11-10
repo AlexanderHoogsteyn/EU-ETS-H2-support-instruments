@@ -11,7 +11,9 @@ function define_common_parameters!(m::String,mod::Model, data::Dict, ts::DataFra
     # Sets
     mod.ext[:sets][:JY] = 1:data["nyears"]    
     mod.ext[:sets][:JY_pre2030] = 1:10  
-    mod.ext[:sets][:JY_post2030] = 11:data["nyears"]    
+    mod.ext[:sets][:JY_post2030] = 11:data["nyears"]
+    mod.ext[:sets][:JY_post2040] = 21:data["nyears"]
+    mod.ext[:sets][:JT] = (data["tender_year"]+data["tender_lead_time"]-2020):(data["tender_year"]+data["tender_lead_time"]+data["contract_duration"]-2020)
     mod.ext[:sets][:JM] = 1:12
     mod.ext[:sets][:JD] = 1:data["nReprDays"]
     mod.ext[:sets][:JH] = 1:data["nTimesteps"]
@@ -81,29 +83,21 @@ function define_common_parameters!(m::String,mod::Model, data::Dict, ts::DataFra
     mod.ext[:parameters][:gH_y_bar] = zeros(data["nyears"])     # ADMM penalty term
     mod.ext[:parameters][:ρ_y_H2] = data["rho_H2_y"]            # ADMM rho value 
 
-    # Parameters related to the carbon-neutral H2 generation subsidy
-    mod.ext[:parameters][:λ_H2CN_prod] = zeros(data["nyears"],1)        # Price structure
-    mod.ext[:parameters][:gHCN_bar] = zeros(data["nyears"],1)           # ADMM penalty term
-    mod.ext[:parameters][:ρ_H2CN_prod] = data["rho_H2CN_prod"]          # ADMM rho value
-
-    # Parameters related to the carbon-neutral H2 production capacity subsidy
-    mod.ext[:parameters][:λ_H2CN_cap] = zeros(data["nyears"],1)         # Price structure
-    mod.ext[:parameters][:capHCN_bar] = zeros(data["nyears"],1)         # ADMM penalty term
-    mod.ext[:parameters][:ρ_H2CN_cap] = data["rho_H2CN_cap"]            # ADMM rho value 
 
     # Parameters related to the natural gas market
     mod.ext[:parameters][:λ_NG] = zeros(data["nyears"],1)               # Price structure
 
     # Parameters related to hydrogen support mechanisms
+    mod.ext[:parameters][:λ_H2CN_prod] = zeros(data["nyears"],1) # Parameters related to the carbon-neutral H2 generation subsidy (theoretical reference)
+    mod.ext[:parameters][:λ_H2CN_cap] = zeros(data["nyears"],1)  # Parameters related to the carbon-neutral H2 production capacity subsidy
     mod.ext[:parameters][:λ_H2FP] = zeros(data["nyears"],1)
-    mod.ext[:parameters][:gHCfD_bar] = zeros(data["nyears"],1)
-    mod.ext[:parameters][:ρ_H2FP] = data["rho_H2FP"]
-
     mod.ext[:parameters][:λ_H2CfD] = zeros(data["nyears"],1)
-    mod.ext[:parameters][:gHCfD_bar] = zeros(data["nyears"],1)
-    mod.ext[:parameters][:ρ_H2CfD] =  data["rho_H2CfD"] 
+    mod.ext[:parameters][:λ_H2CG] = zeros(data["nyears"],1)
+    mod.ext[:parameters][:λ_H2TD] = zeros(data["nyears"],1)
+    mod.ext[:parameters][:support_bar] = zeros(data["nyears"],1)
+    mod.ext[:parameters][:ρ_support] = data["rho_support"]  
 
-    
+
     # Eligble for RECs?
     if data["REC"] == "YES" 
         mod.ext[:parameters][:REC] = 1
@@ -150,6 +144,20 @@ function define_common_parameters!(m::String,mod::Model, data::Dict, ts::DataFra
         push!(agents[:h2cn_cap],m)
     else
         mod.ext[:parameters][:H2CN_cap] = 0
+    end
+
+    if data["Support"] == "YES" 
+        mod.ext[:parameters][:supported] = 1
+        mod.ext[:parameters][:not_supported] = 0
+        push!(agents[:supported],m)
+    else
+        if data["H2"] == "YES" 
+            mod.ext[:parameters][:not_supported] = 1
+            push!(agents[:not_supported],m)
+        else
+            mod.ext[:parameters][:not_supported] = 0
+        end
+        mod.ext[:parameters][:supported] = 0
     end
 
      # Covered by natural gas market

@@ -36,6 +36,7 @@ TO_local = TimerOutput()
         mod.ext[:parameters][:ρ_h_REC_post2030] = ADMM["ρ"]["REC_h_post2030"][end]
     end
     if mod.ext[:parameters][:H2] == 1
+        #mod.ext[:parameters][:support_bar] = results["h2_h"][m][end] - 1/(H2["nAgents"]+1)*ADMM["Imbalances"]["H2_h"][end]
         mod.ext[:parameters][:gH_h_bar] = results["h2_h"][m][end] - 1/(H2["nAgents"]+1)*ADMM["Imbalances"]["H2_h"][end]
         mod.ext[:parameters][:λ_h_H2] = results["λ"]["H2_h"][end] 
         mod.ext[:parameters][:ρ_h_H2] = ADMM["ρ"]["H2_h"][end]
@@ -46,29 +47,16 @@ TO_local = TimerOutput()
         mod.ext[:parameters][:λ_m_H2] = results["λ"]["H2_m"][end] 
         mod.ext[:parameters][:ρ_m_H2] = ADMM["ρ"]["H2_m"][end]
         mod.ext[:parameters][:gH_y_bar] = results["h2_y"][m][end] - 1/(H2["nAgents"]+1)*ADMM["Imbalances"]["H2_y"][end]
-        mod.ext[:parameters][:λ_y_H2] = results["λ"]["H2_y"][end] 
+        mod.ext[:parameters][:λ_y_H2] = results["λ"]["H2_y"][end]
         mod.ext[:parameters][:ρ_y_H2] = ADMM["ρ"]["H2_y"][end]
     end
-    if mod.ext[:parameters][:H2CN_prod] == 1
-        mod.ext[:parameters][:gHCN_bar] = results["h2cn_prod"][m][end] - 1/(H2CN_prod["nAgents"]+1)*ADMM["Imbalances"]["H2CN_prod"][end]
+    if mod.ext[:parameters][:supported] == 1
         mod.ext[:parameters][:λ_H2CN_prod] = results["λ"]["H2CN_prod"][end] 
-        mod.ext[:parameters][:ρ_H2CN_prod] = ADMM["ρ"]["H2CN_prod"][end]
-
-        # Fixed premium contract price
-        mod.ext[:parameters][:gHFP_bar] = results["h2fp_bid"][m][end] - 1/(H2CN_prod["nAgents"]+1)*ADMM["Imbalances"]["H2FP"][end]
         mod.ext[:parameters][:λ_H2FP] = results["λ"]["H2FP"][end] 
-        mod.ext[:parameters][:ρ_H2FP] = ADMM["ρ"]["H2FP"][end]
-
-        # CfD contract price
-        mod.ext[:parameters][:gHCfD_bar] = results["h2cfd_bid"][m][end] - 1/(H2CN_prod["nAgents"]+1)*ADMM["Imbalances"]["H2CfD"][end]
         mod.ext[:parameters][:λ_H2CfD] = results["λ"]["H2CfD"][end] 
-        mod.ext[:parameters][:ρ_H2CfD] = ADMM["ρ"]["H2CfD"][end]
-
-    end
-    if mod.ext[:parameters][:H2CN_cap] == 1
-        mod.ext[:parameters][:capHCN_bar] = results["h2cn_cap"][m][end] - 1/(H2CN_cap["nAgents"]+1)*ADMM["Imbalances"]["H2CN_cap"][end]
         mod.ext[:parameters][:λ_H2CN_cap] = results["λ"]["H2CN_cap"][end] 
-        mod.ext[:parameters][:ρ_H2CN_cap] = ADMM["ρ"]["H2CN_cap"][end]
+        mod.ext[:parameters][:λ_H2CG] = results["λ"]["H2CG"][end] 
+        mod.ext[:parameters][:λ_H2TD] = results["λ"]["H2TD"][end] 
     end
     if mod.ext[:parameters][:NG] == 1 # NG is not yet responsive to changes in demand - could be done at later stage
         mod.ext[:parameters][:λ_NG] =  results[ "λ"]["NG"][end] 
@@ -110,15 +98,11 @@ if mod.ext[:parameters][:H2] == 1
     push!(results["h2_d"][m], collect(value.(mod.ext[:expressions][:gH_d])))
     push!(results["h2_m"][m], collect(value.(mod.ext[:variables][:gH_m])))
     push!(results["h2_y"][m], collect(value.(mod.ext[:expressions][:gH_y])))
-end                     
-if mod.ext[:parameters][:H2CN_prod] == 1
-    push!(results["h2cn_prod"][m], collect(value.(mod.ext[:variables][:gHCN])))
-    push!(results["h2cfd_bid"][m], collect(value.(mod.ext[:variables][:gHCfD])))
-    push!(results["h2fp_bid"][m], collect(value.(mod.ext[:variables][:gHFP])))
-    push!(results["dual_max_support_duration"][m], dual.(mod.ext[:constraints][:max_support_duration]))
-end
-if mod.ext[:parameters][:H2CN_cap] == 1
-    push!(results["h2cn_cap"][m], collect(value.(mod.ext[:variables][:capHCN])))
+    push!(results["h2_cap"][m], collect(value.(mod.ext[:variables][:capH])))
+end               
+if mod.ext[:parameters][:supported] == 1
+    push!(results["support"][m], collect(value.(mod.ext[:variables][:support])))
+    #push!(results["dual_max_support_duration"][m], dual.(mod.ext[:constraints][:max_support_duration]))
 end
 
 # Merge local TO with TO:

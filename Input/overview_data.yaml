@@ -1,25 +1,30 @@
 General: 
   nyears: 40
   nTimesteps: 24 # number of timesteps per representative day
-  nReprDays: 16 # days
+  nReprDays: 2 # days
   nMonths: 12 # number of months
   inflation: 0.02
   discount_rate: 0.1
   social_discount_rate: 0.03
   operationalYear: 2030
+  tender_year: 2030
+  tender_lead_time: 1
   contract_duration: 10
   conv_factor: 33 # 1 mt H2 = 33 TWh
 
 ADMM:
- rho_EUA: 150 # rho ADMM penalty term, EUA market
- rho_EOM: 17 # rho ADMM penalty term, EOM 
- rho_REC: 2 # rho ADMM penalty term, REC electricity
- rho_H2: 10  # rho ADMM penalty term, H2
- rho_H2CN_prod: 5 # rho ADMM penalty term, carbon-neutral H2 production incentive (€/tH2)
- rho_H2CN_cap: 5 # rho ADMM penalty term, carbon-neutral H2 capacity incentive (€/GW)
- rho_H2FP: 100
- rho_H2CfD: 100 
- max_iter: 15000 # maximum number of iterations
+ rho_EUA: 100 # rho ADMM penalty term, EUA market
+ rho_EOM: 10 # rho ADMM penalty term, EOM 
+ rho_REC: 1 # rho ADMM penalty term, REC electricity
+ rho_H2: 5  # rho ADMM penalty term, H2
+ rho_H2CN_prod: 1 # rho ADMM penalty term, carbon-neutral H2 production incentive (€/tH2)
+ rho_H2CN_cap: 1 # rho ADMM penalty term, carbon-neutral H2 capacity incentive (€/GW)
+ rho_H2FP: 1
+ rho_H2CfD: 1
+ rho_H2CG: 1
+ rho_H2TD: 1
+ rho_support: 1
+ max_iter: 2000 # maximum number of iterations
  epsilon: 0.1 # stopping criterion - tolerance on "accuracy" with which the coupling constraints are satisfied, expressed as percentage of initial imbalance (e.g., demand). Applied to dual and primal residuals.
  CircularBufferSize: 10 # number of iterations for which data will be retained, should be at least 2 and less than max_iter
 
@@ -90,6 +95,7 @@ Industry:
   H2: "NO" # participate in the carbon neutral H2 market
   H2CN_prod: "NO" # participate in the carbon neutral H2 market (production)
   H2CN_cap: "NO" # participate in the carbon neutral H2 market (capacity)
+  Support: "NO" # Eligable for support
   NG: "NO" # participate in the natural gas market
 
 HydrogenSector: 
@@ -112,6 +118,7 @@ HydrogenSector:
    H2: "YES" # participate in the carbon neutral H2 market
    H2CN_prod: "NO" # participate in the carbon neutral H2 market (production)
    H2CN_cap: "NO" # participate in the carbon neutral H2 market (capacity)
+   Support: "NO" # Eligable for support
    NG: "YES" # participate in the natural gas market 
 
   SMRCCS: # unless stated otherwise, based on EUR-pypsa_data
@@ -133,13 +140,14 @@ HydrogenSector:
    H2: "YES" # participate in the carbon neutral H2 market
    H2CN_prod: "NO" # participate in the carbon neutral H2 market (production)
    H2CN_cap: "NO" # participate in the carbon neutral H2 market (capacity)
+   Support: "NO" # Eligable for support
    NG: "YES" # participate in the natural gas market  
 
   Alkaline_peak: # unless stated otherwise, based on EUR-pypsa_data
    OC: 750 # M€/GW
    fuelCosts: 0 # MEUR/MtH2 - will be linked to price of electricity
    Lifetime: 20 # Years 
-   Leadtime: 2 # years 
+   Leadtime: 1 # years 
    AF: 1 # - own calculation
    Legcap_2021: 0.135 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683
    efficiency_E_H2: 0.60 # efficiency conversion electricity to hydrogen 
@@ -154,13 +162,14 @@ HydrogenSector:
    H2: "YES" # participate in the H2 market
    H2CN_prod: "YES" # participate in the carbon neutral H2 market (production)
    H2CN_cap: "YES" # participate in the carbon neutral H2 market (capacity)
+   Support: "NO" # Eligable for support
    NG: "NO" # participate in the natural gas market
 
   Alkaline_base: # unless stated otherwise, based on EUR-pypsa_data
    OC: 1000 # M€/GW
    fuelCosts: 0 # MEUR/MtH2 - will be linked to price of electricity
    Lifetime: 20 # Y15ears 
-   Leadtime: 2 # years 
+   Leadtime: 1 # years 
    AF: 1 # - own calculation
    Legcap_2021: 0.1 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683
    efficiency_E_H2: 0.70 # efficiency conversion electricity to hydrogen 
@@ -176,6 +185,52 @@ HydrogenSector:
    H2: "YES" # participate in the H2 market
    H2CN_prod: "YES" # participate in the carbon neutral H2 market (production)
    H2CN_cap: "YES" # participate in the carbon neutral H2 market (capacity)
+   Support: "NO" # Eligable for support
+   NG: "NO" # participate in the natural gas market
+
+  Alkaline_peak_supported: # unless stated otherwise, based on EUR-pypsa_data
+   OC: 750 # M€/GW
+   fuelCosts: 0 # MEUR/MtH2 - will be linked to price of electricity
+   Lifetime: 20 # Years 
+   Leadtime: 1 # years 
+   AF: 1 # - own calculation
+   Legcap_2021: 0 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683
+   efficiency_E_H2: 0.59 # efficiency conversion electricity to hydrogen 
+   efficiency_NG_H2: 0 # efficiency conversion natural gas to hydrogen 
+   emissions: 0.0 # [ton CO2/MWh] = [Mton CO2/TWh]
+   max_YoY_new_cap: 1000 # % of current capacity
+   YoY_OC: -2.1 # % change in overnight investment cost YoY
+   Legcap_out: 20 # years 
+   REC: "YES" # eligible for RECs
+   ETS: "NO" # covered by ETS
+   EOM: "YES" # participates in EOM
+   H2: "YES" # participate in the H2 market
+   H2CN_prod: "YES" # participate in the carbon neutral H2 market (production)
+   H2CN_cap: "YES" # participate in the carbon neutral H2 market (capacity)
+   Support: "YES" # Eligable for support
+   NG: "NO" # participate in the natural gas market
+
+  Alkaline_base_supported: # unless stated otherwise, based on EUR-pypsa_data
+   OC: 1000 # M€/GW
+   fuelCosts: 0 # MEUR/MtH2 - will be linked to price of electricity
+   Lifetime: 20 # Y15ears 
+   Leadtime: 1 # years 
+   AF: 1 # - own calculation
+   Legcap_2021: 0 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683
+   efficiency_E_H2: 0.69 # efficiency conversion electricity to hydrogen 
+   Legcap_2021: 0.135 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683, https://www.swp-berlin.org/en/publication/electrolysers-for-the-hydrogen-revolution#:~:text=However%2C%20the%20EU%2Dwide%20electrolysis,still%20pending%20in%20most%20cases. 
+   efficiency_NG_H2: 0 # efficiency conversion natural gas to hydrogen 
+   emissions: 0.0 # [ton CO2/MWh] = [Mton CO2/TWh]
+   max_YoY_new_cap: 1000 # % of current capacity
+   YoY_OC: -2.1 # % change in overnight investment cost YoY
+   Legcap_out: 20 # years
+   REC: "YES" # eligible for RECs
+   ETS: "NO" # covered by ETS
+   EOM: "YES" # participates in EOM
+   H2: "YES" # participate in the H2 market
+   H2CN_prod: "YES" # participate in the carbon neutral H2 market (production)
+   H2CN_cap: "YES" # participate in the carbon neutral H2 market (capacity)
+   Support: "YES" # Eligable for support
    NG: "NO" # participate in the natural gas market
 
 HydrogenImport:
@@ -186,6 +241,7 @@ HydrogenImport:
     H2: "YES" # participate in the carbon neutral H2 market
     H2CN_prod: "NO" # participate in the carbon neutral H2 market (production)
     H2CN_cap: "NO" # participate in the carbon neutral H2 market (capacity)
+    Support: "NO" # Eligable for support
     NG: "NO" # participate in the natural gas market
     Leadtime: 3 # Import impossible in 2021-2023
     YoY_OC_pre_2030: -8.4
@@ -219,6 +275,7 @@ PowerSector:
   H2: "NO" # participate in the carbon neutral H2 market
   H2CN_prod: "NO" # participate in the carbon neutral H2 market (production)
   H2CN_cap: "NO" # participate in the carbon neutral H2 market (capacity)
+  Support: "NO" # Eligable for support
   NG: "NO" # participate in the natural gas market
 
  SPP_coal:
@@ -243,6 +300,7 @@ PowerSector:
   H2: "NO" # participate in the carbon neutral H2 market
   H2CN_prod: "NO" # participate in the carbon neutral H2 market (production)
   H2CN_cap: "NO" # participate in the carbon neutral H2 market (capacity)
+  Support: "NO" # Eligable for support
   NG: "NO" # participate in the natural gas market
 
  CCGT_new:
@@ -265,6 +323,7 @@ PowerSector:
   H2: "NO" # participate in the carbon neutral H2 market
   H2CN_prod: "NO" # participate in the carbon neutral H2 market (production)
   H2CN_cap: "NO" # participate in the carbon neutral H2 market (capacity)
+  Support: "NO" # Eligable for support
   NG: "YES" # participate in the natural gas market
 
  OCGT:
@@ -287,6 +346,7 @@ PowerSector:
   H2: "NO" # participate in the carbon neutral H2 market
   H2CN_prod: "NO" # participate in the carbon neutral H2 market (production)
   H2CN_cap: "NO" # participate in the carbon neutral H2 market (capacity)
+  Support: "NO" # Eligable for support
   NG: "YES" # participate in the natural gas market
 
  Solar:
@@ -311,6 +371,7 @@ PowerSector:
   H2: "NO" # participate in the carbon neutral H2 market
   H2CN_prod: "NO" # participate in the carbon neutral H2 market (production)
   H2CN_cap: "NO" # participate in the carbon neutral H2 market (capacity)
+  Support: "NO" # Eligable for support
   NG: "NO" # participate in the natural gas market
 
  WindOnshore:
@@ -335,6 +396,7 @@ PowerSector:
   H2: "NO" # participate in the carbon neutral H2 market
   H2CN_prod: "NO" # participate in the carbon neutral H2 market (production)
   H2CN_cap: "NO" # participate in the carbon neutral H2 market (capacity)
+  Support: "NO" # Eligable for support
   NG: "NO" # participate in the natural gas market
 
  WindOffshore:
@@ -359,4 +421,5 @@ PowerSector:
   H2: "NO" # participate in the carbon neutral H2 market
   H2CN_prod: "NO" # participate in the carbon neutral H2 market (production)
   H2CN_cap: "NO" # participate in the carbon neutral H2 market (capacity)
+  Support: "NO" # Eligable for support
   NG: "NO" # participate in the natural gas market

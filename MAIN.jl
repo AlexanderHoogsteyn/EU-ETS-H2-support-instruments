@@ -4,7 +4,7 @@
 
 ## 0. Set-up code
 # HPC or not?
-HPC =  "ThinKing" # NA, DelftBlue or ThinKing
+HPC =  "NA" #, DelftBlue or ThinKing
 
 # Home directory
 const home_dir = @__DIR__
@@ -164,10 +164,10 @@ if HPC == "DelftBlue" || HPC == "ThinKing"
    stop_sens = dict_sim_number["stop_sens"]
 else
     # Range of scenarios to be simulated
-    start_scen = 10
+    start_scen = 2
     stop_scen = 10
-    start_sens = 2
-    stop_sens = 5
+    start_sens = 1
+    stop_sens = 1
 end
 
 #scen_number = 404
@@ -243,6 +243,8 @@ agents[:rec] = []
 agents[:h2] = []            
 agents[:h2cn_prod] = []         
 agents[:h2cn_cap] = []   
+agents[:supported] = []
+agents[:not_supported] = []
 agents[:ng] = []                    
 mdict = Dict(i => Model(optimizer_with_attributes(() -> Gurobi.Optimizer(GUROBI_ENV))) for i in agents[:all])
 
@@ -301,7 +303,6 @@ H2["nAgents"] =  length(agents[:h2])
 H2CN_prod["nAgents"] = length(agents[:h2cn_prod])
 H2CN_cap["nAgents"] = length(agents[:h2cn_cap])
 NG["nAgents"] = length(agents[:ng])
-
 println("Inititate model, sets and parameters: done")
 println("   ")
 
@@ -348,11 +349,12 @@ if data_merged["hot_start"] == "YES"      # initialize structure of results, onl
     end
     define_results_hot_start!(data_merged,results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)
 elseif data_merged["hot_start"] == "NO"
+    println("Hot start: No")
     results = Dict()
     ADMM = Dict()
     define_results!(data_merged,results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)  
 else
-    print("Hot start ill-defined")    
+    println("Hot start ill-defined")    
 end
 ADMM!(results,ADMM,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG,mdict,agents,data,TO)                                                             # calculate equilibrium 
 ADMM["walltime"] =  TimerOutputs.tottime(TO)*10^-9/60                                                                                     # wall time 
@@ -390,7 +392,6 @@ if data["scenario"]["ref_scen_number"] == scen_number && sens_number == 1
         # Save intermediate result
         save_results(mdict,EOM,ETS,H2,ADMM,results,merge(data["General"],data["ADMM"],data["H2"],data["scenario"]),agents,"ref") 
         YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_TO_ref.yaml")),TO)
-    
     end
 end
 

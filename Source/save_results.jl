@@ -56,36 +56,29 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
     CSV.write(joinpath(home_dir,string("Results_",data["nReprDays"],"_repr_days"),string("Scenario_",data["scen_number"],"_PS_",sens,".csv")), DataFrame(mat_output,:auto), delim=";",header=["Year";"EOM_avg";"REC_y";string.("ADD_CAP_",agents[:ps]);string.("CAP_",agents[:ps]);string.("FS_",agents[:ps])]);
     
     # Hydrogen sector 
-    h2_cap = zeros(length(agents[:h2s]),data["nyears"])
-    h2_prod = zeros(length(agents[:h2s]),data["nyears"])
-    h2_add_cap = zeros(length(agents[:h2s]),data["nyears"])
+    h2_cap = zeros(length(agents[:not_supported]),data["nyears"])
+    h2_prod = zeros(length(agents[:not_supported]),data["nyears"])
+    h2_add_cap = zeros(length(agents[:not_supported]),data["nyears"])
     h2_import = zeros(length(agents[:h2import]),data["nyears"])
 
     mm = 1
-    for m in agents[:h2s]
-        CAP_LT = mdict[m].ext[:parameters][:CAP_LT]
-        LEG_CAP = mdict[m].ext[:parameters][:LEG_CAP]
-        h2_add_cap[mm,:] = cap = value.(mdict[m].ext[:variables][:capH])
-        h2_cap[mm,:] = [sum(CAP_LT[y2,jy]*cap[y2] for y2=1:jy) + LEG_CAP[jy] for jy in mdict[m].ext[:sets][:JY]]    
-        h2_prod[mm,:] = value.(mdict[m].ext[:expressions][:gH_y])./data["conv_factor"] # Convert to Mt
-        mm = mm+1
+    for m in agents[:not_supported]
+        if m in agents[:h2s]
+            CAP_LT = mdict[m].ext[:parameters][:CAP_LT]
+            LEG_CAP = mdict[m].ext[:parameters][:LEG_CAP]
+            h2_add_cap[mm,:] = cap = value.(mdict[m].ext[:variables][:capH])
+            h2_cap[mm,:] = [sum(CAP_LT[y2,jy]*cap[y2] for y2=1:jy) + LEG_CAP[jy] for jy in mdict[m].ext[:sets][:JY]]    
+            h2_prod[mm,:] = value.(mdict[m].ext[:expressions][:gH_y])./data["conv_factor"] # Convert to Mt
+            mm = mm+1
+        end
     end
-    h2cn_prod = zeros(length(agents[:h2cn_prod]),data["nyears"])
-    h2cn_cap = zeros(length(agents[:h2cn_prod]),data["nyears"])
-    h2cfd = zeros(length(agents[:h2cn_prod]),data["nyears"])
-    h2fp = zeros(length(agents[:h2cn_prod]),data["nyears"])
+    h2cn_prod = zeros(length(agents[:supported]),data["nyears"])
+    h2cn_cap = zeros(length(agents[:supported]),data["nyears"])
 
     mm = 1
-    for m in agents[:h2cn_cap]
-        h2cn_cap[mm,:] = value.(mdict[m].ext[:variables][:capHCN])
-        mm = mm+1
-    end
-    mm = 1
-    for m in agents[:h2cn_prod]
-        h2cn_prod[mm,:] = value.(mdict[m].ext[:variables][:gHCN])./data["conv_factor"] # Convert to Mt
-        h2cfd[mm,:] = value.(mdict[m].ext[:variables][:gHCfD])./data["conv_factor"] # Convert to Mt
-        h2fp[mm,:] = value.(mdict[m].ext[:variables][:gHFP])./data["conv_factor"] # Convert to Mt
-
+    for m in agents[:supported]
+        h2cn_cap[mm,:] = value.(mdict[m].ext[:variables][:capH])
+        h2cn_prod[mm,:] = value.(mdict[m].ext[:expressions][:gH_y])./data["conv_factor"] # Convert to Mt
         mm = mm+1
     end
     mm = 1
@@ -121,31 +114,26 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
         λ_H2_avg = results["λ"]["H2_y"][end]*data["conv_factor"]/1000
     end
 
-    mat_output = [Years transpose(h2_cap) transpose(h2_prod) transpose(h2_import) transpose(h2cn_cap) transpose(h2cn_prod) transpose(h2cfd) transpose(h2fp) λ_H2_avg results["λ"]["H2CN_prod"][end]*data["conv_factor"]/1000 results["λ"]["H2CN_cap"][end] results["λ"]["H2FP"][end]*data["conv_factor"]/1000 results["λ"]["H2CfD"][end]*data["conv_factor"]/1000 results["λ"]["H2CfD_ref"][end]*data["conv_factor"]/1000]
-    CSV.write(
+    mat_output = [Years transpose(h2_cap) transpose(h2_prod) transpose(h2_import) transpose(h2cn_cap) transpose(h2cn_prod) λ_H2_avg results["λ"]["H2CN_prod"][end]*data["conv_factor"]/1000 results["λ"]["H2CN_cap"][end] results["λ"]["H2FP"][end]*data["conv_factor"]/1000 results["λ"]["H2CfD"][end]*data["conv_factor"]/1000 results["λ"]["H2CfD_ref"][end]*data["conv_factor"]/1000]
+    CSV.write(  
         joinpath(
             home_dir,
             string("Results_",data["nReprDays"],"_repr_days"),
             string("Scenario_",data["scen_number"],"_H2_",sens,".csv")), 
         DataFrame(mat_output,:auto), delim=";",
-        header=["Year";string.("CAP_",agents[:h2s]);string.("PROD_",agents[:h2s]);
+        header=["Year";string.("CAP_",agents[:not_supported]);string.("PROD_",agents[:not_supported]);
                 string.("IMPORT_",agents[:h2import]) ; 
-                string.("CN_CAP_",agents[:h2cn_prod]);string.("CN_PROD_",agents[:h2cn_prod]);string.("H2CfD_",agents[:h2cn_prod]);string.("H2FP_",agents[:h2cn_prod]);
+                string.("CN_CAP_",agents[:supported]);string.("CN_PROD_",agents[:supported]);
                 "PriceH2";"PremiumH2CN_prod";"PremiumH2CN_cap";"PremiumFP";"StrikeH2CfD";"RefH2CfD"]);
 
     # Aggregate metrics 
-    CONT_LT = mdict["Alkaline_peak"].ext[:parameters][:CONT_LT]
     JY = mdict[agents[:h2cn_prod][1]].ext[:sets][:JY]
-    h2_cap_grant_cost = 0 #sum(value(mdict[m].ext[:expressions][:h2_cap_grant_cost]) for m in agents[:h2s])
     As = mdict["Alkaline_peak"].ext[:parameters][:As]
 
     tot_cost = sum(value(mdict[m].ext[:expressions][:tot_cost]) for m in agents[:all])
     tot_em = sum(results["e"][m][end][jy] for m in agents[:ets],jy in mdict[agents[:ps][1]].ext[:sets][:JY]) 
-    H2_policy_cost = ( sum(results["h2cn_prod"][m][end][jy]*results["λ"]["H2CN_prod"][end][jy]*As[jy] for jy in JY, m in agents[:h2cn_prod])
-                    + sum(results["h2cn_cap"][m][end][jy]*results["λ"]["H2CN_cap"][end][jy]*As[jy] for jy in JY, m in agents[:h2cn_cap])
-                    + sum(CONT_LT[jt,jy]*results["h2fp_bid"][m][end][jt]*results["λ"]["H2FP"][end][jt]*As[jy] for jy in JY, jt in JY, m in agents[:h2cn_prod])
-                    + sum(CONT_LT[jt,jy]*results["h2cfd_bid"][m][end][jt]*As[jy]*(results["λ"]["H2CfD"][end][jt] - λ_H2_avg[jy]) for jy in JY, jt in JY, m in agents[:h2cn_prod])
-                    + h2_cap_grant_cost)
+    H2_policy_cost = sum(As[jy]*results["support"][m][end][jy] for jy in JY, m in agents[:supported])
+    
     if data["import"] == "YES" 
         α_1 = mdict["Import"].ext[:parameters][:α_1]
         α_2 = mdict["Import"].ext[:parameters][:α_2]
@@ -214,9 +202,8 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
     cap_cost = zeros(length(agents[:h2cn_prod]),data["nyears"])
     elec_cost = zeros(length(agents[:h2cn_prod]),data["nyears"])
     h2_revenue = zeros(length(agents[:h2cn_prod]),data["nyears"])
-    subsidy = zeros(length(agents[:h2cn_prod]),data["nyears"])
+    subsidy = zeros(length(agents[:supported]),data["nyears"])
 
-    #operational_profit = zeros(length(agents[:h2cn_prod]),data["nyears"])
     A = value.(mdict["Alkaline_peak"].ext[:parameters][:A])
 
     mm = 1
@@ -224,12 +211,14 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
         cap_cost[mm,:] = value.(mdict[m].ext[:variables][:capH]).*value.(mdict[m].ext[:parameters][:IC]).*A
         elec_cost[mm,:] = [ -sum(values.(results["λ"]["EOM"][end][:,:,jy]).*value.(mdict[m].ext[:expressions][:gw][:,:,jy]))*A[jy] for jy in JY]
         h2_revenue[mm,:] = [ sum(values.(results["λ"]["H2_d"][end][:,jy]).*value.(mdict[m].ext[:expressions][:gH_d_w][:,jy]))*A[jy] for jy in JY]
-        subsidy[mm,:] = values.(results["λ"]["H2CN_prod"][end]).*value.(mdict[m].ext[:variables][:gHCN]) + values.(results["λ"]["H2CN_cap"][end]).*value.(mdict[m].ext[:variables][:capHCN])
-        subsidy[mm,:] = subsidy[mm,:].*A
-        #+ 10*values.(results["λ"]["H2CN_prod"][end]).*value.(mdict[m].ext[:variables][:gHFP]).*A
-                    #+ values.(results["λ"]["H2CN_prod"][1]).*values.(mdict[m].ext[:variables][:gHCfD])
         mm = mm + 1
     end
+    mm = 1
+    for m in agents[:supported]
+        subsidy[mm,:] = value.(results["support"][m][end]).*A
+        mm = mm + 1
+    end
+
     mat_output = [Years transpose(cap_cost) transpose(elec_cost) transpose(h2_revenue) transpose(subsidy)]
     CSV.write(
         joinpath(
@@ -244,7 +233,7 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
             string.("CAP_COST_", agents[:h2cn_prod]);
             string.("ELEC_COST_", agents[:h2cn_prod]);
             string.("H2_REV_", agents[:h2cn_prod]);
-            string.("CN_REV_", agents[:h2cn_prod]);
+            string.("SUPPORT_", agents[:supported]);
             ]
     )
 
