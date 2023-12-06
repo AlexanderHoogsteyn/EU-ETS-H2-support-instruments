@@ -62,7 +62,9 @@ function build_h2s_agent!(mod::Model)
     r_d = mod.ext[:variables][:r_d] = @variable(mod, [jd=JD,jy=JY], upper_bound=0, base_name="REC_d") 
     r_h = mod.ext[:variables][:r_h] = @variable(mod, [jh=JH,jd=JD,jy=JY], upper_bound=0, base_name="REC_h") 
     gH_m = mod.ext[:variables][:gH_m] = @variable(mod, [jm=JM,jy=JY],lower_bound=0, base_name="generation_hydrogen_monthly") # needs to be variable to get feasible solution with representative days (combination of days may not allow exact match of montly demand, may be infeasible)
-    
+    capHCN = mod.ext[:variables][:capHCN] = @variable(mod, [jy=JY],  base_name="green_capacity")
+    gHCN = mod.ext[:variables][:gHCN] = @variable(mod, [jy=JY], base_name="generation_carbon_neutral_hydrogen")
+
     # Create affine expressions  
     mod.ext[:expressions][:e] = @expression(mod, [jy=JY],
         CI*dNG[jy]
@@ -277,8 +279,8 @@ function build_h2s_agent!(mod::Model)
         λ_H2CG = mod.ext[:parameters][:λ_H2CG]
 
         #Investment limits: YoY investment is limited
-        mod.ext[:constraints][:cap_limit_1] = @constraint(mod, [jy=JY_pre2030[1:end-1]], capH[jy] <= 0)
-        mod.ext[:constraints][:cap_limit_2] = @constraint(mod, [jy=JY_post2030], capH[jy] <= 0)
+        mod.ext[:constraints][:cap_limit_1] = @constraint(mod, [jy=JY_pre2030[1:end-1]], capH[jy] == 0 )
+        mod.ext[:constraints][:cap_limit_2] = @constraint(mod, [jy=JY_post2030], capH[jy] == 0)
 
         if ρ_h_H2 > 0
             λ_y_H2 = [ sum(λ_h_H2[jh,jd,jy]*W[jd] for jh in JH, jd in JD)/8760 for jy in JY ]
@@ -293,39 +295,56 @@ function build_h2s_agent!(mod::Model)
         # Variables
         support = mod.ext[:variables][:support] = @variable(mod, [jy=JY], base_name="support") 
 
+        # Constraints
+        mod.ext[:constraints][:gen_limit_carbon_neutral] = @constraint(mod, [jy=JY],
+        gHCN[jy] <=  sum(W[jd]*gH[jh,jd,jy] for jh in JH, jd in JD) # [TWh]
+        )
+        mod.ext[:constraints][:cap_limit_carbon_neutral]  = @constraint(mod, [jy=JY], 
+        capHCN[jy] <= sum(CAP_LT[y2,jy]*capH[y2] for y2=1:jy) + LEG_CAP[jy] # [GW] - cap are capacity additions per year, whereas capHCN needs to be the avaiable capacity
+        )
+
         if run_theoretical_min == "YES"
-            mod.ext[:constraints][:max_support] = @constraint(mod, [jy=JY], support[jy] <= gH_y[jy] * λ_H2CN_prod[jy] + capH[jy]*λ_H2CN_cap[jy])
+            mod.ext[:constraints][:max_support] = @constraint(mod, [jy=JY], support[jy] <= gHCN[jy] * λ_H2CN_prod[jy] + capHCN[jy]*λ_H2CN_cap[jy])
             #mod.ext[:constraints][:max_support_duration] = @constraint(mod,  sum(support[jy] for jy in JY) <= max_support_duration * contract_duration * capH[tender_year])
         elseif H2FP_tender == "YES"
-            mod.ext[:constraints][:max_support_1] = @constraint(mod, [jy=JY_pre2030], support[jy] <= 0)
-            mod.ext[:constraints][:max_support_2] = @constraint(mod, [jt=JT], support[jt] <= gH_y[jt] * λ_H2FP[jt])
-            mod.ext[:constraints][:max_support_3] = @constraint(mod, [jy=JY_post2040], support[jy] <= 0)
+            mod.ext[:constraints][:max_support_1] = @constraint(mod, [jy=JY_pre2030], gHCN[jy] <= 0)
+            mod.ext[:constraints][:max_support_3] = @constraint(mod, [jy=JY_post2040], gHCN[jy] <= 0)
+            #mod.ext[:constraints][:constant_generation] = @constraint(mod, [jt=JT], gHCN[jt] == gHCN[JT[1]])
             #mod.ext[:constraints][:max_support_duration] = @constraint(mod, sum(support[jy] for jy in JY) <= max_support_duration * contract_duration * capH[tender_year])
             #mod.ext[:constraints][:overbid_limit_FP] = @constraint(mod, [jy=JY], gHFP[jy] <= max_bid_FP # [TWh]
         elseif H2CfD_tender  == "YES"
-            mod.ext[:constraints][:max_support_1] = @constraint(mod, [jy=JY_pre2030], support[jy] <= 0)
-            mod.ext[:constraints][:max_support_2] = @constraint(mod, [jt=JT], support[jt] <= gH_y[jt] *  (λ_H2CfD[jt] - λ_y_H2[jt]))
-            mod.ext[:constraints][:max_support_3] = @constraint(mod, [jy=JY_post2040], support[jy] <= 0)
-            mod.ext[:constraints][:max_support_duration] = @constraint(mod, support[tender_year] <= max_support_duration * contract_duration * capH[tender_year])
-            #mod.ext[:constraints][:overbid_limit_CfD] = @constraint(mod, [jy=JY], gHCfD[jy] <= max_bid_CfD # [TWh]
+            mod.ext[:constraints][:max_support_1] = @constraint(mod, [jy=JY_pre2030], gHCN[jy] <= 0)
+            mod.ext[:constraints][:max_support_3] = @constraint(mod, [jy=JY_post2040], gHCN[jy] <= 0)
+            #mod.ext[:constraints][:constant_generation] = @constraint(mod, [jt=JT], gHCN[jt] == gHCN[JT[1]])
         elseif H2_cap_tax_reduct == "YES"
-            mod.ext[:constraints][:max_support_1] = @constraint(mod, [jy=JY_pre2030], support[jy] <= 0)
-            mod.ext[:constraints][:max_support_2] = @constraint(mod, [jt=JT], support[jt] <= capH[tender_year]*IC*λ_H2TD[jt])
-            mod.ext[:constraints][:max_support_3] = @constraint(mod, [jy=JY_post2040], support[jy] <= 0)
-            mod.ext[:constraints][:max_support_duration] = @constraint(mod,  sum(support[jy] for jy in JY) <= max_support_duration * contract_duration * capH[tender_year])
+            mod.ext[:constraints][:max_support_1] = @constraint(mod, [jy=JY_pre2030], gHCN[jy] <= 0)
+            mod.ext[:constraints][:max_support_3] = @constraint(mod, [jy=JY_post2040], gHCN[jy] <= 0)
+            # mod.ext[:constraints][:max_support_1] = @constraint(mod, [jy=JY_pre2030], support[jy] <= 0)
+            # mod.ext[:constraints][:max_support_2] = @constraint(mod, [jt=JT], support[jt] <= capHCN[tender_year]*IC[jt]*λ_H2TD[jt])
+            # mod.ext[:constraints][:max_support_3] = @constraint(mod, [jy=JY_post2040], support[jy] <= 0)
+            # mod.ext[:constraints][:max_support_duration] = @constraint(mod,  sum(support[jy] for jy in JY) <= max_support_duration * contract_duration * capHCN[tender_year])
         elseif H2_cap_grant == "YES"
-            mod.ext[:constraints][:max_support_1] = @constraint(mod, [jy=JY_pre2030], support[jy] <= 0)
-            mod.ext[:constraints][:max_support_2] = @constraint(mod, [jt=JT], support[jt] <= capH[tender_year]*λ_H2CG[jt])
-            mod.ext[:constraints][:max_support_3] = @constraint(mod, [jy=JY_post2040], support[jy] <= 0)
-            mod.ext[:constraints][:max_support_duration] = @constraint(mod,  sum(support[jy] for jy in JY) <= max_support_duration * contract_duration * capH[tender_year])
+            mod.ext[:constraints][:max_support_1] = @constraint(mod, [jy=JY_pre2030], gHCN[jy] <= 0)
+            mod.ext[:constraints][:max_support_3] = @constraint(mod, [jy=JY_post2040], gHCN[jy] <= 0)
+            # mod.ext[:constraints][:max_support_1] = @constraint(mod, [jy=JY_pre2030], support[jy] <= 0)
+            # mod.ext[:constraints][:max_support_2] = @constraint(mod, [jt=JT], support[jt] <= capHCN[tender_year]*λ_H2CG[jt])
+            # mod.ext[:constraints][:max_support_3] = @constraint(mod, [jy=JY_post2040], support[jy] <= 0)
+            # mod.ext[:constraints][:max_support_duration] = @constraint(mod,  sum(support[jy] for jy in JY) <= max_support_duration * contract_duration * capHCN[tender_year])
         end
+
     else
-        #Investment limits: YoY investment is limited
+        # Investment limits: YoY investment is limited
         mod.ext[:constraints][:cap_limit] = @constraint(mod,
             capH[1] <= DELTA_CAP_MAX*LEG_CAP[1] # [GW]
         )
         mod.ext[:constraints][:cap_limit] = @constraint(mod, [jy=2:JY[end]],
             capH[jy] <= DELTA_CAP_MAX*(sum(CAP_LT[y2,jy]*capH[y2] for y2=1:jy-1) + LEG_CAP[jy-1]) # [GW]
+        )
+        mod.ext[:constraints][:gen_limit_carbon_neutral] = @constraint(mod, [jy=JY],
+        gHCN[jy] == 0
+        )
+        mod.ext[:constraints][:cap_limit_carbon_neutral]  = @constraint(mod, [jy=JY], 
+        capHCN[jy] == 0
         )
     end   
 

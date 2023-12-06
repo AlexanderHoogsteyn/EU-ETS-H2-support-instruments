@@ -12,6 +12,8 @@ function define_results!(data::Dict,results::Dict,ADMM::Dict,agents::Dict,ETS::D
     results["h2_h"] = Dict()
     results["h2_cap"] = Dict()
     results["support"] = Dict()
+    results["h2cn_prod"] = Dict()
+    results["h2cn_cap"] = Dict()
     results["dual_max_support_duration"] = Dict()
 
     for m in agents[:ets]
@@ -45,6 +47,14 @@ function define_results!(data::Dict,results::Dict,ADMM::Dict,agents::Dict,ETS::D
         push!(results["h2_h"][m],zeros(data["nTimesteps"],data["nReprDays"],data["nyears"]))
         results["h2_cap"][m] = CircularBuffer{Array{Float64,1}}(data["CircularBufferSize"]) 
         push!(results["h2_cap"][m],zeros(data["nyears"]))
+    end
+    for m in agents[:h2cn_prod]
+        results["h2cn_prod"][m] = CircularBuffer{Array{Float64,1}}(data["CircularBufferSize"]) 
+        push!(results["h2cn_prod"][m],zeros(data["nyears"]))
+    end
+    for m in agents[:h2cn_cap]
+        results["h2cn_cap"][m] = CircularBuffer{Array{Float64,1}}(data["CircularBufferSize"]) 
+        push!(results["h2cn_cap"][m],zeros(data["nyears"]))
     end
     for m in agents[:supported]
         results["support"][m] = CircularBuffer{Array{Float64,1}}(data["CircularBufferSize"]) 
@@ -250,6 +260,7 @@ function define_results!(data::Dict,results::Dict,ADMM::Dict,agents::Dict,ETS::D
         ADMM["imbalance_mode"] = "CAPACITY"
     else 
          # TO DO add policy budget case ADMM["Imbalances"]["H2CN_cap"]
+         ADMM["imbalance_mode"] = "NO TARGET"
     end
 
     return results, ADMM

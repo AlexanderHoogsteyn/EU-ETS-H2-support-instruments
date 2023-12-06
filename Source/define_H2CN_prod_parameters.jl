@@ -1,4 +1,4 @@
-function define_H2CN_prod_parameters!(H2CN_prod::Dict,data::Dict,ts::DataFrame,repr_days::DataFrame)
+function define_H2CN_prod_parameters!(H2CN_prod::Dict,data::Dict,ts::DataFrame,repr_days::DataFrame,sens)
     # H2 demand
     if data["run_theoretical_min"] == "NO"
         H2CN_prod["H2CN_PRODT"] = [
@@ -17,7 +17,7 @@ function define_H2CN_prod_parameters!(H2CN_prod::Dict,data::Dict,ts::DataFrame,r
             DataFrame;delim=";"
         )
 
-        H2CN_prod["H2CN_PRODT"] =  h2_results[!,:PROD_Alkaline_base] + h2_results[!,:PROD_Alkaline_peak]
+        H2CN_prod["H2CN_PRODT"] =  h2_results[!,:PROD_Alkaline_base] + h2_results[!,:PROD_Alkaline_peak] + h2_results[!,:PROD_Alkaline_base_supported] + h2_results[!,:PROD_Alkaline_peak_supported]
     else
         print("Scenario overview ill-defined")
     end

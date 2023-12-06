@@ -37,8 +37,8 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
                 elseif data["scenario"]["H2_balance"] == "Yearly"
                     push!(ADMM["Imbalances"]["H2_y"], sum(results["h2_y"][m][end] for m in agents[:h2]) - H2["D_y"][:])
                 end
-                push!(ADMM["Imbalances"]["H2CN_prod"], sum(results["h2_y"][m][end] for m in agents[:supported]) - H2CN_prod["H2CN_PRODT"][:])
-                push!(ADMM["Imbalances"]["H2CN_cap"], sum(results["h2_cap"][m][end] for m in agents[:supported]) - H2CN_cap["H2CN_CAPT"][:])
+                push!(ADMM["Imbalances"]["H2CN_prod"], sum(results["h2cn_prod"][m][end] for m in agents[:supported]) - H2CN_prod["H2CN_PRODT"][:])
+                push!(ADMM["Imbalances"]["H2CN_cap"], sum(results["h2cn_cap"][m][end] for m in agents[:supported]) - H2CN_cap["H2CN_CAPT"][:])
                 # TO DO Add policy budget imbalance
                 
             # Primal residuals
@@ -127,15 +127,15 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
                 end
                 if ADMM["imbalance_mode"] == "QUANTITY"
                     push!(ADMM["Residuals"]["Dual"]["H2CN_prod"], sqrt(sum(sum((ADMM["ρ"]["H2CN_prod"][end]*(
-                        (results["h2_y"][m][end]-sum(results["h2_y"][mstar][end] for mstar in agents[:supported])./(H2CN_prod["nAgents"]+1)) 
-                        - (results["h2_y"][m][end-1]-sum(results["h2_y"][mstar][end-1] for mstar in agents[:supported])./(H2CN_prod["nAgents"]+1))
+                        (results["h2cn_prod"][m][end]-sum(results["h2cn_prod"][mstar][end] for mstar in agents[:supported])./(H2CN_prod["nAgents"]+1)) 
+                        - (results["h2cn_prod"][m][end-1]-sum(results["h2cn_prod"][mstar][end-1] for mstar in agents[:supported])./(H2CN_prod["nAgents"]+1))
                         )).^2 for m in agents[:supported])))
                     )
                     push!(ADMM["Residuals"]["Dual"]["H2CN_prod"], 0)
                 elseif ADMM["imbalance_mode"] == "CAPACITY"
                     push!(ADMM["Residuals"]["Dual"]["H2CN_cap"], sqrt(sum(sum((ADMM["ρ"]["H2CN_cap"][end]*(
-                        (results["h2_cap"][m][end]-sum(results["h2_cap"][mstar][end] for mstar in agents[:supported])./(H2CN_cap["nAgents"]+1)) 
-                        - (results["h2_cap"][m][end-1]-sum(results["h2_cap"][mstar][end-1] for mstar in agents[:supported])./(H2CN_cap["nAgents"]+1))
+                        (results["h2cn_cap"][m][end]-sum(results["h2cn_cap"][mstar][end] for mstar in agents[:supported])./(H2CN_cap["nAgents"]+1)) 
+                        - (results["h2cn_cap"][m][end-1]-sum(results["h2cn_cap"][mstar][end-1] for mstar in agents[:supported])./(H2CN_cap["nAgents"]+1))
                         )).^2 for m in agents[:supported])))
                     )
                     push!(ADMM["Residuals"]["Dual"]["H2CN_prod"], 0)
@@ -170,7 +170,7 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
                         for jy in mdict[agents[:h2s][1]].ext[:sets][:JY]]
                 )
             elseif data["scenario"]["H2_balance"] == "Daily"
-                push!(results["λ"]["H2_d"], results["λ"]["H2_d"][end] - ADMM["ρ"]["H2_d"][end]*ADMM["Imbalances"]["H2_d"][end])
+                push!(results["λ"]["H2_d"], results["λ"]["H2_d"][end] - ADMM["ρ"]["H2_d"][end]/10*ADMM["Imbalances"]["H2_d"][end])
                 push!(results["λ"]["H2CfD_ref"], [sum(H2["D_d"][:,jy].*results["λ"]["H2_d"][end][:,jy])./sum(H2["D_d"][:,jy]) 
                     for jy in mdict[agents[:h2s][1]].ext[:sets][:JY]]
                 )
@@ -180,29 +180,32 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
                     for jy in mdict[agents[:h2s][1]].ext[:sets][:JY]]
                 )
             elseif data["scenario"]["H2_balance"] == "Yearly"
-                push!(results["λ"]["H2_y"], results["λ"]["H2_y"][end] - ADMM["ρ"]["H2_y"][end]/10*ADMM["Imbalances"]["H2_y"][end])
+                push!(results["λ"]["H2_y"], results["λ"]["H2_y"][end] - ADMM["ρ"]["H2_y"][end]/1000*ADMM["Imbalances"]["H2_y"][end])
                 push!(results["λ"]["H2CfD_ref"], results["λ"]["H2_y"][end])
             end
+            JT = mdict["Alkaline_base"].ext[:sets][:JT]
+            JY = mdict["Alkaline_base"].ext[:sets][:JY]
+
             if ADMM["imbalance_mode"] == "QUANTITY"
                 push!(results["λ"]["H2CN_prod"], results["λ"]["H2CN_prod"][end] - ADMM["ρ"]["H2CN_prod"][end]/5000*ADMM["Imbalances"]["H2CN_prod"][end])
-                push!(results["λ"]["H2FP"], results["λ"]["H2FP"][end] - ADMM["ρ"]["H2FP"][end]/5000*ADMM["Imbalances"]["H2CN_prod"][end])
-                push!(results["λ"]["H2CfD"], results["λ"]["H2CfD"][end] - ADMM["ρ"]["H2CfD"][end]/100*ADMM["Imbalances"]["H2CN_prod"][end])
-                push!(results["λ"]["H2CG"], results["λ"]["H2CG"][end] - ADMM["ρ"]["H2CG"][end]/100*ADMM["Imbalances"]["H2CN_prod"][end])
-                push!(results["λ"]["H2TD"], results["λ"]["H2TD"][end] - ADMM["ρ"]["H2TD"][end]/100*ADMM["Imbalances"]["H2CN_prod"][end])
+                push!(results["λ"]["H2FP"], results["λ"]["H2FP"][end] - ADMM["ρ"]["H2FP"][end]/5000*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT) for jy in JY ])
+                push!(results["λ"]["H2CfD"], results["λ"]["H2CfD"][end] - ADMM["ρ"]["H2CfD"][end]/5000*ADMM["Imbalances"]["H2CN_prod"][end])
+                push!(results["λ"]["H2CG"], results["λ"]["H2CG"][end] - ADMM["ρ"]["H2CG"][end]/5000*ADMM["Imbalances"]["H2CN_prod"][end])
+                push!(results["λ"]["H2TD"], results["λ"]["H2TD"][end] - ADMM["ρ"]["H2TD"][end]/5000*ADMM["Imbalances"]["H2CN_prod"][end])
                 push!(results["λ"]["NG"], NG["λ"])
             elseif ADMM["imbalance_mode"] == "CAPACITY"
-                push!(results["λ"]["H2CN_prod"], results["λ"]["H2CN_prod"][end] - ADMM["ρ"]["H2CN_prod"][end]/100*ADMM["Imbalances"]["H2CN_cap"][end])
-                push!(results["λ"]["H2FP"], results["λ"]["H2FP"][end] - ADMM["ρ"]["H2FP"][end]/100*ADMM["Imbalances"]["H2CN_cap"][end])
-                push!(results["λ"]["H2CfD"], results["λ"]["H2CfD"][end] - ADMM["ρ"]["H2CfD"][end]/100*ADMM["Imbalances"]["H2CN_cap"][end])
-                push!(results["λ"]["H2CG"], results["λ"]["H2CG"][end] - ADMM["ρ"]["H2CG"][end]/100*ADMM["Imbalances"]["H2CN_cap"][end])
-                push!(results["λ"]["H2TD"], results["λ"]["H2TD"][end] - ADMM["ρ"]["H2TD"][end]/100*ADMM["Imbalances"]["H2CN_cap"][end])
+                push!(results["λ"]["H2CN_prod"], results["λ"]["H2CN_prod"][end] - ADMM["ρ"]["H2CN_prod"][end]/5000*ADMM["Imbalances"]["H2CN_cap"][end])
+                push!(results["λ"]["H2FP"], results["λ"]["H2FP"][end] - ADMM["ρ"]["H2FP"][end]/5000*ADMM["Imbalances"]["H2CN_cap"][end])
+                push!(results["λ"]["H2CfD"], results["λ"]["H2CfD"][end] - ADMM["ρ"]["H2CfD"][end]/5000*ADMM["Imbalances"]["H2CN_cap"][end])
+                push!(results["λ"]["H2CG"], results["λ"]["H2CG"][end] - ADMM["ρ"]["H2CG"][end]/5000*ADMM["Imbalances"]["H2CN_cap"][end])
+                push!(results["λ"]["H2TD"], results["λ"]["H2TD"][end] - ADMM["ρ"]["H2TD"][end]/5000*ADMM["Imbalances"]["H2CN_cap"][end])
                 push!(results["λ"]["NG"], NG["λ"])
             else
-                push!(results["λ"]["H2CN_prod"], 0)
-                push!(results["λ"]["H2FP"], 0)
-                push!(results["λ"]["H2CfD"], 0)
-                push!(results["λ"]["H2CG"], 0)
-                push!(results["λ"]["H2TD"], 0)
+                push!(results["λ"]["H2CN_prod"], zeros(data["General"]["nyears"]))
+                push!(results["λ"]["H2FP"], zeros(data["General"]["nyears"]))
+                push!(results["λ"]["H2CfD"], zeros(data["General"]["nyears"]))
+                push!(results["λ"]["H2CG"], zeros(data["General"]["nyears"]))
+                push!(results["λ"]["H2TD"], zeros(data["General"]["nyears"]))
                 push!(results["λ"]["NG"], NG["λ"])
                 # TO DO add policy budget case ADMM["Imbalances"]["H2CN_cap"]
             end

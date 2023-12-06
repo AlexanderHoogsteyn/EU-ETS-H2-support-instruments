@@ -4,7 +4,7 @@
 
 ## 0. Set-up code
 # HPC or not?
-HPC =  "NA" #, DelftBlue or ThinKing
+HPC =  "ThinKing" # NA, DelftBlue or ThinKing
 
 # Home directory
 const home_dir = @__DIR__
@@ -164,8 +164,8 @@ if HPC == "DelftBlue" || HPC == "ThinKing"
    stop_sens = dict_sim_number["stop_sens"]
 else
     # Range of scenarios to be simulated
-    start_scen = 2
-    stop_scen = 10
+    start_scen = 3
+    stop_scen = 20
     start_sens = 1
     stop_sens = 1
 end
@@ -216,9 +216,11 @@ end
 
 # write final set-up to yaml 
 if sens_number == 1
-    YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_ref.yaml")),data)
+    sens = "ref"
+    YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_",sens,".yaml")),data)
 else    
-    YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_",sensitivity_overview[sens_number-1,:remarks],".yaml")),data)
+    sens = sensitivity_overview[sens_number-1,:remarks]
+    YAML.write_file(joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_",data["scenario"]["scen_number"],"_",sens ,".yaml")),data)
 end
 
 println("    ")
@@ -259,11 +261,11 @@ define_EOM_parameters!(EOM,merge(data["General"],data["EOM"]),ts,repr_days)
 
 # Parameters/variables REC 
 REC = Dict()
-define_REC_parameters!(REC,merge(data["General"],data["REC"],data["scenario"]),ts,repr_days)
+define_REC_parameters!(REC,merge(data["General"],data["REC"],data["scenario"]),ts,repr_days) 
 
 # Parameters/variables incentive scheme carbon neutral hydrogen 
 H2CN_prod = Dict()
-define_H2CN_prod_parameters!(H2CN_prod,merge(data["General"],data["H2"],data["scenario"]),ts,repr_days)
+define_H2CN_prod_parameters!(H2CN_prod,merge(data["General"],data["H2"],data["scenario"]),ts,repr_days,sens)
 
 # Parameters/variables incentive scheme carbon neutral hydrogen production capacity
 H2CN_cap = Dict()

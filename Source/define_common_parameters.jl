@@ -95,7 +95,13 @@ function define_common_parameters!(m::String,mod::Model, data::Dict, ts::DataFra
     mod.ext[:parameters][:λ_H2CG] = zeros(data["nyears"],1)
     mod.ext[:parameters][:λ_H2TD] = zeros(data["nyears"],1)
     mod.ext[:parameters][:support_bar] = zeros(data["nyears"],1)
+    mod.ext[:parameters][:gHCN_bar] = zeros(data["nyears"],1)
+    mod.ext[:parameters][:capHCN_bar] = zeros(data["nyears"],1)         # ADMM penalty term
     mod.ext[:parameters][:ρ_support] = data["rho_support"]  
+    mod.ext[:parameters][:ρ_H2CN_prod] = data["rho_H2CN_prod"]          # ADMM rho value
+    mod.ext[:parameters][:ρ_H2CN_cap] = data["rho_H2CN_cap"]            # ADMM rho value 
+
+
 
 
     # Eligble for RECs?

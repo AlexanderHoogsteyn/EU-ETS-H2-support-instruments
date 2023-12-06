@@ -44,7 +44,7 @@ TO_local = TimerOutput()
         mod.ext[:parameters][:λ_d_H2] = results["λ"]["H2_d"][end] 
         mod.ext[:parameters][:ρ_d_H2] = ADMM["ρ"]["H2_d"][end]
         mod.ext[:parameters][:gH_m_bar] = results["h2_m"][m][end] - 1/(H2["nAgents"]+1)*ADMM["Imbalances"]["H2_m"][end]
-        mod.ext[:parameters][:λ_m_H2] = results["λ"]["H2_m"][end] 
+        mod.ext[:parameters][:λ_m_H2] = results["λ"]["H2_m"][end]
         mod.ext[:parameters][:ρ_m_H2] = ADMM["ρ"]["H2_m"][end]
         mod.ext[:parameters][:gH_y_bar] = results["h2_y"][m][end] - 1/(H2["nAgents"]+1)*ADMM["Imbalances"]["H2_y"][end]
         mod.ext[:parameters][:λ_y_H2] = results["λ"]["H2_y"][end]
@@ -57,6 +57,10 @@ TO_local = TimerOutput()
         mod.ext[:parameters][:λ_H2CN_cap] = results["λ"]["H2CN_cap"][end] 
         mod.ext[:parameters][:λ_H2CG] = results["λ"]["H2CG"][end] 
         mod.ext[:parameters][:λ_H2TD] = results["λ"]["H2TD"][end] 
+        mod.ext[:parameters][:gHCN_bar] = results["h2cn_prod"][m][end] - 1/(H2CN_prod["nAgents"]+1)*ADMM["Imbalances"]["H2CN_prod"][end]
+        mod.ext[:parameters][:ρ_H2CN_prod] = ADMM["ρ"]["H2CN_prod"][end]
+        mod.ext[:parameters][:capHCN_bar] = results["h2cn_cap"][m][end] - 1/(H2CN_cap["nAgents"]+1)*ADMM["Imbalances"]["H2CN_cap"][end]
+        mod.ext[:parameters][:ρ_H2CN_cap] = ADMM["ρ"]["H2CN_cap"][end]
     end
     if mod.ext[:parameters][:NG] == 1 # NG is not yet responsive to changes in demand - could be done at later stage
         mod.ext[:parameters][:λ_NG] =  results[ "λ"]["NG"][end] 
@@ -102,6 +106,8 @@ if mod.ext[:parameters][:H2] == 1
 end               
 if mod.ext[:parameters][:supported] == 1
     push!(results["support"][m], collect(value.(mod.ext[:variables][:support])))
+    push!(results["h2cn_prod"][m], collect(value.(mod.ext[:variables][:gHCN])))
+    push!(results["h2cn_cap"][m], collect(value.(mod.ext[:variables][:capHCN])))
     #push!(results["dual_max_support_duration"][m], dual.(mod.ext[:constraints][:max_support_duration]))
 end
 
