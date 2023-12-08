@@ -36,7 +36,6 @@ TO_local = TimerOutput()
         mod.ext[:parameters][:ρ_h_REC_post2030] = ADMM["ρ"]["REC_h_post2030"][end]
     end
     if mod.ext[:parameters][:H2] == 1
-        #mod.ext[:parameters][:support_bar] = results["h2_h"][m][end] - 1/(H2["nAgents"]+1)*ADMM["Imbalances"]["H2_h"][end]
         mod.ext[:parameters][:gH_h_bar] = results["h2_h"][m][end] - 1/(H2["nAgents"]+1)*ADMM["Imbalances"]["H2_h"][end]
         mod.ext[:parameters][:λ_h_H2] = results["λ"]["H2_h"][end] 
         mod.ext[:parameters][:ρ_h_H2] = ADMM["ρ"]["H2_h"][end]
@@ -103,9 +102,8 @@ if mod.ext[:parameters][:H2] == 1
     push!(results["h2_m"][m], collect(value.(mod.ext[:variables][:gH_m])))
     push!(results["h2_y"][m], collect(value.(mod.ext[:expressions][:gH_y])))
     push!(results["h2_cap"][m], collect(value.(mod.ext[:variables][:capH])))
-end               
+end          
 if mod.ext[:parameters][:supported] == 1
-    push!(results["support"][m], collect(value.(mod.ext[:variables][:support])))
     push!(results["h2cn_prod"][m], collect(value.(mod.ext[:variables][:gHCN])))
     push!(results["h2cn_cap"][m], collect(value.(mod.ext[:variables][:capHCN])))
     #push!(results["dual_max_support_duration"][m], dual.(mod.ext[:constraints][:max_support_duration]))

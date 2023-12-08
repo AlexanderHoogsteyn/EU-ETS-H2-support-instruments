@@ -213,11 +213,6 @@ function solve_h2s_agent!(mod::Model)
         capHCN_bar = mod.ext[:parameters][:capHCN_bar]
 
 
-
-
-
-        support = mod.ext[:variables][:support]
-
         gH_y = mod.ext[:expressions][:gH_y]
         gH = mod.ext[:variables][:gH]
 
@@ -239,21 +234,20 @@ function solve_h2s_agent!(mod::Model)
                                                                         )
         elseif H2FP_tender == "YES"
             H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -sum( gHCN[jt]*λ_H2FP[jt] for jt in JT) + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY))
-            #mod.ext[:constraints][:max_support_duration] = @constraint(mod, sum(support[jy] for jy in JY) >= 0 )# <= max_support_duration * contract_duration * capH[tender_year])
-            #mod.ext[:constraints][:overbid_limit_FP] = @constraint(mod, [jy=JY], gHFP[jy] <= max_bid_FP # [TWh]
+            #mod.ext[:constraints][:max_support_duration] = @constraint(mod, sum(gHCN[jt]*λ_H2FP[jt] for jt in  JT) <= max_support_duration * contract_duration * capHCN[tender_year])
         elseif H2CfD_tender  == "YES"
             H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -sum(gHCN[jt]*(λ_H2CfD[jt] - λ_y_H2[jt]) for jt in  JT) + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY))
-            mod.ext[:constraints][:max_support_duration] = @constraint(mod, support[tender_year] <= max_support_duration * contract_duration * capHCN[tender_year])
-            #mod.ext[:constraints][:overbid_limit_CfD] = @constraint(mod, [jy=JY], gHCfD[jy] <= max_bid_CfD # [TWh]
+            #mod.ext[:constraints][:max_support_duration] = @constraint(mod, sum(gHCN[jt]*(λ_H2CfD[jt] - λ_y_H2[jt]) for jt in  JT) <= max_support_duration * contract_duration * capHCN[tender_year])
         elseif H2_cap_tax_reduct == "YES"
             H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -capHCN[tender_year]*IC[tender_year]*λ_H2TD[tender_year] + sum(ρ_H2CN_cap/2*(capHCN[jy] - capHCN_bar[jy])^2 for jy in JY))
         elseif H2_cap_grant == "YES"
             H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -capHCN[tender_year]*λ_H2CG[tender_year] + sum(ρ_H2CN_cap/2*(capHCN[jy] - capHCN_bar[jy])^2 for jy in JY))
+        else 
+            # if calibration run
+            H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, 0)
         end
     else
-        H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod,
-           0
-        )
+        H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, 0)
     end
 
     if mod.ext[:parameters][:ETS] == 1

@@ -56,14 +56,13 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
     CSV.write(joinpath(home_dir,string("Results_",data["nReprDays"],"_repr_days"),string("Scenario_",data["scen_number"],"_PS_",sens,".csv")), DataFrame(mat_output,:auto), delim=";",header=["Year";"EOM_avg";"REC_y";string.("ADD_CAP_",agents[:ps]);string.("CAP_",agents[:ps]);string.("FS_",agents[:ps])]);
     
     # Hydrogen sector 
-    h2_cap = zeros(length(agents[:not_supported]),data["nyears"])
-    h2_prod = zeros(length(agents[:not_supported]),data["nyears"])
-    h2_add_cap = zeros(length(agents[:not_supported]),data["nyears"])
-    h2_import = zeros(length(agents[:h2import]),data["nyears"])
+    h2_cap = zeros(length(agents[:h2s])-length(agents[:supported]),data["nyears"])
+    h2_prod = zeros(length(agents[:h2s])-length(agents[:supported]),data["nyears"])
+    h2_add_cap = zeros(length(agents[:h2s])-length(agents[:supported]),data["nyears"])
 
     mm = 1
-    for m in agents[:not_supported]
-        if m in agents[:h2s]
+    for m in agents[:h2s]
+        if m in agents[:not_supported]
             CAP_LT = mdict[m].ext[:parameters][:CAP_LT]
             LEG_CAP = mdict[m].ext[:parameters][:LEG_CAP]
             h2_add_cap[mm,:] = cap = value.(mdict[m].ext[:variables][:capH])
@@ -72,15 +71,27 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
             mm = mm+1
         end
     end
-    h2cn_prod = zeros(length(agents[:supported]),data["nyears"])
-    h2cn_cap = zeros(length(agents[:supported]),data["nyears"])
+
+    h2_cap_s = zeros(length(agents[:supported]),data["nyears"])
+    h2_prod_s = zeros(length(agents[:supported]),data["nyears"])
+    h2_add_cap_s = zeros(length(agents[:supported]),data["nyears"])
+    h2cn_prod_s = zeros(length(agents[:supported]),data["nyears"])
+    h2cn_cap_s = zeros(length(agents[:supported]),data["nyears"])
 
     mm = 1
     for m in agents[:supported]
-        h2cn_cap[mm,:] = value.(mdict[m].ext[:variables][:capH])
-        h2cn_prod[mm,:] = value.(mdict[m].ext[:expressions][:gH_y])./data["conv_factor"] # Convert to Mt
+        CAP_LT = mdict[m].ext[:parameters][:CAP_LT]
+        LEG_CAP = mdict[m].ext[:parameters][:LEG_CAP]
+        h2_add_cap_s[mm,:] = cap = value.(mdict[m].ext[:variables][:capH])
+        h2_cap_s[mm,:] = [sum(CAP_LT[y2,jy]*cap[y2] for y2=1:jy) + LEG_CAP[jy] for jy in mdict[m].ext[:sets][:JY]]    
+        h2_prod_s[mm,:] = value.(mdict[m].ext[:expressions][:gH_y])./data["conv_factor"] # Convert to Mt
+        h2cn_cap_s[mm,:] = value.(mdict[m].ext[:variables][:capHCN])
+        h2cn_prod_s[mm,:] = value.(mdict[m].ext[:variables][:gHCN])./data["conv_factor"] # Convert to Mt
         mm = mm+1
     end
+
+    h2_import = zeros(length(agents[:h2import]),data["nyears"])
+
     mm = 1
     for m in agents[:h2import]
         h2_import[mm,:] = value.(mdict[m].ext[:expressions][:gH_y])./data["conv_factor"] # Convert to Mt
@@ -114,17 +125,19 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
         λ_H2_avg = results["λ"]["H2_y"][end]*data["conv_factor"]/1000
     end
 
-    mat_output = [Years transpose(h2_cap) transpose(h2_prod) transpose(h2_import) transpose(h2cn_cap) transpose(h2cn_prod) λ_H2_avg results["λ"]["H2CN_prod"][end]*data["conv_factor"]/1000 results["λ"]["H2CN_cap"][end] results["λ"]["H2FP"][end]*data["conv_factor"]/1000 results["λ"]["H2CfD"][end]*data["conv_factor"]/1000 results["λ"]["H2CfD_ref"][end]*data["conv_factor"]/1000]
+    mat_output = [Years transpose(h2_cap) transpose(h2_prod) transpose(h2_import) transpose(h2cn_cap_s) transpose(h2cn_prod_s) λ_H2_avg results["λ"]["H2CN_prod"][end]*data["conv_factor"]/1000 results["λ"]["H2CN_cap"][end] results["λ"]["H2FP"][end]*data["conv_factor"]/1000 results["λ"]["H2CfD"][end]*data["conv_factor"]/1000 results["λ"]["H2CfD_ref"][end]*data["conv_factor"]/1000 transpose(h2_cap_s) transpose(h2_prod_s)]
     CSV.write(  
         joinpath(
             home_dir,
             string("Results_",data["nReprDays"],"_repr_days"),
             string("Scenario_",data["scen_number"],"_H2_",sens,".csv")), 
         DataFrame(mat_output,:auto), delim=";",
-        header=["Year";string.("CAP_",agents[:not_supported]);string.("PROD_",agents[:not_supported]);
+        header=["Year";string.("CAP_",intersect(agents[:h2s],agents[:not_supported]));string.("PROD_",intersect(agents[:h2s],agents[:not_supported]));
                 string.("IMPORT_",agents[:h2import]) ; 
                 string.("CN_CAP_",agents[:supported]);string.("CN_PROD_",agents[:supported]);
-                "PriceH2";"PremiumH2CN_prod";"PremiumH2CN_cap";"PremiumFP";"StrikeH2CfD";"RefH2CfD"]);
+                "PriceH2";"PremiumH2CN_prod";"PremiumH2CN_cap";"PremiumFP";"StrikeH2CfD";"RefH2CfD";
+                string.("CAP_",agents[:supported]);string.("PROD_",agents[:supported]);
+                ]);
 
     # Aggregate metrics 
     JY = mdict[agents[:h2cn_prod][1]].ext[:sets][:JY]

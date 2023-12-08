@@ -14,7 +14,7 @@ General:
 
 ADMM:
  rho_EUA: 100 # rho ADMM penalty term, EUA market
- rho_EOM: 10 # rho ADMM penalty term, EOM 
+ rho_EOM: 10 # rho ADMM penalty term, EOM   
  rho_REC: 1 # rho ADMM penalty term, REC electricity
  rho_H2: 5  # rho ADMM penalty term, H2
  rho_H2CN_prod: 1 # rho ADMM penalty term, carbon-neutral H2 production incentive (€/tH2)
@@ -24,9 +24,9 @@ ADMM:
  rho_H2CG: 1
  rho_H2TD: 1
  rho_support: 1
- max_iter: 2000 # maximum number of iterations
+ max_iter: 5000 # maximum number of iterations
  epsilon: 0.1 # stopping criterion - tolerance on "accuracy" with which the coupling constraints are satisfied, expressed as percentage of initial imbalance (e.g., demand). Applied to dual and primal residuals.
- CircularBufferSize: 10 # number of iterations for which data will be retained, should be at least 2 and less than max_iter
+ CircularBufferSize: 2 # number of iterations for which data will be retained, should be at least 2 and less than max_iter
 
 EOM: 
   SF: 1 # scale factor for sensitivity analysis
@@ -195,7 +195,7 @@ HydrogenSector:
    Leadtime: 1 # years 
    AF: 1 # - own calculation
    Legcap_2021: 0 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683
-   efficiency_E_H2: 0.59 # efficiency conversion electricity to hydrogen 
+   efficiency_E_H2: 0.60 # efficiency conversion electricity to hydrogen 
    efficiency_NG_H2: 0 # efficiency conversion natural gas to hydrogen 
    emissions: 0.0 # [ton CO2/MWh] = [Mton CO2/TWh]
    max_YoY_new_cap: 1000 # % of current capacity
@@ -217,7 +217,7 @@ HydrogenSector:
    Leadtime: 1 # years 
    AF: 1 # - own calculation
    Legcap_2021: 0 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683
-   efficiency_E_H2: 0.69 # efficiency conversion electricity to hydrogen 
+   efficiency_E_H2: 0.70 # efficiency conversion electricity to hydrogen 
    Legcap_2021: 0.135 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683, https://www.swp-berlin.org/en/publication/electrolysers-for-the-hydrogen-revolution#:~:text=However%2C%20the%20EU%2Dwide%20electrolysis,still%20pending%20in%20most%20cases. 
    efficiency_NG_H2: 0 # efficiency conversion natural gas to hydrogen 
    emissions: 0.0 # [ton CO2/MWh] = [Mton CO2/TWh]

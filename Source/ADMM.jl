@@ -2,6 +2,8 @@
 function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H2CN_prod::Dict,H2CN_cap::Dict,NG::Dict,mdict::Dict,agents::Dict,data::Dict,TO::TimerOutput)
     convergence = 0
     iterations = ProgressBar(1:data["ADMM"]["max_iter"])
+    JT = mdict["Alkaline_base"].ext[:sets][:JT]
+    JY = mdict["Alkaline_base"].ext[:sets][:JY]
     for iter in iterations
         if convergence == 0
             # Multi-threaded version
@@ -54,11 +56,21 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
                 push!(ADMM["Residuals"]["Primal"]["H2_m"], sqrt(sum(ADMM["Imbalances"]["H2_m"][end]).^2))
                 push!(ADMM["Residuals"]["Primal"]["H2_y"], sqrt(sum(ADMM["Imbalances"]["H2_y"][end].^2)))
                 if ADMM["imbalance_mode"] == "QUANTITY"
-                    push!(ADMM["Residuals"]["Primal"]["H2CN_prod"], sqrt(sum(ADMM["Imbalances"]["H2CN_prod"][end].^2)))
-                    push!(ADMM["Residuals"]["Primal"]["H2CN_cap"], 0)
+                    if data["scenario"]["run_theoretical_min"] == "YES"
+                        push!(ADMM["Residuals"]["Primal"]["H2CN_prod"], sqrt(sum(ADMM["Imbalances"]["H2CN_prod"][end].^2)))
+                        push!(ADMM["Residuals"]["Primal"]["H2CN_cap"], 0)
+                    else
+                        push!(ADMM["Residuals"]["Primal"]["H2CN_prod"], sqrt(sum(ADMM["Imbalances"]["H2CN_prod"][end][jt].^2 for jt in JT)))
+                        push!(ADMM["Residuals"]["Primal"]["H2CN_cap"], 0)
+                    end
                 elseif ADMM["imbalance_mode"] == "CAPACITY" 
-                    push!(ADMM["Residuals"]["Primal"]["H2CN_cap"], sqrt(sum(ADMM["Imbalances"]["H2CN_cap"][end].^2)))
-                    push!(ADMM["Residuals"]["Primal"]["H2CN_prod"], 0)
+                    if data["scenario"]["run_theoretical_min"]
+                        push!(ADMM["Residuals"]["Primal"]["H2CN_cap"], sqrt(sum(ADMM["Imbalances"]["H2CN_cap"][end].^2)))
+                        push!(ADMM["Residuals"]["Primal"]["H2CN_prod"], 0)
+                    else
+                        push!(ADMM["Residuals"]["Primal"]["H2CN_cap"], sqrt(sum(ADMM["Imbalances"]["H2CN_cap"][end][jt].^2 for jt in JT)))
+                        push!(ADMM["Residuals"]["Primal"]["H2CN_prod"], 0)
+                    end
                 else
                     push!(ADMM["Residuals"]["Primal"]["H2CN_cap"], 0)
                     push!(ADMM["Residuals"]["Primal"]["H2CN_prod"], 0)
@@ -183,15 +195,13 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
                 push!(results["λ"]["H2_y"], results["λ"]["H2_y"][end] - ADMM["ρ"]["H2_y"][end]/1000*ADMM["Imbalances"]["H2_y"][end])
                 push!(results["λ"]["H2CfD_ref"], results["λ"]["H2_y"][end])
             end
-            JT = mdict["Alkaline_base"].ext[:sets][:JT]
-            JY = mdict["Alkaline_base"].ext[:sets][:JY]
 
             if ADMM["imbalance_mode"] == "QUANTITY"
                 push!(results["λ"]["H2CN_prod"], results["λ"]["H2CN_prod"][end] - ADMM["ρ"]["H2CN_prod"][end]/5000*ADMM["Imbalances"]["H2CN_prod"][end])
                 push!(results["λ"]["H2FP"], results["λ"]["H2FP"][end] - ADMM["ρ"]["H2FP"][end]/5000*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT) for jy in JY ])
-                push!(results["λ"]["H2CfD"], results["λ"]["H2CfD"][end] - ADMM["ρ"]["H2CfD"][end]/5000*ADMM["Imbalances"]["H2CN_prod"][end])
-                push!(results["λ"]["H2CG"], results["λ"]["H2CG"][end] - ADMM["ρ"]["H2CG"][end]/5000*ADMM["Imbalances"]["H2CN_prod"][end])
-                push!(results["λ"]["H2TD"], results["λ"]["H2TD"][end] - ADMM["ρ"]["H2TD"][end]/5000*ADMM["Imbalances"]["H2CN_prod"][end])
+                push!(results["λ"]["H2CfD"], results["λ"]["H2CfD"][end] - ADMM["ρ"]["H2CfD"][end]/5000*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT) for jy in JY])
+                push!(results["λ"]["H2CG"], results["λ"]["H2CG"][end] - ADMM["ρ"]["H2CG"][end]/5000*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT) for jy in JY])
+                push!(results["λ"]["H2TD"], results["λ"]["H2TD"][end] - ADMM["ρ"]["H2TD"][end]/5000*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT) for jy in JY])
                 push!(results["λ"]["NG"], NG["λ"])
             elseif ADMM["imbalance_mode"] == "CAPACITY"
                 push!(results["λ"]["H2CN_prod"], results["λ"]["H2CN_prod"][end] - ADMM["ρ"]["H2CN_prod"][end]/5000*ADMM["Imbalances"]["H2CN_cap"][end])

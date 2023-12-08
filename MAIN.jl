@@ -164,7 +164,7 @@ if HPC == "DelftBlue" || HPC == "ThinKing"
    stop_sens = dict_sim_number["stop_sens"]
 else
     # Range of scenarios to be simulated
-    start_scen = 3
+    start_scen = 1
     stop_scen = 20
     start_sens = 1
     stop_sens = 1
@@ -346,8 +346,8 @@ if data_merged["hot_start"] == "YES"      # initialize structure of results, onl
         ADMM = load(scen_string)["ADMM"]
     else
         println("The file '",scen_string,"' does not exist.")
-        results = load("Scenario_2.jld2")["results"]
-        ADMM = load("Scenario_2.jld2")["ADMM"]
+        results = load("Scenario_1.jld2")["results"]
+        ADMM = load("Scenario_1.jld2")["ADMM"]
     end
     define_results_hot_start!(data_merged,results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)
 elseif data_merged["hot_start"] == "NO"

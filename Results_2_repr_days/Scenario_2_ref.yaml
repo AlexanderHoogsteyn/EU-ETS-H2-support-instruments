@@ -6,10 +6,12 @@ EOM:
 scenario:
   Additionality_pre_2030: "NA"
   H2_demand_2030: 20
+  H2FP_tender_2030: "NO"
   Comments: missing
-  CNH2_cap_target_2030: 1
+  CNH2_cap_target_2030: 0
   Additionality_post_2030: "NA"
   CNH2_cap_target_2024: 0
+  H2CfD_tender_2030: "NO"
   Sens_analysis: "NO"
   scen_number: 2
   MSR: "NO"
@@ -17,44 +19,53 @@ scenario:
   max_support_duration: 8760
   CNH2_demand_2040: 0
   RES_target_2030: 0.45
-  HPA_price: 0
   import: "YES"
   H2_demand_2050: 50
-  H2_cap_grant: 0
+  H2_cap_grant: "NO"
   CNH2_demand_2024: 0
-  H2S_premium: 0
-  H2F_premium: 0
+  run_theoretical_min: "NO"
+  H2_cap_tax_reduct: "NO"
   gamma: 1
   CNH2_demand_2030: 0
   H2_balance: "Daily"
+  hot_start: "NO"
   CNH2_cap_target_2040: 0
-  sens_number: 1
   max_em_change: 100
+  sens_number: 1
 General:
-  operationalYear: 2040
+  inflation: 0.02
+  nReprDays: 2
+  operationalYear: 2030
+  conv_factor: 33
+  nTimesteps: 24
   discount_rate: 0.1
   nMonths: 12
-  inflation: 0.02
-  nTimesteps: 24
-  nyears: 40
-  nReprDays: 2
+  tender_year: 2030
+  social_discount_rate: 0.03
+  tender_lead_time: 1
   contract_duration: 10
+  nyears: 40
 HydrogenImport:
   Import:
-    EOM: "NO"
-    H2CN_cap: "NO"
     REC: "NO"
-    a_1: 150
+    a_1: 40
+    Support: "NO"
+    a_2: 861.2
+    EOM: "NO"
+    Leadtime: 3
+    H2CN_cap: "NO"
     H2CN_prod: "NO"
     ETS: "NO"
     NG: "NO"
-    a_2: 45672
+    YoY_OC_pre_2030: -8.4
+    YoY_OC_post_2030: -2.1
     H2: "YES"
 PowerSector:
   CCGT_new:
     REC: "NO"
     fuelCosts: 0
     YoY_VC: 0
+    Support: "NO"
     OC: 880
     EOM: "YES"
     AF: 0.9
@@ -76,6 +87,7 @@ PowerSector:
     REC: "YES"
     fuelCosts: 0
     YoY_VC: 0
+    Support: "NO"
     OC: 1748
     EOM: "YES"
     AF: 0.9
@@ -99,6 +111,7 @@ PowerSector:
     REC: "NO"
     fuelCosts: 26.91
     YoY_VC: 2
+    Support: "NO"
     OC: 3845
     EOM: "YES"
     AF: 0.4
@@ -122,6 +135,7 @@ PowerSector:
     REC: "YES"
     fuelCosts: 0
     YoY_VC: 0
+    Support: "NO"
     OC: 1118
     EOM: "YES"
     AF: 1
@@ -145,6 +159,7 @@ PowerSector:
     REC: "NO"
     fuelCosts: 10
     YoY_VC: 0
+    Support: "NO"
     OC: 7940
     EOM: "YES"
     AF: 0.75
@@ -168,6 +183,7 @@ PowerSector:
     REC: "YES"
     fuelCosts: 0
     YoY_VC: 0
+    Support: "NO"
     OC: 529
     EOM: "YES"
     AF: 1
@@ -191,6 +207,7 @@ PowerSector:
     REC: "NO"
     fuelCosts: 0
     YoY_VC: 0
+    Support: "NO"
     OC: 453
     EOM: "YES"
     AF: 0.85
@@ -210,30 +227,36 @@ PowerSector:
     H2: "NO"
 ADMM:
   rho_REC_y_pre2030: 0
-  CircularBufferSize: 2
+  CircularBufferSize: 20
   rho_REC_m_post2030: 0
-  rho_REC_y: 0.1
+  rho_H2FP: 1
+  rho_REC_y: 1
   rho_REC_d_pre2030: 0
   rho_H2_h: 0
   rho_H2_y: 0
-  rho_H2: 1
-  rho_H2_d: 1
-  rho_EUA: 1
-  max_iter: 50
+  rho_H2: 5
+  rho_H2_d: 5
+  rho_EUA: 100
+  max_iter: 5000
   rho_REC_h_post2030: 0
   rho_REC_y_post2030: 0
   rho_REC_m_pre2030: 0
-  rho_REC: 0.1
+  rho_REC: 1
   rho_REC_h_pre2030: 0
+  rho_H2CG: 1
+  rho_H2CfD: 1
+  rho_H2TD: 1
   rho_H2CN_cap: 1
-  rho_EOM: 500
+  rho_EOM: 10
   epsilon: 0.1
   rho_H2CN_prod: 1
   rho_REC_d_post2030: 0
   rho_H2_m: 0
+  rho_support: 1
 Industry:
   E_ref: 800
   REC: "NO"
+  Support: "NO"
   E_ind_2020: 548.6
   EOM: "NO"
   E_ind_2021: 512.9
@@ -289,6 +312,7 @@ HydrogenSector:
     efficiency_NG_H2: 0.75
     REC: "NO"
     fuelCosts: 0
+    Support: "NO"
     OC: 540
     EOM: "NO"
     AF: 1
@@ -309,6 +333,7 @@ HydrogenSector:
     efficiency_NG_H2: 0.67
     REC: "NO"
     fuelCosts: 0
+    Support: "NO"
     OC: 1032
     EOM: "NO"
     AF: 1
@@ -329,10 +354,53 @@ HydrogenSector:
     efficiency_NG_H2: 0
     REC: "YES"
     fuelCosts: 0
+    Support: "NO"
     OC: 1000
     EOM: "YES"
     AF: 1
-    Leadtime: 2
+    Leadtime: 1
+    Lifetime: 20
+    YoY_OC: -2.1
+    H2CN_cap: "YES"
+    efficiency_E_H2: 0.7
+    H2CN_prod: "YES"
+    ETS: "NO"
+    Legcap_2021: 0.135
+    NG: "NO"
+    Legcap_out: 20
+    emissions: 0.0
+    max_YoY_new_cap: 1000
+    H2: "YES"
+  Alkaline_peak_supported:
+    efficiency_NG_H2: 0
+    REC: "YES"
+    fuelCosts: 0
+    Support: "YES"
+    OC: 750
+    EOM: "YES"
+    AF: 1
+    Leadtime: 1
+    Lifetime: 20
+    YoY_OC: -2.1
+    H2CN_cap: "YES"
+    efficiency_E_H2: 0.6
+    H2CN_prod: "YES"
+    ETS: "NO"
+    Legcap_2021: 0
+    NG: "NO"
+    Legcap_out: 20
+    emissions: 0.0
+    max_YoY_new_cap: 1000
+    H2: "YES"
+  Alkaline_base_supported:
+    efficiency_NG_H2: 0
+    REC: "YES"
+    fuelCosts: 0
+    Support: "YES"
+    OC: 1000
+    EOM: "YES"
+    AF: 1
+    Leadtime: 1
     Lifetime: 20
     YoY_OC: -2.1
     H2CN_cap: "YES"
@@ -349,14 +417,15 @@ HydrogenSector:
     efficiency_NG_H2: 0
     REC: "YES"
     fuelCosts: 0
+    Support: "NO"
     OC: 750
     EOM: "YES"
     AF: 1
-    Leadtime: 2
+    Leadtime: 1
     Lifetime: 20
     YoY_OC: -2.1
     H2CN_cap: "YES"
-    efficiency_E_H2: 0.65
+    efficiency_E_H2: 0.6
     H2CN_prod: "YES"
     ETS: "NO"
     Legcap_2021: 0.135
@@ -368,5 +437,4 @@ HydrogenSector:
 H2:
   Import_Q_calibration: 10
   demand: 10
-  conv_factor: 33
   tolerance_calibration: 0.1
