@@ -18,6 +18,8 @@ function define_H2S_parameters!(mod::Model, data::Dict,ts::DataFrame,repr_days::
     mod.ext[:parameters][:H2_cap_grant] = data["H2_cap_grant"]
     mod.ext[:parameters][:contract_duration] = data["contract_duration"]
     mod.ext[:parameters][:tender_year] = data["tender_year"] -2020
+    mod.ext[:parameters][:cap_lead_time] = data["Leadtime"]
+    mod.ext[:parameters][:nyears] = data["nyears"]
 
     #mod.ext[:parameters][:max_bid_CfD] = data["conv_factor"]*data["H2CfD_tender_2030"]
     #mod.ext[:parameters][:max_bid_FP] = data["conv_factor"]*data["H2FP_tender_2030"]

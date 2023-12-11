@@ -6,7 +6,7 @@ General:
   inflation: 0.02
   discount_rate: 0.1
   social_discount_rate: 0.03
-  operationalYear: 2030
+  operationalYear: 2031
   tender_year: 2030
   tender_lead_time: 1
   contract_duration: 10
@@ -17,8 +17,8 @@ ADMM:
  rho_EOM: 10 # rho ADMM penalty term, EOM   
  rho_REC: 1 # rho ADMM penalty term, REC electricity
  rho_H2: 5  # rho ADMM penalty term, H2
- rho_H2CN_prod: 1 # rho ADMM penalty term, carbon-neutral H2 production incentive (€/tH2)
- rho_H2CN_cap: 1 # rho ADMM penalty term, carbon-neutral H2 capacity incentive (€/GW)
+ rho_H2CN_prod: 100 # rho ADMM penalty term, carbon-neutral H2 production incentive (€/tH2)
+ rho_H2CN_cap: 100 # rho ADMM penalty term, carbon-neutral H2 capacity incentive (€/GW)
  rho_H2FP: 1
  rho_H2CfD: 1
  rho_H2CG: 1
@@ -171,7 +171,6 @@ HydrogenSector:
    Lifetime: 20 # Y15ears 
    Leadtime: 1 # years 
    AF: 1 # - own calculation
-   Legcap_2021: 0.1 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683
    efficiency_E_H2: 0.70 # efficiency conversion electricity to hydrogen 
    Legcap_2021: 0.135 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683, https://www.swp-berlin.org/en/publication/electrolysers-for-the-hydrogen-revolution#:~:text=However%2C%20the%20EU%2Dwide%20electrolysis,still%20pending%20in%20most%20cases. 
    efficiency_NG_H2: 0 # efficiency conversion natural gas to hydrogen 
@@ -218,7 +217,6 @@ HydrogenSector:
    AF: 1 # - own calculation
    Legcap_2021: 0 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683
    efficiency_E_H2: 0.70 # efficiency conversion electricity to hydrogen 
-   Legcap_2021: 0.135 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683, https://www.swp-berlin.org/en/publication/electrolysers-for-the-hydrogen-revolution#:~:text=However%2C%20the%20EU%2Dwide%20electrolysis,still%20pending%20in%20most%20cases. 
    efficiency_NG_H2: 0 # efficiency conversion natural gas to hydrogen 
    emissions: 0.0 # [ton CO2/MWh] = [Mton CO2/TWh]
    max_YoY_new_cap: 1000 # % of current capacity

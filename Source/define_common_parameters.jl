@@ -13,7 +13,9 @@ function define_common_parameters!(m::String,mod::Model, data::Dict, ts::DataFra
     mod.ext[:sets][:JY_pre2030] = 1:10  
     mod.ext[:sets][:JY_post2030] = 11:data["nyears"]
     mod.ext[:sets][:JY_post2040] = 21:data["nyears"]
-    mod.ext[:sets][:JT] = (data["tender_year"]+data["tender_lead_time"]-2020):(data["tender_year"]+data["tender_lead_time"]+data["contract_duration"]-2020)
+    mod.ext[:sets][:JT] = (data["tender_year"]+data["tender_lead_time"]-2020):(data["tender_year"]+data["tender_lead_time"]+data["contract_duration"]-2020-1)
+    mod.ext[:sets][:pre_JT] = 1:(data["tender_year"]+data["tender_lead_time"]-2020-1)
+    mod.ext[:sets][:post_JT] = (data["tender_year"]+data["tender_lead_time"]+data["contract_duration"]-2020):data["nyears"]
     mod.ext[:sets][:JM] = 1:12
     mod.ext[:sets][:JD] = 1:data["nReprDays"]
     mod.ext[:sets][:JH] = 1:data["nTimesteps"]

@@ -82,8 +82,8 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
     for m in agents[:supported]
         CAP_LT = mdict[m].ext[:parameters][:CAP_LT]
         LEG_CAP = mdict[m].ext[:parameters][:LEG_CAP]
-        h2_add_cap_s[mm,:] = cap = value.(mdict[m].ext[:variables][:capH])
-        h2_cap_s[mm,:] = [sum(CAP_LT[y2,jy]*cap[y2] for y2=1:jy) + LEG_CAP[jy] for jy in mdict[m].ext[:sets][:JY]]    
+        h2_add_cap_s[mm,:] = cap_s = value.(mdict[m].ext[:variables][:capH])
+        h2_cap_s[mm,:] = [sum(CAP_LT[y2,jy]*cap_s[y2] for y2=1:jy) + LEG_CAP[jy] for jy in mdict[m].ext[:sets][:JY]]    
         h2_prod_s[mm,:] = value.(mdict[m].ext[:expressions][:gH_y])./data["conv_factor"] # Convert to Mt
         h2cn_cap_s[mm,:] = value.(mdict[m].ext[:variables][:capHCN])
         h2cn_prod_s[mm,:] = value.(mdict[m].ext[:variables][:gHCN])./data["conv_factor"] # Convert to Mt

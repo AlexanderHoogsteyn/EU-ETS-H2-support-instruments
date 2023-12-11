@@ -4,10 +4,13 @@ function build_h2s_agent!(mod::Model)
     JD = mod.ext[:sets][:JD]
     JM = mod.ext[:sets][:JM]
     JY = mod.ext[:sets][:JY]
-    JT= mod.ext[:sets][:JT]
+    JT = mod.ext[:sets][:JT]
+    pre_JT = mod.ext[:sets][:pre_JT]
+    post_JT = mod.ext[:sets][:post_JT]
     JY_pre2030 = mod.ext[:sets][:JY_pre2030]
     JY_post2030 = mod.ext[:sets][:JY_post2030]
     JY_post2040 = mod.ext[:sets][:JY_post2040]
+
        
     # Extract parameters
     W = mod.ext[:parameters][:W] # weight of the representative days
@@ -62,8 +65,8 @@ function build_h2s_agent!(mod::Model)
     r_d = mod.ext[:variables][:r_d] = @variable(mod, [jd=JD,jy=JY], upper_bound=0, base_name="REC_d") 
     r_h = mod.ext[:variables][:r_h] = @variable(mod, [jh=JH,jd=JD,jy=JY], upper_bound=0, base_name="REC_h") 
     gH_m = mod.ext[:variables][:gH_m] = @variable(mod, [jm=JM,jy=JY],lower_bound=0, base_name="generation_hydrogen_monthly") # needs to be variable to get feasible solution with representative days (combination of days may not allow exact match of montly demand, may be infeasible)
-    capHCN = mod.ext[:variables][:capHCN] = @variable(mod, [jy=JY],  base_name="green_capacity")
-    gHCN = mod.ext[:variables][:gHCN] = @variable(mod, [jy=JY], base_name="generation_carbon_neutral_hydrogen")
+    capHCN = mod.ext[:variables][:capHCN] = @variable(mod, [jy=JY], lower_bound=0, base_name="green_capacity")
+    gHCN = mod.ext[:variables][:gHCN] = @variable(mod, [jy=JY],lower_bound=0, base_name="generation_carbon_neutral_hydrogen")
 
     # Create affine expressions  
     mod.ext[:expressions][:e] = @expression(mod, [jy=JY],
@@ -268,7 +271,9 @@ function build_h2s_agent!(mod::Model)
         H2_cap_tax_reduct = mod.ext[:parameters][:H2_cap_tax_reduct]
         H2_cap_grant = mod.ext[:parameters][:H2_cap_grant]
         contract_duration = mod.ext[:parameters][:contract_duration]
+        cap_lead_time = mod.ext[:parameters][:cap_lead_time]
         tender_year = mod.ext[:parameters][:tender_year]
+        nyears = mod.ext[:parameters][:nyears]
 
         λ_H2CN_prod = mod.ext[:parameters][:λ_H2CN_prod] # Carbon neutral H2 generation subsidy
         λ_H2CN_cap = mod.ext[:parameters][:λ_H2CN_cap] # Carbon neutral H2 capacity subsidy
@@ -279,8 +284,6 @@ function build_h2s_agent!(mod::Model)
         λ_H2CG = mod.ext[:parameters][:λ_H2CG]
 
         #Investment limits: YoY investment is limited
-        mod.ext[:constraints][:cap_limit_1] = @constraint(mod, [jy=JY_pre2030[1:end-1]], capH[jy] == 0 )
-        mod.ext[:constraints][:cap_limit_2] = @constraint(mod, [jy=JY_post2030], capH[jy] == 0)
 
         if ρ_h_H2 > 0
             λ_y_H2 = [ sum(λ_h_H2[jh,jd,jy]*W[jd] for jh in JH, jd in JD)/8760 for jy in JY ]
@@ -300,13 +303,13 @@ function build_h2s_agent!(mod::Model)
         capHCN[jy] <= sum(CAP_LT[y2,jy]*capH[y2] for y2=1:jy) + LEG_CAP[jy] # [GW] - cap are capacity additions per year, whereas capHCN needs to be the avaiable capacity
         )
 
-        if run_theoretical_min == "YES"
-            mod.ext[:constraints][:max_support] = @constraint(mod, [jy=JY], support[jy] <= gHCN[jy] * λ_H2CN_prod[jy] + capHCN[jy]*λ_H2CN_cap[jy])
-            #mod.ext[:constraints][:max_support_duration] = @constraint(mod,  sum(support[jy] for jy in JY) <= max_support_duration * contract_duration * capH[tender_year])
-        else
-            mod.ext[:constraints][:max_support_1] = @constraint(mod, [jy=JY_pre2030], gHCN[jy] <= 0)
-            mod.ext[:constraints][:max_support_3] = @constraint(mod, [jy=JY_post2040], gHCN[jy] <= 0)
+        if run_theoretical_min != "YES"
+            mod.ext[:constraints][:max_support_1] = @constraint(mod, [jy=pre_JT], gHCN[jy] == 0)
+            mod.ext[:constraints][:max_support_3] = @constraint(mod, [jy=post_JT], gHCN[jy] == 0)
+            mod.ext[:constraints][:cap_limit_1] = @constraint(mod, [jy=1:(tender_year-cap_lead_time)], capH[jy] == 0 )
+            mod.ext[:constraints][:cap_limit_2] = @constraint(mod, [jy=(tender_year-cap_lead_time+2):nyears], capH[jy] == 0)    
         end
+
     else
         # Investment limits: YoY investment is limited
         mod.ext[:constraints][:cap_limit] = @constraint(mod,
