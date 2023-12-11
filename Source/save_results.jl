@@ -125,7 +125,7 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
         λ_H2_avg = results["λ"]["H2_y"][end]*data["conv_factor"]/1000
     end
 
-    mat_output = [Years transpose(h2_cap) transpose(h2_prod) transpose(h2_import) transpose(h2cn_cap_s) transpose(h2cn_prod_s) λ_H2_avg results["λ"]["H2CN_prod"][end]*data["conv_factor"]/1000 results["λ"]["H2CN_cap"][end] results["λ"]["H2FP"][end]*data["conv_factor"]/1000 results["λ"]["H2CfD"][end]*data["conv_factor"]/1000 results["λ"]["H2CfD_ref"][end]*data["conv_factor"]/1000 transpose(h2_cap_s) transpose(h2_prod_s)]
+    mat_output = [Years transpose(h2_cap) transpose(h2_prod) transpose(h2_import) transpose(h2cn_cap_s) transpose(h2cn_prod_s) λ_H2_avg results["λ"]["H2CN_prod"][end]*data["conv_factor"]/1000 results["λ"]["H2CN_cap"][end] results["λ"]["H2FP"][end]*data["conv_factor"]/1000 results["λ"]["H2CfD"][end]*data["conv_factor"]/1000 results["λ"]["H2CfD_ref"][end]*data["conv_factor"]/1000 results["λ"]["H2CG"][end] results["λ"]["H2TD"][end] transpose(h2_cap_s) transpose(h2_prod_s)]
     CSV.write(  
         joinpath(
             home_dir,
@@ -135,7 +135,7 @@ function save_results(mdict::Dict,EOM::Dict,ETS::Dict,H2::Dict,ADMM::Dict,result
         header=["Year";string.("CAP_",intersect(agents[:h2s],agents[:not_supported]));string.("PROD_",intersect(agents[:h2s],agents[:not_supported]));
                 string.("IMPORT_",agents[:h2import]) ; 
                 string.("CN_CAP_",agents[:supported]);string.("CN_PROD_",agents[:supported]);
-                "PriceH2";"PremiumH2CN_prod";"PremiumH2CN_cap";"PremiumFP";"StrikeH2CfD";"RefH2CfD";
+                "PriceH2";"PremiumH2CN_prod";"PremiumH2CN_cap";"PremiumFP";"StrikeH2CfD";"RefH2CfD";"CapacityGrant";"TaxDeduction"
                 string.("CAP_",agents[:supported]);string.("PROD_",agents[:supported]);
                 ]);
 
