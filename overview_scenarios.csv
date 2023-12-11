@@ -1,6 +1,6 @@
 scen_number;MSR;RES_target_2030;H2_demand_2030;H2_demand_2050;CNH2_cap_target_2024;CNH2_cap_target_2030;CNH2_cap_target_2040;CNH2_demand_2024;CNH2_demand_2030;CNH2_demand_2040;gamma;max_em_change;Additionality_pre_2030;Additionality_post_2030;H2_balance;import;run_theoretical_min;H2FP_tender_2030;H2CfD_tender_2030;H2_cap_grant;H2_cap_tax_reduct;max_support_duration;ref_scen_number;Sens_analysis;hot_start;Comments
-1;NO;0.45;20;50;0;0;0;0;0;0;1;100;NA;NA;Daily;YES;NO;NO;NO;NO;NO;8760;1;NO;NO;Used to calibrate MACC
-2;NO;0.45;20;50;0;0;0;0;0;0;1;100;NA;NA;Daily;YES;NO;NO;NO;NO;NO;8760;1;NO;NO;
+1;NO;0.45;20;50;0;0;0;0;0;0;1;100;NA;NA;Daily;YES;NO;NO;NO;NO;NO;8760;1;NO;YES;Used to calibrate MACC
+2;NO;0.45;20;50;0;0;0;0;0;0;1;100;NA;NA;Daily;YES;NO;NO;NO;NO;NO;8760;1;NO;YES;
 3;NO;0.45;20;50;0;0;0;0;10;0;1;100;NA;NA;Daily;YES;NO;YES;NO;NO;NO;8760;1;NO;YES;
 4;NO;0.45;20;50;0;0;0;0;10;0;1;100;NA;NA;Daily;YES;NO;NO;YES;NO;NO;8760;1;NO;YES;
 5;NO;0.45;20;50;0;0;0;0;10;0;1;100;NA;NA;Daily;YES;NO;NO;NO;YES;NO;8760;1;NO;YES;

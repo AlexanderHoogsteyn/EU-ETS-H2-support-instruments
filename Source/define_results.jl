@@ -323,13 +323,14 @@ function define_results_hot_start!(data::Dict,results::Dict,ADMM::Dict,agents::D
     ADMM["n_iter"] = 1 
     ADMM["walltime"] = 0
 
-    if data["scenario"]["CNH2_demand_2030"] > 0 && data["scenario"]["CNH2_cap_target_2024"] == 0
-        ADMM["imbalance_mode"] = "QUANTITY"
-    elseif data["scenario"]["CNH2_cap_target_2024"] > 0 && data["scenario"]["CNH2_demand_2030"] == 0
-        ADMM["imbalance_mode"] = "CAPACITY"
-    else 
-         # TO DO add policy budget case ADMM["Imbalances"]["H2CN_cap"]
-    end
+   if data["CNH2_demand_2030"] > 0 && data["CNH2_cap_target_2024"] == 0
+    ADMM["imbalance_mode"] = "QUANTITY"
+elseif data["CNH2_cap_target_2024"] > 0 && data["CNH2_demand_2030"] == 0
+    ADMM["imbalance_mode"] = "CAPACITY"
+else 
+     # TO DO add policy budget case ADMM["Imbalances"]["H2CN_cap"]
+     ADMM["imbalance_mode"] = "NO TARGET"
+end
 
     return results, ADMM
 end

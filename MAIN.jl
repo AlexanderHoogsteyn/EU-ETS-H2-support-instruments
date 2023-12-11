@@ -334,9 +334,12 @@ println("   ")
 # Optional hot-start
 TO = TimerOutput()
 data_merged = merge(data["General"],data["ADMM"],data["scenario"])
-if data_merged["hot_start"] == "YES"      # initialize structure of results, only those that will be stored in each iteration
+if data_merged["hot_start"] == "YES"     # initialize structure of results, only those that will be stored in each iteration
     if sens_number > 1
         scen_string = joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_1_",sensitivity_overview[sens_number-1,:remarks], ".jld2"))
+        if !isfile(scen_string)
+            scen_string = joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_1.jld2"))
+        end
     else 
         scen_string = joinpath(home_dir,string("Results_",data["General"]["nReprDays"],"_repr_days"),string("Scenario_1.jld2"))
     end
@@ -344,17 +347,18 @@ if data_merged["hot_start"] == "YES"      # initialize structure of results, onl
         println("Hot start from '",scen_string,"'")
         results = load(scen_string)["results"]
         ADMM = load(scen_string)["ADMM"]
+        define_results_hot_start!(data_merged,results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)
     else
-        println("The file '",scen_string,"' does not exist.")
-        results = load("Scenario_1.jld2")["results"]
-        ADMM = load("Scenario_1.jld2")["ADMM"]
+        println("Hot start: No")
+        results = Dict()
+        ADMM = Dict()
+        define_results!(data_merged,results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)
     end
-    define_results_hot_start!(data_merged,results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)
 elseif data_merged["hot_start"] == "NO"
     println("Hot start: No")
     results = Dict()
     ADMM = Dict()
-    define_results!(data_merged,results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)  
+    define_results!(data_merged,results,ADMM,agents,ETS,EOM,REC,H2,H2CN_prod,H2CN_cap,NG)
 else
     println("Hot start ill-defined")    
 end
