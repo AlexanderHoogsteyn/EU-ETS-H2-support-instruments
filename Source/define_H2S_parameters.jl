@@ -12,6 +12,7 @@ function define_H2S_parameters!(mod::Model, data::Dict,ts::DataFrame,repr_days::
     mod.ext[:parameters][:CAP_LT] = zeros(data["nyears"],data["nyears"]) 
     mod.ext[:parameters][:max_support_duration] = data["max_support_duration"]
     mod.ext[:parameters][:run_theoretical_min] = data["run_theoretical_min"]
+    mod.ext[:parameters][:fix_generation] = data["fix_generation"]
     mod.ext[:parameters][:H2CfD_tender] = data["H2CfD_tender_2030"]
     mod.ext[:parameters][:H2FP_tender] = data["H2FP_tender_2030"]
     mod.ext[:parameters][:H2_cap_tax_reduct] = data["H2_cap_tax_reduct"]

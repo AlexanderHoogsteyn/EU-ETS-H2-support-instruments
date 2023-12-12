@@ -274,6 +274,7 @@ function build_h2s_agent!(mod::Model)
         cap_lead_time = mod.ext[:parameters][:cap_lead_time]
         tender_year = mod.ext[:parameters][:tender_year]
         nyears = mod.ext[:parameters][:nyears]
+        fix_generation = mod.ext[:parameters][:fix_generation]
 
         λ_H2CN_prod = mod.ext[:parameters][:λ_H2CN_prod] # Carbon neutral H2 generation subsidy
         λ_H2CN_cap = mod.ext[:parameters][:λ_H2CN_cap] # Carbon neutral H2 capacity subsidy
@@ -308,6 +309,10 @@ function build_h2s_agent!(mod::Model)
             mod.ext[:constraints][:max_support_3] = @constraint(mod, [jy=post_JT], gHCN[jy] == 0)
             mod.ext[:constraints][:cap_limit_1] = @constraint(mod, [jy=1:(tender_year-cap_lead_time)], capH[jy] == 0 )
             mod.ext[:constraints][:cap_limit_2] = @constraint(mod, [jy=(tender_year-cap_lead_time+2):nyears], capH[jy] == 0)    
+        end
+
+        if fix_generation == "YES"
+            mod.ext[:constraints][:fix_generation] = @constraint(mod, [jt=JT],gHCN[jt] == gHCN[JT[1]])
         end
 
     else
