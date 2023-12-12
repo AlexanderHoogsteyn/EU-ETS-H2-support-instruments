@@ -35,7 +35,7 @@ scenario:
 General:
   inflation: 0.02
   nReprDays: 2
-  operationalYear: 2030
+  operationalYear: 2031
   conv_factor: 33
   nTimesteps: 24
   discount_rate: 0.1
@@ -227,7 +227,7 @@ PowerSector:
     H2: "NO"
 ADMM:
   rho_REC_y_pre2030: 0
-  CircularBufferSize: 20
+  CircularBufferSize: 2
   rho_REC_m_post2030: 0
   rho_H2FP: 1
   rho_REC_y: 1
@@ -237,7 +237,7 @@ ADMM:
   rho_H2: 5
   rho_H2_d: 5
   rho_EUA: 100
-  max_iter: 500
+  max_iter: 5000
   rho_REC_h_post2030: 0
   rho_REC_y_post2030: 0
   rho_REC_m_pre2030: 0
@@ -246,10 +246,10 @@ ADMM:
   rho_H2CG: 1
   rho_H2CfD: 1
   rho_H2TD: 1
-  rho_H2CN_cap: 1
+  rho_H2CN_cap: 100
   rho_EOM: 10
   epsilon: 0.1
-  rho_H2CN_prod: 1
+  rho_H2CN_prod: 100
   rho_REC_d_post2030: 0
   rho_H2_m: 0
   rho_support: 1
@@ -407,7 +407,7 @@ HydrogenSector:
     efficiency_E_H2: 0.7
     H2CN_prod: "YES"
     ETS: "NO"
-    Legcap_2021: 0.135
+    Legcap_2021: 0
     NG: "NO"
     Legcap_out: 20
     emissions: 0.0
