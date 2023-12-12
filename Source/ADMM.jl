@@ -201,14 +201,14 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
                 push!(results["λ"]["H2FP"], results["λ"]["H2FP"][end] - ADMM["ρ"]["H2FP"][end]/5000*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT) for jy in JY ])
                 push!(results["λ"]["H2CfD"], results["λ"]["H2CfD"][end] - ADMM["ρ"]["H2CfD"][end]/5000*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT) for jy in JY])
                 push!(results["λ"]["H2CG"], results["λ"]["H2CG"][end] - ADMM["ρ"]["H2CG"][end]/5000*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT) for jy in JY])
-                push!(results["λ"]["H2TD"], results["λ"]["H2TD"][end] - ADMM["ρ"]["H2TD"][end]/500000*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT) for jy in JY])
+                push!(results["λ"]["H2TD"], results["λ"]["H2TD"][end] - ADMM["ρ"]["H2TD"][end]/5000000*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT) for jy in JY])
                 push!(results["λ"]["NG"], NG["λ"])
             elseif ADMM["imbalance_mode"] == "CAPACITY"
                 push!(results["λ"]["H2CN_prod"], results["λ"]["H2CN_prod"][end] - ADMM["ρ"]["H2CN_prod"][end]/5000*ADMM["Imbalances"]["H2CN_cap"][end])
                 push!(results["λ"]["H2FP"], results["λ"]["H2FP"][end] - ADMM["ρ"]["H2FP"][end]/5000*ADMM["Imbalances"]["H2CN_cap"][end])
                 push!(results["λ"]["H2CfD"], results["λ"]["H2CfD"][end] - ADMM["ρ"]["H2CfD"][end]/5000*ADMM["Imbalances"]["H2CN_cap"][end])
                 push!(results["λ"]["H2CG"], results["λ"]["H2CG"][end] - ADMM["ρ"]["H2CG"][end]/5000*ADMM["Imbalances"]["H2CN_cap"][end])
-                push!(results["λ"]["H2TD"], results["λ"]["H2TD"][end] - ADMM["ρ"]["H2TD"][end]/500000*ADMM["Imbalances"]["H2CN_cap"][end])
+                push!(results["λ"]["H2TD"], results["λ"]["H2TD"][end] - ADMM["ρ"]["H2TD"][end]/5000000*ADMM["Imbalances"]["H2CN_cap"][end])
                 push!(results["λ"]["NG"], NG["λ"])
             else
                 push!(results["λ"]["H2CN_prod"], zeros(data["General"]["nyears"]))

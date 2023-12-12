@@ -314,6 +314,9 @@ function build_h2s_agent!(mod::Model)
         if fix_generation == "YES"
             mod.ext[:constraints][:fix_generation] = @constraint(mod, [jt=JT],gHCN[jt] == gHCN[JT[1]])
         end
+        if H2CfD_tender  == "YES" || H2FP_tender == "YES"
+            mod.ext[:constraints][:max_support_duration] = @constraint(mod, sum(gHCN[jt] for jt in  JT)*1000 <= max_support_duration * contract_duration * capH[tender_year])
+        end
 
     else
         # Investment limits: YoY investment is limited
