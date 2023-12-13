@@ -232,13 +232,13 @@ function solve_h2s_agent!(mod::Model)
                                                                         + sum(ρ_H2CN_cap/2*(capHCN[jy] - capHCN_bar[jy])^2 for jy in JY)
                                                                         )
         elseif H2FP_tender == "YES"
-            H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -sum( gHCN[jt]*λ_H2FP[jt] for jt in JT) + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY))
+            H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -sum( gHCN[jt]*λ_H2FP[jt] for jt in JT) + sum(ρ_H2CN_prod/2*(gH_y[jt] - gHCN_bar[jt])^2 for jt in JT))
         elseif H2CfD_tender  == "YES"
-            H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -sum(gHCN[jt]*(λ_H2CfD[jt] - λ_y_H2[jt]) for jt in  JT) + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY))
+            H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -sum(gHCN[jt]*(λ_H2CfD[jt] - λ_y_H2[jt]) for jt in  JT) + sum(ρ_H2CN_prod/2*(gH_y[jt] - gHCN_bar[jt])^2 for jt in JT))
         elseif H2_cap_tax_reduct == "YES"
-            H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -capH[tender_year]*IC[tender_year]*λ_H2TD[tender_year] + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY))
+            H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -capH[tender_year]*IC[tender_year]*λ_H2TD[tender_year] + sum(ρ_H2CN_prod/2*(gH_y[jy] - gHCN_bar[jy])^2 for jt in JT))
         elseif H2_cap_grant == "YES"
-            H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -capH[tender_year]*λ_H2CG[tender_year] + sum(ρ_H2CN_prod/2*(gHCN[jy] - gHCN_bar[jy])^2 for jy in JY))
+            H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -capH[tender_year]*λ_H2CG[tender_year] + sum(ρ_H2CN_prod/2*(gH_y[jt] - gHCN_bar[jt])^2 for jt in JT))
         else 
             # if calibration run
             H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, 0)

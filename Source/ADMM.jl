@@ -39,7 +39,7 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
                 elseif data["scenario"]["H2_balance"] == "Yearly"
                     push!(ADMM["Imbalances"]["H2_y"], sum(results["h2_y"][m][end] for m in agents[:h2]) - H2["D_y"][:])
                 end
-                push!(ADMM["Imbalances"]["H2CN_prod"], sum(results["h2cn_prod"][m][end] for m in agents[:supported]) - H2CN_prod["H2CN_PRODT"][:])
+                push!(ADMM["Imbalances"]["H2CN_prod"], sum(results["h2_y"][m][end] for m in agents[:supported]) - H2CN_prod["H2CN_PRODT"][:])
                 push!(ADMM["Imbalances"]["H2CN_cap"], sum(results["h2cn_cap"][m][end] for m in agents[:supported]) - H2CN_cap["H2CN_CAPT"][:])
                 # TO DO Add policy budget imbalance
                 
@@ -60,7 +60,7 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
                         push!(ADMM["Residuals"]["Primal"]["H2CN_prod"], sqrt(sum(ADMM["Imbalances"]["H2CN_prod"][end].^2)))
                         push!(ADMM["Residuals"]["Primal"]["H2CN_cap"], 0)
                     else
-                        push!(ADMM["Residuals"]["Primal"]["H2CN_prod"], sqrt(sum(ADMM["Imbalances"]["H2CN_prod"][end][jt].^2 for jt in JT)))
+                        push!(ADMM["Residuals"]["Primal"]["H2CN_prod"], sqrt(sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT)^2))
                         push!(ADMM["Residuals"]["Primal"]["H2CN_cap"], 0)
                     end
                 elseif ADMM["imbalance_mode"] == "CAPACITY" 
@@ -68,7 +68,7 @@ function ADMM!(results::Dict,ADMM::Dict,ETS::Dict,EOM::Dict,REC::Dict,H2::Dict,H
                         push!(ADMM["Residuals"]["Primal"]["H2CN_cap"], sqrt(sum(ADMM["Imbalances"]["H2CN_cap"][end].^2)))
                         push!(ADMM["Residuals"]["Primal"]["H2CN_prod"], 0)
                     else
-                        push!(ADMM["Residuals"]["Primal"]["H2CN_cap"], sqrt(sum(ADMM["Imbalances"]["H2CN_cap"][end][jt].^2 for jt in JT)))
+                        push!(ADMM["Residuals"]["Primal"]["H2CN_cap"], sqrt(sum(ADMM["Imbalances"]["H2CN_cap"][end][jt] for jt in JT)^2))
                         push!(ADMM["Residuals"]["Primal"]["H2CN_prod"], 0)
                     end
                 else

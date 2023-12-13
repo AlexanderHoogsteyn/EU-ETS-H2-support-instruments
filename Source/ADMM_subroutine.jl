@@ -2,6 +2,8 @@ function ADMM_subroutine!(m::String,data::Dict,results::Dict,ADMM::Dict,ETS::Dic
 TO_local = TimerOutput()
 # Calculate penalty terms ADMM and update price to most recent value 
 @timeit TO_local "Compute ADMM penalty terms" begin
+    JT = mod.ext[:sets][:JT]
+    JY = mod.ext[:sets][:JY]
     if mod.ext[:parameters][:ETS] == 1
         mod.ext[:parameters][:b_bar] = results["b"][m][end] + 1/(ETS["nAgents"]+1)*ADMM["Imbalances"]["ETS"][end]
         mod.ext[:parameters][:λ_EUA] = results["λ"]["EUA"][end] 
@@ -50,15 +52,22 @@ TO_local = TimerOutput()
         mod.ext[:parameters][:ρ_y_H2] = ADMM["ρ"]["H2_y"][end]
     end
     if mod.ext[:parameters][:supported] == 1
+        run_theoretical_min = mod.ext[:parameters][:run_theoretical_min]
+
         mod.ext[:parameters][:λ_H2CN_prod] = results["λ"]["H2CN_prod"][end] 
         mod.ext[:parameters][:λ_H2FP] = results["λ"]["H2FP"][end] 
         mod.ext[:parameters][:λ_H2CfD] = results["λ"]["H2CfD"][end] 
         mod.ext[:parameters][:λ_H2CN_cap] = results["λ"]["H2CN_cap"][end] 
         mod.ext[:parameters][:λ_H2CG] = results["λ"]["H2CG"][end] 
         mod.ext[:parameters][:λ_H2TD] = results["λ"]["H2TD"][end] 
-        mod.ext[:parameters][:gHCN_bar] = results["h2cn_prod"][m][end] - 1/(H2CN_prod["nAgents"]+1)*ADMM["Imbalances"]["H2CN_prod"][end]
+        if run_theoretical_min == "YES"
+            mod.ext[:parameters][:gHCN_bar] = results["h2cn_prod"][m][end] - 1/(H2CN_prod["nAgents"]+1)*ADMM["Imbalances"]["H2CN_prod"][end]
+            mod.ext[:parameters][:capHCN_bar] = results["h2_y"][m][end] - 1/(H2CN_cap["nAgents"]+1)*ADMM["Imbalances"]["H2CN_cap"][end]
+        else 
+            mod.ext[:parameters][:gHCN_bar] = results["h2cn_prod"][m][end] - 1/(H2CN_prod["nAgents"]+1)/10*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT) for jy in JY]
+            mod.ext[:parameters][:capHCN_bar] = results["h2_y"][m][end] - 1/(H2CN_cap["nAgents"]+1)*ADMM["Imbalances"]["H2CN_cap"][end] 
+        end
         mod.ext[:parameters][:ρ_H2CN_prod] = ADMM["ρ"]["H2CN_prod"][end]
-        mod.ext[:parameters][:capHCN_bar] = results["h2cn_cap"][m][end] - 1/(H2CN_cap["nAgents"]+1)*ADMM["Imbalances"]["H2CN_cap"][end]
         mod.ext[:parameters][:ρ_H2CN_cap] = ADMM["ρ"]["H2CN_cap"][end]
     end
     if mod.ext[:parameters][:NG] == 1 # NG is not yet responsive to changes in demand - could be done at later stage
