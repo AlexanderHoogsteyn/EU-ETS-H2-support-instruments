@@ -7,8 +7,9 @@ scenario:
   Additionality_pre_2030: "NA"
   H2_demand_2030: 20
   H2FP_tender_2030: "YES"
-  Comments: missing
+  Comments: "Fixed Premium with limit on 4000h operating hours"
   CNH2_cap_target_2030: 0
+  fix_generation: "NO"
   Additionality_post_2030: "NA"
   CNH2_cap_target_2024: 0
   H2CfD_tender_2030: "NO"
@@ -237,7 +238,7 @@ ADMM:
   rho_H2: 5
   rho_H2_d: 5
   rho_EUA: 100
-  max_iter: 5000
+  max_iter: 10000
   rho_REC_h_post2030: 0
   rho_REC_y_post2030: 0
   rho_REC_m_pre2030: 0
