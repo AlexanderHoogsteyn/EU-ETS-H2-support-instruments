@@ -27,7 +27,7 @@ scenario:
   run_theoretical_min: "NO"
   H2_cap_tax_reduct: "NO"
   gamma: 1
-  CNH2_demand_2030: 10
+  CNH2_demand_2030: 10.0
   H2_balance: "Daily"
   hot_start: "YES"
   CNH2_cap_target_2040: 0

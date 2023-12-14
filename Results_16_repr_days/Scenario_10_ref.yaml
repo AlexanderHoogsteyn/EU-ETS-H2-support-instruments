@@ -238,7 +238,7 @@ ADMM:
   rho_H2: 5
   rho_H2_d: 5
   rho_EUA: 100
-  max_iter: 5000
+  max_iter: 10000
   rho_REC_h_post2030: 0
   rho_REC_y_post2030: 0
   rho_REC_m_pre2030: 0
