@@ -59,14 +59,24 @@ TO_local = TimerOutput()
         mod.ext[:parameters][:λ_H2CfD] = results["λ"]["H2CfD"][end] 
         mod.ext[:parameters][:λ_H2CN_cap] = results["λ"]["H2CN_cap"][end] 
         mod.ext[:parameters][:λ_H2CG] = results["λ"]["H2CG"][end] 
-        mod.ext[:parameters][:λ_H2TD] = results["λ"]["H2TD"][end] 
+        mod.ext[:parameters][:λ_H2TD] = results["λ"]["H2TD"][end]
         if run_theoretical_min == "YES"
             mod.ext[:parameters][:gHCN_bar] = results["h2cn_prod"][m][end] - 1/(H2CN_prod["nAgents"]+1)*ADMM["Imbalances"]["H2CN_prod"][end]
             mod.ext[:parameters][:capHCN_bar] = results["h2_y"][m][end] - 1/(H2CN_cap["nAgents"]+1)*ADMM["Imbalances"]["H2CN_cap"][end]
         else 
-            mod.ext[:parameters][:gHCN_bar] = results["h2cn_prod"][m][end] - 1/(H2CN_prod["nAgents"]+1)/10*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT) for jy in JY]
-            mod.ext[:parameters][:capHCN_bar] = results["h2_y"][m][end] - 1/(H2CN_cap["nAgents"]+1)*ADMM["Imbalances"]["H2CN_cap"][end] 
+            if ADMM["imbalance_mode"] == "QUANTITY"
+                mod.ext[:parameters][:gHCN_bar] = results["h2_y"][m][end] - 1/(H2CN_prod["nAgents"]+1)*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT)/10 for jy in JY]
+                mod.ext[:parameters][:capHCN_bar] = results["h2_y"][m][end] - 1/(H2CN_prod["nAgents"]+1)*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT)/10*4 for jy in JY]
+            elseif ADMM["imbalance_mode"] == "CAPACITY"
+                mod.ext[:parameters][:gHCN_bar] = results["h2_y"][m][end] - 1/(H2CN_prod["nAgents"]+1)*ADMM["Imbalances"]["H2CN_cap"][end]/4
+                mod.ext[:parameters][:capHCN_bar] = results["h2_y"][m][end] - 1/(H2CN_cap["nAgents"]+1)*ADMM["Imbalances"]["H2CN_cap"][end]
+            else
+                mod.ext[:parameters][:gHCN_bar] = zeros(data["nyears"])
+                mod.ext[:parameters][:capHCN_bar] = zeros(data["nyears"])
+            end
         end
+        
+
         mod.ext[:parameters][:ρ_H2CN_prod] = ADMM["ρ"]["H2CN_prod"][end]
         mod.ext[:parameters][:ρ_H2CN_cap] = ADMM["ρ"]["H2CN_cap"][end]
     end
