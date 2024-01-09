@@ -1,7 +1,7 @@
 General: 
   nyears: 40
   nTimesteps: 24 # number of timesteps per representative day
-  nReprDays: 2 # days
+  nReprDays: 8 # days
   nMonths: 12 # number of months
   inflation: 0.02
   discount_rate: 0.1
@@ -131,7 +131,7 @@ HydrogenSector:
    efficiency_E_H2: 0 # efficiency conversion electricity to hydrogen 
    efficiency_NG_H2: 0.67 # efficiency conversion natural gas to hydrogen 
    emissions: 0.0205 # [ton CO2/MWh] = [Mton CO2/TWh]  - assumed capture rate of 90%
-   max_YoY_new_cap: 1000 # % of current capacity
+   max_YoY_new_cap: 100 # % of current capacity
    YoY_OC: 0 # % change in overnight investment cost YoY
    Legcap_out: 15 # years 
    REC: "NO" # eligible for RECs
@@ -144,7 +144,7 @@ HydrogenSector:
    NG: "YES" # participate in the natural gas market  
 
   Alkaline_peak: # unless stated otherwise, based on EUR-pypsa_data
-   OC: 750 # M€/GW
+   OC: 1500 # M€/GW
    fuelCosts: 0 # MEUR/MtH2 - will be linked to price of electricity
    Lifetime: 20 # Years 
    Leadtime: 1 # years 
@@ -153,7 +153,7 @@ HydrogenSector:
    efficiency_E_H2: 0.60 # efficiency conversion electricity to hydrogen 
    efficiency_NG_H2: 0 # efficiency conversion natural gas to hydrogen 
    emissions: 0.0 # [ton CO2/MWh] = [Mton CO2/TWh]
-   max_YoY_new_cap: 1000 # % of current capacity
+   max_YoY_new_cap: 100 # % of current capacity
    YoY_OC: -2.1 # % change in overnight investment cost YoY
    Legcap_out: 20 # years 
    REC: "YES" # eligible for RECs
@@ -166,7 +166,7 @@ HydrogenSector:
    NG: "NO" # participate in the natural gas market
 
   Alkaline_base: # unless stated otherwise, based on EUR-pypsa_data
-   OC: 1000 # M€/GW
+   OC: 2000 # M€/GW
    fuelCosts: 0 # MEUR/MtH2 - will be linked to price of electricity
    Lifetime: 20 # Y15ears 
    Leadtime: 1 # years 
@@ -175,7 +175,7 @@ HydrogenSector:
    Legcap_2021: 0.135 # GW - calculation based on https://publications.jrc.ec.europa.eu/repository/handle/JRC130683, https://www.swp-berlin.org/en/publication/electrolysers-for-the-hydrogen-revolution#:~:text=However%2C%20the%20EU%2Dwide%20electrolysis,still%20pending%20in%20most%20cases. 
    efficiency_NG_H2: 0 # efficiency conversion natural gas to hydrogen 
    emissions: 0.0 # [ton CO2/MWh] = [Mton CO2/TWh]
-   max_YoY_new_cap: 1000 # % of current capacity
+   max_YoY_new_cap: 100 # % of current capacity
    YoY_OC: -2.1 # % change in overnight investment cost YoY
    Legcap_out: 20 # years
    REC: "YES" # eligible for RECs
@@ -188,7 +188,7 @@ HydrogenSector:
    NG: "NO" # participate in the natural gas market
 
   Alkaline_peak_supported: # unless stated otherwise, based on EUR-pypsa_data
-   OC: 750 # M€/GW
+   OC: 1500 # M€/GW
    fuelCosts: 0 # MEUR/MtH2 - will be linked to price of electricity
    Lifetime: 20 # Years 
    Leadtime: 1 # years 
@@ -197,7 +197,7 @@ HydrogenSector:
    efficiency_E_H2: 0.60 # efficiency conversion electricity to hydrogen 
    efficiency_NG_H2: 0 # efficiency conversion natural gas to hydrogen 
    emissions: 0.0 # [ton CO2/MWh] = [Mton CO2/TWh]
-   max_YoY_new_cap: 1000 # % of current capacity
+   max_YoY_new_cap: 100 # % of current capacity
    YoY_OC: -2.1 # % change in overnight investment cost YoY
    Legcap_out: 20 # years 
    REC: "YES" # eligible for RECs
@@ -210,7 +210,7 @@ HydrogenSector:
    NG: "NO" # participate in the natural gas market
 
   Alkaline_base_supported: # unless stated otherwise, based on EUR-pypsa_data
-   OC: 1000 # M€/GW
+   OC: 2000 # M€/GW
    fuelCosts: 0 # MEUR/MtH2 - will be linked to price of electricity
    Lifetime: 20 # Y15ears 
    Leadtime: 1 # years 
@@ -219,7 +219,7 @@ HydrogenSector:
    efficiency_E_H2: 0.70 # efficiency conversion electricity to hydrogen 
    efficiency_NG_H2: 0 # efficiency conversion natural gas to hydrogen 
    emissions: 0.0 # [ton CO2/MWh] = [Mton CO2/TWh]
-   max_YoY_new_cap: 1000 # % of current capacity
+   max_YoY_new_cap: 100 # % of current capacity
    YoY_OC: -2.1 # % change in overnight investment cost YoY
    Legcap_out: 20 # years
    REC: "YES" # eligible for RECs
