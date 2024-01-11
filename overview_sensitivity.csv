@@ -1,16 +1,12 @@
 Parameter;Scaling;remarks
-NG SF;0.75;low-natural-gas-price
-NG SF;1.5;high-natural-gas-price
-HydrogenSector Alkaline_base-Alkaline_peak-Alkaline_base_supported-Alkaline_peak-supported OC;1.5;expensive-PtH
-HydrogenSector Alkaline_base-Alkaline_peak-Alkaline_base_supported-Alkaline_peak-supported OC;0.75;cheap-PtH
-PowerSector Solar-WindOnshore-WindOffshore YoY_OC;1.5;Expensive-RES
-PowerSector Solar-WindOnshore-WindOffshore YoY_OC;0.75;Cheap-RES
+NG SF;0.5;low-natural-gas-price
 HydrogenImport Import a_1;0.75;cheap-import
 HydrogenImport Import a_1;1.5;expensive-import
 HydrogenSector Alkaline_base-Alkaline_peak max_YoY_new_cap;0.75;high_electrolysis_buildout
 HydrogenSector Alkaline_base-Alkaline_peak max_YoY_new_cap;1.5;extreme_electrolysis_buildout
 HydrogenSector Alkaline_base-Alkaline_base_supported OC;1.5;expensive-base-PtH
-HydrogenSector Alkaline_peak-Alkaline_peak_supported OC;0.75;expensive-peak-PtH
+HydrogenSector Alkaline_peak-Alkaline_peak_supported OC;1.5;expensive-peak-PtH
+HydrogenSector Alkaline_base-Alkaline_peak-SMRCCS max_YoY_new_cap;20;no_buildout_limits
 EOM SF;0.5;low-demand-growth
 EOM SF;2;high-demand-growth
 scenario RES_target_2030;1.5;2030 res target 60
@@ -25,3 +21,8 @@ PowerSector Solar-WindOnshore-WindOffshore max_YoY_new_cap;0.5;Low RES buildout
 PowerSector Solar-WindOnshore-WindOffshore max_YoY_new_cap;2;High RES buildout
 HydrogenSector SMRCCS YoY_OC;0.5;cheap SMR+CCS
 HydrogenSector SMRCCS YoY_OC;2;expensive SMR+CCS
+HydrogenSector Alkaline_base-Alkaline_peak-Alkaline_base_supported-Alkaline_peak-supported OC;1.5;expensive-PtH
+HydrogenSector Alkaline_base-Alkaline_peak- Alkaline_base_supported-Alkaline_peak-supported OC;0.75;cheap-PtH
+NG SF;0.75;low-natural-gas-price
+PowerSector Solar-WindOnshore-WindOffshore YoY_OC;1.5;Expensive-RES
+PowerSector Solar-WindOnshore-WindOffshore YoY_OC;0.75;Cheap-RES
