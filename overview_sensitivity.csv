@@ -7,22 +7,22 @@ HydrogenSector Alkaline_base-Alkaline_peak max_YoY_new_cap;1.5;extreme_electroly
 HydrogenSector Alkaline_base-Alkaline_base_supported OC;1.5;expensive-base-PtH
 HydrogenSector Alkaline_peak-Alkaline_peak_supported OC;1.5;expensive-peak-PtH
 HydrogenSector Alkaline_base-Alkaline_peak-SMRCCS max_YoY_new_cap;20;no_buildout_limits
+PowerSector Solar-WindOnshore-WindOffshore max_YoY_new_cap;0.5;low-RES-buildout
+PowerSector Solar-WindOnshore-WindOffshore max_YoY_new_cap;2;high-RES-buildout
 EOM SF;0.5;low-demand-growth
 EOM SF;2;high-demand-growth
-scenario RES_target_2030;1.5;2030 res target 60
-PowerSector Solar-WindOnshore-WindOffshore YoY_OC;0.5;Expensive RES
-PowerSector Solar-WindOnshore-WindOffshore YoY_OC;2;Cheap RES
-EOM SF;0.5;low demand growth
-EOM SF;2;high demand growth
-General discount_rate;0.8;Low discount rate
-General discount_rate;1.2;High discount rate
-PowerSector Nuclear-Biomass max_YoY_new_cap;0;No new nuclear-biomass
-PowerSector Solar-WindOnshore-WindOffshore max_YoY_new_cap;0.5;Low RES buildout
-PowerSector Solar-WindOnshore-WindOffshore max_YoY_new_cap;2;High RES buildout
-HydrogenSector SMRCCS YoY_OC;0.5;cheap SMR+CCS
-HydrogenSector SMRCCS YoY_OC;2;expensive SMR+CCS
+scenario RES_target_2030;1.5;2030-res-target-60
+PowerSector Solar-WindOnshore-WindOffshore YoY_OC;0.5;expensive-RES
+PowerSector Solar-WindOnshore-WindOffshore YoY_OC;2;cheap-RES
+EOM SF;0.5;low-demand-growth
+EOM SF;2;high-demand-growth
+General discount_rate;0.8;low-discount-rate
+General discount_rate;1.2;high-discount-rate
+PowerSector Nuclear-Biomass max_YoY_new_cap;0;no-new-nuclear-biomass
+HydrogenSector SMRCCS YoY_OC;0.5;cheap-SMR+CCS
+HydrogenSector SMRCCS YoY_OC;2;expensive-SMR+CCS
 HydrogenSector Alkaline_base-Alkaline_peak-Alkaline_base_supported-Alkaline_peak-supported OC;1.5;expensive-PtH
 HydrogenSector Alkaline_base-Alkaline_peak- Alkaline_base_supported-Alkaline_peak-supported OC;0.75;cheap-PtH
 NG SF;0.75;low-natural-gas-price
-PowerSector Solar-WindOnshore-WindOffshore YoY_OC;1.5;Expensive-RES
-PowerSector Solar-WindOnshore-WindOffshore YoY_OC;0.75;Cheap-RES
+PowerSector Solar-WindOnshore-WindOffshore YoY_OC;1.5;expensive-RES
+PowerSector Solar-WindOnshore-WindOffshore YoY_OC;0.75;cheap-RES
