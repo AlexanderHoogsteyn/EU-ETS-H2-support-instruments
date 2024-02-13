@@ -100,7 +100,7 @@ Running the code will generate X output files:
     -   Beta: Employed beta-value in this scenario
     -	EUA_2021: Emission allowance price in 2021 (€/tCO2)
     -   CumulativeEmissions: Cumulative emissions 2020-end horizon (MtCO2)
-2. "Scenario_X.csv" (X = scenario number, in the folder "Results"), a csv-file per simulation with more detailed results, per year (first column)
+2. "Scenario_X_ETS_Y.csv" in "Results_Z_repr_days" (X = scenario number, Y= sensitivity, Z = number of representative days ), a csv-file per simulation with more detailed results on the Emission trading scheme
     -   CAP: annual cap on emissions (MtCO2)
     -   Supply: annual supply of emission allowances after corrections MSR (MtCO2)
     -   Cancellation: annual volume of invalidated or cancelled allowances (MtCO2)
@@ -109,6 +109,32 @@ Running the code will generate X output files:
     -   Emissions: annual emissions (MtCO2)
     -   EUAprice: price of emission allowances (€/tCO2)
     -   EUAs: annually procured emission allowances (MtCO2)
+3. "Scenario_X_PS_Y.csv" in "Results_Z_repr_days" (X = scenario number, Y= sensitivity, Z = number of representative days ), a csv-file per simulation with more detailed results on the power system
+    -   Year: Represents the calendar year for which the data corresponds.
+    -   EOM_avg: Refers to the average electricity-only market (EOM) price in euros per megawatt-hour (EUR/MWh).
+    -   REC_y: Indicates the renewable energy certificate (REC) price in euros per megawatt-hour (EUR/MWh) for the given year.
+    -   ADD_CAP_CCGT_new: Represents the additional capacity investment (in gigawatts, GW) for Combined Cycle Gas Turbine (CCGT) power plants.
+    -   ADD_CAP_WindOffshore: Signifies the additional capacity investment (in GW) for offshore wind power plants.
+    -   ADD_CAP_SPP_coal: Denotes the additional capacity investment (in GW) for coal-fired Single Point Producer (SPP) plants.
+    -   ADD_CAP_WindOnshore: Represents the additional capacity investment (in GW) for onshore wind power plants.
+    -   ADD_CAP_Nuclear: Indicates the additional capacity investment (in GW) for nuclear power plants.
+    -   ADD_CAP_Solar: Refers to the additional capacity investment (in GW) for solar power plants.
+    -   ADD_CAP_OCGT: Represents the additional capacity investment (in GW) for Open Cycle Gas Turbine (OCGT) power plants.
+    -   CAP_CCGT_new: Denotes the total installed capacity (in GW) for Combined Cycle Gas Turbine (CCGT) power plants.
+    -   CAP_WindOffshore: Represents the total installed capacity (in GW) for offshore wind power plants.
+    -   CAP_SPP_coal: Signifies the total installed capacity (in GW) for coal-fired Single Point Producer (SPP) plants.
+    -   CAP_WindOnshore: Indicates the total installed capacity (in GW) for onshore wind power plants.
+    -   CAP_Nuclear: Refers to the total installed capacity (in GW) for nuclear power plants.
+    -   CAP_Solar: Denotes the total installed capacity (in GW) for solar power plants.
+    -   CAP_OCGT: Represents the total installed capacity (in GW) for Open Cycle Gas Turbine (OCGT) power plants.
+    -   FS_CCGT_new: Represents the fuel share (production) in terawatt-hours (TWh) for Combined Cycle Gas Turbine (CCGT) power plants.
+    -   FS_WindOffshore: Signifies the fuel share (production) in TWh for offshore wind power plants.
+    -   FS_SPP_coal: Denotes the fuel share (production) in TWh for coal-fired Single Point Producer (SPP) plants.
+    -   FS_WindOnshore: Indicates the fuel share (production) in TWh for onshore wind power plants.
+    -   FS_Nuclear: Refers to the fuel share (production) in TWh for nuclear power plants.
+    -   FS_Solar: Represents the fuel share (production) in TWh for solar power plants.
+    -   FS_OCGT: Signifies the fuel share (production) in TWh for Open Cycle Gas Turbine (OCGT) power plants.
+5. "Scenario_X_H2_Y.csv" in "Results_Z_repr_days" (X = scenario number, Y= sensitivity, Z = number of representative days ), a csv-file per simulation with more detailed results on the hydrogen sector
 
 ### Demos & reproducing the results (to be updated)
 ## Some simulation
