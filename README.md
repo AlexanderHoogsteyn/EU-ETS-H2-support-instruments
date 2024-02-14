@@ -45,13 +45,28 @@ No specific hardware is required. Depending on the configuration (number of agen
 There are three places where the user can change the input.
 
 2. The specifications of each scenario can be found in the file "overview_scenarios.csv"
-    - scen_number (Integer): the number of the scenario
-    - LRF_2021 (Float): the Linear Reduction Factor applied in the period 2021-2030 (default: 0.022)
-    - LRF_2031 (Float): the Linear Reduction Factor applied as of 2021 (default: 0.022)
-    - COVID (0/1): consider the negative demand shock induced by COVID-19 yes (1) or no (0)
-    - MSR (2018/2021): the MSR design considered (2018: current design, based on 2018 directive or 2021: as proposed in the Fit for 55 Package)
-    - gamma (Float): exponent in the functional form of the abatement cost curve
-    - ref_scen (Integer): reference scenario. If this is the same as the scenario number (scen_number), the beta-parameter in the marginal abatement cost curve will be calibrated to reproduce emission allowance prices in 2019. If it differs from the scenario number in the  same row, the beta-value from the reference scenario will be retrieved and used in the marginal abatement cost curve. Note that the user must ensure that the results of the reference scenario are available.
+    - scen_number: Represents the scenario number or identifier.
+    - MSR: "YES" or "NO", Choose to consider the MSR 2021-2023 based on 2018 rules, 2024 - end based on 2023 rules or not conider the MSR at all.
+    - RES_target_2030: Set the renewable energy source (RES) target for 2030, e.g. 0.45 for 45%.
+    - H2_demand_2030: Total hydrogen demand for 2030 (Mt).
+    - H2_demand_2050: Total hydrogen demand for 2050 (Mt).
+    - CNH2_demand_2030: Auctioned hydrogen volume in 2030.
+    - gamma: Order of the marginal abatement curve (1=linear cost curve, 2=linear MAC, 3=quadratic MAC)
+    - max_em_change: Maximum allowable change in emissions per iteration (used to improve numeric stability)
+    - Additionality_pre_2030: "NA", "Daily", "Monthly", "Yearly". Can be used to imposse of RFNBO additionality rules before 2030.
+    - Additionality_post_2030: "NA", "Daily", "Monthly", "Yearly". Can be used to imposse  of RFNBO additionality rules after 2030.
+    - H2_balance: "Daily", "Monthly", "Yearly". Choose how the balance of hydrogen supply and demand is imposed.
+    - import: "YES", "NO". Choose to consider import of carbon-neutral hydrogen.
+    - H2FP_tender_2030: "YES", "NO". Select FP policy mechanism 
+    - H2CfD_tender_2030: "YES", "NO". Select hydrogen Contracts for Difference (H2CfD) policy mechanism
+    - H2_cap_grant: "YES", "NO".  Select capacity grant policy mechanism.
+    - H2_cap_tax_reduct: "YES", "NO". Select investment subsidy policy mechanism.
+    - fix_generation: "YES", "NO". Impose that hydrogen generation needs to be kept fixed during the years under the contract.
+    - max_support_duration: e.g. 8760. Set a maximum yearly duration of government support.
+    - ref_scen_number: Reference scenario number applicable to this scenario.
+    - Sens_analysis: "YES", "NO". Turn sensetivity analysis on for this scenario
+    - hot_start: Use a hot start; initialize the prices in the model based of a previous model run.
+    - Comments: Additional comments or notes related to the scenario.
 3. The file "overview_data.yaml" contains a number of input parameters that are common to all scenarios. Examples include the number of years the analysis considers, the historical emissions and prices that will be used to calibrate the marginal abatement cost curve and the parameters of the market stability reserve for each of the two designs. Note that the impact of COVID (240 MtCO2, linearly decreasing between 2020-2025) can only be switched on/off (see above).
 
 ### Running the code (to be updated)
@@ -186,7 +201,7 @@ Running the code will generate X output files:
     -   FS_Nuclear: Refers to the fuel share (production) in TWh for nuclear power plants.
     -   FS_Solar: Represents the fuel share (production) in TWh for solar power plants.
     -   FS_OCGT: Signifies the fuel share (production) in TWh for Open Cycle Gas Turbine (OCGT) power plants.
-5. "Scenario_X_H2_Y.csv" in "Results_Z_repr_days" (X = scenario number, Y= sensitivity, Z = number of representative days ), a csv-file per simulation with more detailed results on the hydrogen sector
+4. "Scenario_X_H2_Y.csv" in "Results_Z_repr_days" (X = scenario number, Y= sensitivity, Z = number of representative days ), a csv-file per simulation with more detailed results on the hydrogen sector
     -   CAP_SMR: Total installed capacity (GW) for Steam Methane Reforming (SMR) hydrogen production.
     -   CAP_SMRCCS: Total installed capacity (in GW) for SMR with Carbon Capture and Storage (CCS) hydrogen production.
     -   CAP_Alkaline_base: Total installed capacity (in GW) for alkaline electrolysis-based hydrogen production (base load).
@@ -212,6 +227,24 @@ Running the code will generate X output files:
     -   CAP_Alkaline_base_supported: Total installed capacity (in GW) for alkaline electrolysis-based hydrogen production (base load) with government support.
     -   PROD_Alkaline_peak_supported: Annual hydrogen production (in Mt) from alkaline electrolysis (peak load) with government support.
     -   PROD_Alkaline_base_supported: Annual hydrogen production (in Mt) from alkaline electrolysis (base load) with government support.
+5. "Scenario_X_operation_Y.csv" in "Results_Z_repr_days" (X = scenario number, Y= sensitivity, Z = number of representative days ), a csv-file per simulation with more detailed results within one specific modelled year. The year from which operational data is extracted can be set using "operationalYear" in "overview_data.yaml"
+    -   Hour: Represents the specific hour of the day. All considered representative days are placed in consection.
+    -   EOM_price: Refers to the electricity-only market (EOM) price for that particular hour (EUR/MWh).
+    -   H2_price: Indicates the price of hydrogen for that hour (in euros per kilogram, €/kg).
+    -   PROD_SMR: Annual hydrogen production (in mega tons, Mt) from Steam Methane Reforming for that specific hour.
+    -   PROD_SMRCCS: Annual hydrogen production (in Mt) from SMR with Carbon Capture and Storage (CCS) for that specific hour.
+    -   PROD_Alkaline_base: Annual hydrogen production (in Mt) from alkaline electrolysis (base load) for that specific hour.
+    -   PROD_Alkaline_peak_supported: Annual hydrogen production (in Mt) from alkaline electrolysis (peak load) with government support for that specific hour.
+    -   PROD_Alkaline_base_supported: Annual hydrogen production (in Mt) from alkaline electrolysis (base load) with government support for that specific hour.
+    -   PROD_Alkaline_peak: Annual hydrogen production (in Mt) from alkaline electrolysis (peak load) for that specific hour.
+    -   PROD_Import: Annual import of hydrogen (in Mt) for that specific hour.
+    -   PROD_CCGT_new: Hydrogen production (in Mt) from Combined Cycle Gas Turbine (CCGT) power plants for that specific hour.
+    -   PROD_WindOffshore: Hydrogen production (in Mt) from offshore wind power plants for that specific hour.
+    -   PROD_SPP_coal: Hydrogen production (in Mt) from coal-fired Single Point Producer (SPP) plants for that specific hour.
+    -   PROD_WindOnshore: Hydrogen production (in Mt) from onshore wind power plants for that specific hour.
+    -   PROD_Nuclear: Hydrogen production (in Mt) from nuclear power plants for that specific hour.
+    -   PROD_Solar: Hydrogen production (in Mt) from solar power plants for that specific hour.
+    -   PROD_OCGT: Hydrogen production (in Mt) from Open Cycle Gas Turbine (OCGT) power plants for that specific hour.
 
 ### Demos & reproducing the results (to be updated)
 ## Some simulation
