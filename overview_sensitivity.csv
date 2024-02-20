@@ -1,14 +1,13 @@
 Parameter;Scaling;remarks
 NG SF;0.5;low-natural-gas-price
-HydrogenImport Import a_1;0.75;cheap-import
 HydrogenImport Import a_1;1.5;expensive-import
 HydrogenSector Alkaline_base-Alkaline_peak max_YoY_new_cap;0.75;high-electrolysis-buildout
 HydrogenSector Alkaline_base-Alkaline_peak max_YoY_new_cap;1.5;extreme-electrolysis-buildout
 HydrogenSector Alkaline_base-Alkaline_base_supported OC;1.5;expensive-base-PtH
 HydrogenSector Alkaline_peak-Alkaline_peak_supported OC;1.5;expensive-peak-PtH
 HydrogenSector Alkaline_base-Alkaline_peak-SMRCCS max_YoY_new_cap;20;no-buildout-limits
-PowerSector Solar-WindOnshore-WindOffshore max_YoY_new_cap;0.5;low-RES-buildout
-PowerSector Solar-WindOnshore-WindOffshore max_YoY_new_cap;2;high-RES-buildout
+PowerSector Solar-WindOnshore-WindOffshore max_YoY_new_cap;0.2;low-RES-buildout
+PowerSector Solar-WindOnshore-WindOffshore max_YoY_new_cap;0.1;extreme-low-RES-buildout
 EOM SF;0.5;low-demand-growth
 EOM SF;2;high-demand-growth
 scenario RES_target_2030;1.5;2030-res-target-60
