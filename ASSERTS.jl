@@ -13,26 +13,21 @@ using JLD2
 include(joinpath(home_dir,"Source","KKT_tests.jl"))
 
 # Set number of representive days to test
-repr_days = 2
+repr_days = 16
 
+start_scen = 2
+stop_scen = 9
 
-#Test Scenario 1
-filename = "Scenario_1_low-natural-gas-price.jld2"
-yaml_filename  = "Scenario_1_low-natural-gas-price.yaml"
-YAML_data, results = test_KKT_conditions(joinpath(home_dir,"Results_"*string(repr_days)*"_repr_days",filename),
-                                    joinpath(home_dir,"Results_"*string(repr_days)*"_repr_days",yaml_filename)                                    
-);
+scen = 6
 
-#Test Scenario 2
-filename = "Scenario_2_low-natural-gas-price.jld2"
-yaml_filename  = "Scenario_2_low-natural-gas-price.yaml"
-YAML_data, results = test_KKT_conditions(joinpath(home_dir,"Results_"*string(repr_days)*"_repr_days",filename),
-                                    joinpath(home_dir,"Results_"*string(repr_days)*"_repr_days",yaml_filename)                                    
-);
+#for scen in start_scen:stop_scen
+    filename = "Scenario_"*string(scen)*"_low-natural-gas-price.jld2"
+    yaml_filename  = "Scenario_"*string(scen)*"_low-natural-gas-price.yaml"
+    YAML_data, unload = test_KKT_conditions(joinpath(home_dir,"Results_"*string(repr_days)*"_repr_days",filename),
+                                        joinpath(home_dir,"Results_"*string(repr_days)*"_repr_days",yaml_filename)                                    
+    );
+    ADMM = unload["ADMM"]
+    results = unload["results"]
 
-#Test Scenario 3
-filename = "Scenario_3_low-natural-gas-price.jld2"
-yaml_filename  = "Scenario_3_low-natural-gas-price.yaml"
-YAML_data, results = test_KKT_conditions(joinpath(home_dir,"Results_"*string(repr_days)*"_repr_days",filename),
-                                    joinpath(home_dir,"Results_"*string(repr_days)*"_repr_days",yaml_filename)                                    
-);
+    println(filename, " passed all asserts")
+#end
