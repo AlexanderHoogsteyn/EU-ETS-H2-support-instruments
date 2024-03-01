@@ -1,6 +1,6 @@
 ## Topic: EU ETS, MSR and overlapping policies
 # Author: Kenneth Bruninx
-# Last update: November 2022
+# Last update: Februari 2024
 
 ## 0. Set-up code
 # HPC or not?
@@ -164,10 +164,10 @@ if HPC == "DelftBlue" || HPC == "ThinKing"
    stop_sens = dict_sim_number["stop_sens"]
 else
     # Range of scenarios to be simulated
-    start_scen = 2
-    stop_scen = 2
-    start_sens = 1
-    stop_sens = 1
+    start_scen = 1
+    stop_scen = 5
+    start_sens = 2
+    stop_sens = 2
 end
 
 #scen_number = 404
