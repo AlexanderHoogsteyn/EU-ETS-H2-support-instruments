@@ -14,7 +14,7 @@ General:
 
 ADMM:
  rho_EUA: 100 # rho ADMM penalty term, EUA market
- rho_EOM: 10 # rho ADMM penalty term, EOM   
+ rho_EOM: 1 # rho ADMM penalty term, EOM   
  rho_REC: 1 # rho ADMM penalty term, REC electricity
  rho_H2: 5  # rho ADMM penalty term, H2
  rho_H2CN_prod: 100 # rho ADMM penalty term, carbon-neutral H2 production incentive (€/tH2)
