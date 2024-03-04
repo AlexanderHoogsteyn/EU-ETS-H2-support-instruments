@@ -235,7 +235,7 @@ function solve_h2s_agent!(mod::Model)
         elseif H2CfD_tender  == "YES"
             H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -sum(A[jt]*gHCN[jt]*(λ_H2CfD[jt] - λ_y_H2[jt]) for jt in  JT) + sum(ρ_H2CN_prod/2*(gH_y[jt] - gHCN_bar[jt])^2 for jt in JT))
         elseif H2_cap_tax_reduct == "YES"
-            H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -A[tender_year]*capH[tender_year]*IC[tender_year]*λ_H2TD[tender_year] + sum(ρ_H2CN_prod/2*(gH_y[jt] - gHCN_bar[jt])^2 for jt in JT) + ρ_H2CN_prod/2000*(capH[tender_year] - capHCN_bar[tender_year])^2)
+            H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -A[tender_year]*capH[tender_year]*IC[tender_year]*λ_H2TD[tender_year] + sum(ρ_H2CN_prod*(gH_y[jt] - gHCN_bar[jt])^2 for jt in JT) + ρ_H2CN_prod/20*(capH[tender_year] - capHCN_bar[tender_year])^2)
         elseif H2_cap_grant == "YES"
             H2CN_obj = mod.ext[:expressions][:H2CN_obj] = @expression(mod, -capH[tender_year]*λ_H2CG[tender_year] + sum(ρ_H2CN_prod/2*(gH_y[jt] - gHCN_bar[jt])^2 for jt in JT) + ρ_H2CN_prod/2000*(capH[tender_year] - capHCN_bar[tender_year])^2)
         else 
