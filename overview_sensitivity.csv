@@ -2,7 +2,6 @@ Parameter;Scaling;remarks
 NG SF;0.5;low-natural-gas-price
 HydrogenImport Import a_1;1.5;expensive-import
 HydrogenSector Alkaline_base-Alkaline_peak max_YoY_new_cap;0.75;high-electrolysis-buildout
-HydrogenSector Alkaline_base-Alkaline_peak max_YoY_new_cap;1.5;extreme-electrolysis-buildout
 HydrogenSector Alkaline_base-Alkaline_base_supported OC;1.5;expensive-base-PtH
 HydrogenSector Alkaline_peak-Alkaline_peak_supported OC;1.5;expensive-peak-PtH
 HydrogenSector Alkaline_base-Alkaline_peak-SMRCCS max_YoY_new_cap;20;no-buildout-limits

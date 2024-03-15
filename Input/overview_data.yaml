@@ -6,7 +6,7 @@ General:
   inflation: 0.02
   discount_rate: 0.1
   social_discount_rate: 0.03
-  operationalYear: 2031
+  operationalYear: 2035
   tender_year: 2030
   tender_lead_time: 1
   contract_duration: 10

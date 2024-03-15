@@ -2,16 +2,16 @@
 
 #SBATCH --cluster="wice"
 #SBATCH --nodes="1"
-#SBATCH --job-name="sensetivities_all_scen_1"
+#SBATCH --job-name="sensetivities_all_scen_6"
 #SBATCH --mail-user="alexander.hoogsteyn@kuleuven.be"
 #SBATCH --mail-type=FAIL,END,BEGIN
-#SBATCH --time="5:59:00"
+#SBATCH --time="23:59:00"
 #SBATCH --ntasks="1"
 #SBATCH --cpus-per-task=16
 #SBATCH --account="lp_elect_gen_modeling"
 #SBATCH --partition="batch"
 #SBATCH --error="%x_%A.e"
-#SBATCH --array=1-11
+#SBATCH --array=1-8
 
 
 cd $VSC_DATA/EU-ETS-H2-support-instruments

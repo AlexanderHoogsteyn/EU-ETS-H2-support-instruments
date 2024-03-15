@@ -69,7 +69,7 @@ TO_local = TimerOutput()
                 mod.ext[:parameters][:capHCN_bar] = results["h2_cap"][m][end] - 1/(H2CN_prod["nAgents"]+1)*[sum(ADMM["Imbalances"]["H2CN_prod"][end][jt] for jt in JT)/10*4 for jy in JY]
             elseif ADMM["imbalance_mode"] == "CAPACITY"
                 mod.ext[:parameters][:gHCN_bar] = results["h2_y"][m][end] - 1/(H2CN_prod["nAgents"]+1)*ADMM["Imbalances"]["H2CN_cap"][end]/4
-                mod.ext[:parameters][:capHCN_bar] = results["h2_y"][m][end] - 1/(H2CN_cap["nAgents"]+1)*ADMM["Imbalances"]["H2CN_cap"][end]
+                mod.ext[:parameters][:capHCN_bar] = results["h2_cap"][m][end] - 1/(H2CN_cap["nAgents"]+1)*ADMM["Imbalances"]["H2CN_cap"][end]
             else
                 mod.ext[:parameters][:gHCN_bar] = zeros(data["General"]["nyears"])
                 mod.ext[:parameters][:capHCN_bar] = zeros(data["General"]["nyears"])
