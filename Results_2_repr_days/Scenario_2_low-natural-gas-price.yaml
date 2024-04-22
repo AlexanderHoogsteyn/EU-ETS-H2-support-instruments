@@ -29,7 +29,7 @@ scenario:
   gamma: 1
   CNH2_demand_2030: 0
   H2_balance: "Daily"
-  hot_start: "YES"
+  hot_start: "NO"
   CNH2_cap_target_2040: 0
   max_em_change: 100
   sens_number: 2
@@ -45,7 +45,7 @@ General:
   social_discount_rate: 0.03
   tender_lead_time: 1
   contract_duration: 10
-  nyears: 40
+  nyears: 80
 HydrogenImport:
   Import:
     REC: "NO"
@@ -238,7 +238,7 @@ ADMM:
   rho_H2: 5
   rho_H2_d: 5
   rho_EUA: 100
-  max_iter: 5000
+  max_iter: 10000
   rho_REC_h_post2030: 0
   rho_REC_y_post2030: 0
   rho_REC_m_pre2030: 0
@@ -248,7 +248,7 @@ ADMM:
   rho_H2CfD: 1
   rho_H2TD: 1
   rho_H2CN_cap: 100
-  rho_EOM: 10
+  rho_EOM: 1
   epsilon: 0.1
   rho_H2CN_prod: 100
   rho_REC_d_post2030: 0

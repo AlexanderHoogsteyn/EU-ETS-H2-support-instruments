@@ -27,16 +27,16 @@ scenario:
   run_theoretical_min: "NO"
   H2_cap_tax_reduct: "NO"
   gamma: 1
-  CNH2_demand_2030: 15.0
+  CNH2_demand_2030: 15
   H2_balance: "Daily"
-  hot_start: "YES"
+  hot_start: "NO"
   CNH2_cap_target_2040: 0
   max_em_change: 100
-  sens_number: 6
+  sens_number: 5
 General:
   inflation: 0.02
   nReprDays: 16
-  operationalYear: 2031
+  operationalYear: 2035
   conv_factor: 33
   nTimesteps: 24
   discount_rate: 0.1
@@ -248,7 +248,7 @@ ADMM:
   rho_H2CfD: 1
   rho_H2TD: 1
   rho_H2CN_cap: 100
-  rho_EOM: 10
+  rho_EOM: 1
   epsilon: 0.1
   rho_H2CN_prod: 100
   rho_REC_d_post2030: 0
@@ -356,7 +356,7 @@ HydrogenSector:
     REC: "YES"
     fuelCosts: 0
     Support: "NO"
-    OC: 1250.0
+    OC: 1500.0
     EOM: "YES"
     AF: 1
     Leadtime: 1
@@ -398,7 +398,7 @@ HydrogenSector:
     REC: "YES"
     fuelCosts: 0
     Support: "YES"
-    OC: 1250.0
+    OC: 1500.0
     EOM: "YES"
     AF: 1
     Leadtime: 1

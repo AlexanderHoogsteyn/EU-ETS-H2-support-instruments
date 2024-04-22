@@ -29,14 +29,14 @@ scenario:
   gamma: 1
   CNH2_demand_2030: 15
   H2_balance: "Daily"
-  hot_start: "YES"
+  hot_start: "NO"
   CNH2_cap_target_2040: 0
   max_em_change: 100
   sens_number: 8
 General:
   inflation: 0.02
   nReprDays: 16
-  operationalYear: 2031
+  operationalYear: 2035
   conv_factor: 33
   nTimesteps: 24
   discount_rate: 0.1
@@ -104,7 +104,7 @@ PowerSector:
     NG: "NO"
     Legcap_out: 18
     emissions: 0
-    max_YoY_new_cap: 10.0
+    max_YoY_new_cap: 20.0
     efficiency: 0
     AF_ts: "WIND_OFFSHORE"
     H2: "NO"
@@ -152,7 +152,7 @@ PowerSector:
     NG: "NO"
     Legcap_out: 15
     emissions: 0
-    max_YoY_new_cap: 10.0
+    max_YoY_new_cap: 20.0
     efficiency: 0
     AF_ts: "WIND_ONSHORE"
     H2: "NO"
@@ -200,7 +200,7 @@ PowerSector:
     NG: "NO"
     Legcap_out: 15
     emissions: 0
-    max_YoY_new_cap: 10.0
+    max_YoY_new_cap: 20.0
     efficiency: 0
     AF_ts: "SOLAR"
     H2: "NO"
@@ -356,7 +356,7 @@ HydrogenSector:
     REC: "YES"
     fuelCosts: 0
     Support: "NO"
-    OC: 2000
+    OC: 1000
     EOM: "YES"
     AF: 1
     Leadtime: 1
@@ -377,7 +377,7 @@ HydrogenSector:
     REC: "YES"
     fuelCosts: 0
     Support: "YES"
-    OC: 1500
+    OC: 750
     EOM: "YES"
     AF: 1
     Leadtime: 1
@@ -398,7 +398,7 @@ HydrogenSector:
     REC: "YES"
     fuelCosts: 0
     Support: "YES"
-    OC: 2000
+    OC: 1000
     EOM: "YES"
     AF: 1
     Leadtime: 1
@@ -419,7 +419,7 @@ HydrogenSector:
     REC: "YES"
     fuelCosts: 0
     Support: "NO"
-    OC: 1500
+    OC: 750
     EOM: "YES"
     AF: 1
     Leadtime: 1

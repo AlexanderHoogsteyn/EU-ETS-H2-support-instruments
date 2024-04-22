@@ -9,6 +9,7 @@ scenario:
   H2FP_tender_2030: "NO"
   Comments: "Used to calibrate MACC"
   CNH2_cap_target_2030: 0
+  fix_generation: "NO"
   Additionality_post_2030: "NA"
   CNH2_cap_target_2024: 0
   H2CfD_tender_2030: "NO"
@@ -26,16 +27,16 @@ scenario:
   run_theoretical_min: "NO"
   H2_cap_tax_reduct: "NO"
   gamma: 1
-  CNH2_demand_2030: 0
+  CNH2_demand_2030: 0.0
   H2_balance: "Daily"
-  hot_start: "NO"
+  hot_start: "YES"
   CNH2_cap_target_2040: 0
   max_em_change: 100
   sens_number: 1
 General:
   inflation: 0.02
   nReprDays: 16
-  operationalYear: 2030
+  operationalYear: 2031
   conv_factor: 33
   nTimesteps: 24
   discount_rate: 0.1
@@ -237,7 +238,7 @@ ADMM:
   rho_H2: 5
   rho_H2_d: 5
   rho_EUA: 100
-  max_iter: 5000
+  max_iter: 10000
   rho_REC_h_post2030: 0
   rho_REC_y_post2030: 0
   rho_REC_m_pre2030: 0
@@ -246,10 +247,10 @@ ADMM:
   rho_H2CG: 1
   rho_H2CfD: 1
   rho_H2TD: 1
-  rho_H2CN_cap: 1
+  rho_H2CN_cap: 100
   rho_EOM: 10
   epsilon: 0.1
-  rho_H2CN_prod: 1
+  rho_H2CN_prod: 100
   rho_REC_d_post2030: 0
   rho_H2_m: 0
   rho_support: 1
@@ -348,7 +349,7 @@ HydrogenSector:
     NG: "YES"
     Legcap_out: 15
     emissions: 0.0205
-    max_YoY_new_cap: 1000
+    max_YoY_new_cap: 100
     H2: "YES"
   Alkaline_base:
     efficiency_NG_H2: 0
@@ -369,7 +370,7 @@ HydrogenSector:
     NG: "NO"
     Legcap_out: 20
     emissions: 0.0
-    max_YoY_new_cap: 1000
+    max_YoY_new_cap: 100
     H2: "YES"
   Alkaline_peak_supported:
     efficiency_NG_H2: 0
@@ -390,7 +391,7 @@ HydrogenSector:
     NG: "NO"
     Legcap_out: 20
     emissions: 0.0
-    max_YoY_new_cap: 1000
+    max_YoY_new_cap: 100
     H2: "YES"
   Alkaline_base_supported:
     efficiency_NG_H2: 0
@@ -407,11 +408,11 @@ HydrogenSector:
     efficiency_E_H2: 0.7
     H2CN_prod: "YES"
     ETS: "NO"
-    Legcap_2021: 0.135
+    Legcap_2021: 0
     NG: "NO"
     Legcap_out: 20
     emissions: 0.0
-    max_YoY_new_cap: 1000
+    max_YoY_new_cap: 100
     H2: "YES"
   Alkaline_peak:
     efficiency_NG_H2: 0
@@ -432,9 +433,9 @@ HydrogenSector:
     NG: "NO"
     Legcap_out: 20
     emissions: 0.0
-    max_YoY_new_cap: 1000
+    max_YoY_new_cap: 100
     H2: "YES"
 H2:
   Import_Q_calibration: 10
   demand: 10
-  tolerance_calibration: 0.05
+  tolerance_calibration: 0.1
